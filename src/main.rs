@@ -38,9 +38,9 @@ fn main() {
 
     // let test_window: Vec<Vec<(Box2D <i32> , modtile::RGB) = vec:new();
 
-    // let input_window: Vec<Vec<(Box2D< Point2D<i32, i32>,  Point2D<i32, i32>>, modtile::RGB)>> = create_test_data();
+    let input_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = create_test_data();
 
-    // let _ = &svg_it(&input_window);
+    let _ = &svg_it(&input_window);
 
     // let mut match_colour :modtile::RGB = RGB(0,0,0);
 
@@ -117,10 +117,10 @@ fn get_tile_lines(box_points: &[Point2D<i32>]) -> Vec<Line> {
 /// let p_end: Point2D<i32> = Point2D::new(10,10);
 /// let box2d = Box2D { min: p_start, max: p_end,};
 /// // convert Box2d to a vector Point2D one for each corner points
-/// let corner_coords:Vec<Point2D<i32,i32>> = box2d_to_points(box2d);
+/// let corner_coords:Vec<Point2D<i32>> = box2d_to_points(box2d);
 /// println!("Box2D corner coordinates {:?}", corner_coords);
 ///
-/// let eq_ans: Vec<Point2D<i32,i32>> = vec [Point2D::new(0,0),Point2D::new(0,10), Point2D::new(10,0), Point2D::new(10,10),  ]
+/// let eq_ans: Vec<Point2D<i32>> = vec [Point2D::new(0,0),Point2D::new(0,10), Point2D::new(10,0), Point2D::new(10,10),  ]
 /// assert_eq!(corner_coords, eq_ans);
 ///
 /// ```
@@ -305,8 +305,10 @@ pub fn create_test_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
     result_window
 }
 
+
+/// . This function will create the SVG File 
 fn svg_it(input_window: &Vec<Vec<(Box2D<i32>, modtile::RGB)>>) {
-    println!("\n YO ********* \n\n {:?} \n ********* \n\n", input_window)
+    println!("\n YO svg_it*********\n{:?}\n ********* \n\n", input_window)
 }
 
 /// Returns the first element of a 2D vector of tuples containing a Box2D and an RGB value.
