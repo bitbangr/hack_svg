@@ -17,4 +17,5 @@ serde_json = "*"
 itertools = "*"
 regex = "*"
 ndarray = "*"
+svg = "*"
 

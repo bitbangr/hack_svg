@@ -5,6 +5,30 @@ use euclid::default::Point2D;
 use modtile::RGB;
 use ndarray::{Array, Array2};
 
+use svg::node::element::path::Data;
+use svg::node::element::Path;
+use svg::node::element::Polygon;
+use svg::node::element::Polyline;
+use svg::node::element::Rectangle;
+use svg::Document;
+use std::fmt::Write;
+
+
+const BOARD_SIZE: i32 = 8;
+const RECT_SIZE: i32 = 50;
+const WIDTH: i32 = 100;
+const HEIGHT: i32 = 100;
+const CELL_SIZE: i32 = 100;
+const COLOR_BLK: &str = "black";
+const COLOR_WHT: &str = "white";
+
+const NORTH:usize = 0;
+const EAST: usize = 1;
+const SOUTH: usize = 2;
+const WEST: usize = 3;
+
+
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Line {
     start: Point2D<i32>,
@@ -147,21 +171,100 @@ fn main() {
     
 }
 
+///
+/// Smush everthing together
+/// we take line_bool bucket
+/// pane ndarray
+/// check the booleans and draw and svg line in the cardinal direction 
+/// create one path for all
+/// and write out to document
+
 fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
                         pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>) 
 {
     println!("draw_svg_grid");
 
     for (row, rows) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
-        for (col, cardinal_dirs) in rows.iter().enumerate() {
-            println!("Row: {}, Col: {}, Cardinal Direction Bool: {:?}", row, col, cardinal_dirs);
+        for (col, card_dir) in rows.iter().enumerate() {
+            println!("Row: {}, Col: {}, Cardinal Direction Bool: {:?}", row, col, card_dir);
 
-            println!("Tile info {:?}\n", pane_nd_arr[[row,col]]);
-            
+            println!("Tile info {:?}", pane_nd_arr[[row,col]]);  
+            print!("Draw ->");
+            if !card_dir[NORTH] {
+                print!(" NORTH ");
+                
+            }
+            if !card_dir[EAST] {
+                print!(" EAST ");
+            }
+            if !card_dir[SOUTH] {
+                print!(" SOUTH ");
+            }
+            if !card_dir[WEST] {
+                print!(" WEST ");
+            }
+            println!("edges\n");
         }
     }
-         
+    
+    create_non_overlapping_squares();
 }
+
+
+///
+///  Issues.  Two overlappping polygons
+/// 
+fn create_non_overlapping_squares() -> Result<(), std::io::Error> {
+
+    let mut square_data = Data::new()
+    .move_to((0,0))
+    .line_to((100,0))
+    .line_to((100,100))
+    .line_to((0,100))
+    .line_to((0,0))
+    .close()
+    .move_to((25,25))
+    .line_to((75,25))
+    .line_to((75,75))
+    .line_to((25,75))
+    .line_to((25,25))
+    .close();
+
+    let path = Path::new()
+    .set("fill", "green")
+    .set("stroke", "black")
+    .set("stroke-width", 1)
+    .set("d", square_data)
+    .set("fill-rule", "evenodd");
+
+    let mut inner_square_data = Data::new()
+    .move_to((25,25))
+    .line_to((75,25))
+    .line_to((75,75))
+    .line_to((25,75))
+    .line_to((25,25))
+    .close();
+
+    let inner_sqr_path = Path::new()
+    .set("fill", "blue")
+    .set("stroke", "black")
+    .set("stroke-width", 1)
+    .set("d", inner_square_data)
+    .set("fill-rule", "evenodd");
+
+
+    // // Create the svg document
+    let document = Document::new()
+        .set("viewBox", (0, 0, WIDTH, HEIGHT))
+        .add(path)
+        .add(inner_sqr_path);
+
+    // Write the svg document to a file
+    svg::save("hack_svg_square_da_bug.svg", &document)
+
+
+}
+
 
 /// Use the boolean file to draw SVG lines for each 
 /// of the tiles based on the boolean values of the cardinal directions
@@ -181,19 +284,16 @@ fn simple_draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<b
 
     for (row, rows) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
         for (col, cardinal_dirs) in rows.iter().enumerate() {
-            println!("Row: {}, Col: {}, Cardinal Direction Bool: {:?}", row, col, cardinal_dirs);
-
-            
+            println!("Row: {}, Col: {}, Cardinal Direction Bool: {:?}", row, col, cardinal_dirs);            
         }
     }
          
-
 }
 
 
 /// Create an Array2 nd array of booleans
 /// 
-/// Each tile has a north, east, south and west direction
+/// Each tile has a north, east, SOUTH and west direction
 /// If a tile matches the colour of its neighbour then corresponding direction boolean is set to true
 /// if it does not or if it is an edge then direction boolean is set to false
 /// Lines are drawn for all false edges. No lines are drawn for true edges
@@ -210,60 +310,55 @@ fn get_test_bool_bucket() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, n
     let tiles_per_pane_width: usize = 3;
     let tiles_per_pane_height: usize = 3;
 
-    let north:usize = 0;
-    let east: usize = 1;
-    let south: usize = 2;
-    let west: usize = 3;
-
     // let mut initf = vec![vec![false ; 4] ; row_dim * col_dim] ;
     // let bucket = Array::from_shape_vec((3,3), initf.to_vec()).unwrap();
     let mut bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_bool_arr(tiles_per_pane_height, tiles_per_pane_width);
     // println!("bucket = {:?}" , &bucket);
 
-    bucket[[0,0]][north] = false;
-    bucket[[0,0]][east] = true;
-    bucket[[0,0]][south] = false;
-    bucket[[0,0]][west] = false;
+    bucket[[0,0]][NORTH] = false;
+    bucket[[0,0]][EAST] = true;
+    bucket[[0,0]][SOUTH] = false;
+    bucket[[0,0]][WEST] = false;
 
-    bucket[[0,1]][north] = false;
-    bucket[[0,1]][east] = false;
-    bucket[[0,1]][south] = true;
-    bucket[[0,1]][west] = true;
+    bucket[[0,1]][NORTH] = false;
+    bucket[[0,1]][EAST] = false;
+    bucket[[0,1]][SOUTH] = true;
+    bucket[[0,1]][WEST] = true;
 
-    bucket[[0,2]][north] = false;
-    bucket[[0,2]][east] = false;
-    bucket[[0,2]][south] = false;
-    bucket[[0,2]][west] = false;
+    bucket[[0,2]][NORTH] = false;
+    bucket[[0,2]][EAST] = false;
+    bucket[[0,2]][SOUTH] = false;
+    bucket[[0,2]][WEST] = false;
 
-    bucket[[1,0]][north] = false;
-    bucket[[1,0]][east] = false;
-    bucket[[1,0]][south] = false;
-    bucket[[1,0]][west] = false;
+    bucket[[1,0]][NORTH] = false;
+    bucket[[1,0]][EAST] = false;
+    bucket[[1,0]][SOUTH] = false;
+    bucket[[1,0]][WEST] = false;
 
-    bucket[[1,1]][north] = true;
-    bucket[[1,1]][east] = true;
-    bucket[[1,1]][south] = false;
-    bucket[[1,1]][west] = false;
+    bucket[[1,1]][NORTH] = true;
+    bucket[[1,1]][EAST] = true;
+    bucket[[1,1]][SOUTH] = false;
+    bucket[[1,1]][WEST] = false;
 
-    bucket[[1,2]][north] = false;
-    bucket[[1,2]][east] = false;
-    bucket[[1,2]][south] = false;
-    bucket[[1,2]][west] = true;
+    bucket[[1,2]][NORTH] = false;
+    bucket[[1,2]][EAST] = false;
+    bucket[[1,2]][SOUTH] = false;
+    bucket[[1,2]][WEST] = true;
 // 
-    bucket[[2,0]][north] = false;
-    bucket[[2,0]][east] = false;
-    bucket[[2,0]][south] = false;
-    bucket[[2,0]][west] = false;
+    bucket[[2,0]][NORTH] = false;
+    bucket[[2,0]][EAST] = false;
+    bucket[[2,0]][SOUTH] = false;
+    bucket[[2,0]][WEST] = false;
 
-    bucket[[2,1]][north] = false;
-    bucket[[2,1]][east] = true;
-    bucket[[2,1]][south] = false;
-    bucket[[2,1]][west] = false;
+    bucket[[2,1]][NORTH] = false;
+    bucket[[2,1]][EAST] = true;
+    bucket[[2,1]][SOUTH] = false;
+    bucket[[2,1]][WEST] = false;
 
-    bucket[[2,2]][north] = false;
-    bucket[[2,2]][east] = false;
-    bucket[[2,2]][south] = false;
-    bucket[[2,2]][west] = true;
+    bucket[[2,2]][NORTH] = false;
+    bucket[[2,2]][EAST] = false;
+    bucket[[2,2]][SOUTH] = false;
+    bucket[[2,2]][WEST] = true;
 
     // println!("bucket[0,0][0] = {:?}" , bucket[[0,0]][0]);
     // println!("bucket = {:?}" , &bucket);
