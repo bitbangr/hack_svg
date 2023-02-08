@@ -199,6 +199,10 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
 
             println!("Tile info {:?}", &cur_tile);  
             print!("Draw ->");
+
+            // only do white tiles
+            if cur_tile.1.0 == 255 {
+                            
             if !card_dir[NORTH] {
                 print!(" NORTH ");
 
@@ -220,7 +224,7 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
                 let x1 = tile_box.max.x as usize;
                 let y1 = tile_box.max.y as usize;
             
-                east_line_data = east_line_data.move_to((x0,y0)).line_to((x0,y1));           
+                east_line_data = east_line_data.move_to((x1,y0)).line_to((x1,y1));           
 
             }
             if !card_dir[SOUTH] {
@@ -244,26 +248,15 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
                 let x1 = tile_box.max.x as usize;
                 let y1 = tile_box.max.y as usize;
             
-                west_line_data = west_line_data.move_to((x1,y0)).line_to((x1,y1));           
+                west_line_data = west_line_data.move_to((x0,y0)).line_to((x0,y1));           
              
             }
             println!("edges\n");
+
+        } // white tiles 
         }
     }
-    
-    // let mut line_data = Data::new()
-    // .move_to((0,0))
-    // .line_to((100,0))
-    // .line_to((100,100))
-    // .line_to((0,100))
-    // .line_to((0,0))
-    // .close()
-    // .move_to((25,25))
-    // .line_to((75,25))
-    // .line_to((75,75))
-    // .line_to((25,75))
-    // .line_to((25,25))
-    // .close();
+
 
     let north_path = Path::new()
     .set("fill", "green")
