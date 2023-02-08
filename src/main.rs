@@ -135,24 +135,44 @@ fn main() {
     println!("Pane NDArray [2][1] {:?} ", &pane_nd_arr[[2,1]]);
     println!("Pane NDArray [2][2] {:?} ", &pane_nd_arr[[2,2]]);
 
+    // get the test boolean array to build our svg path with
+    let mut bucket = get_test_bool_bucket();
+
+    println!("bucket[0,0][0] = {:?}" , bucket[[0,0]][0]);
+    println!("bucket = {:?}" , &bucket);
+
+   
+}
+
+
+/// Create an Array2 nd array of booleans
+/// 
+/// Each tile has a north, east, south and west direction
+/// If a tile matches the colour of its neighbour then corresponding direction boolean is set to true
+/// if it does not or if it is an edge then direction boolean is set to false
+/// Lines are drawn for all false edges. No lines are drawn for true edges
+/// 
+/// set the booleans to match the colour below
+/// all edges are automatically false.
+/// 3x3 pane of 9 tiles with the following colours 
+/// white, white, black
+/// green, white, white
+/// white, green, green
+fn get_test_bool_bucket() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> 
+{
+
+    let tiles_per_pane_width: usize = 3;
+    let tiles_per_pane_height: usize = 3;
+
     let north:usize = 0;
     let east: usize = 1;
     let south: usize = 2;
     let west: usize = 3;
 
     // let mut initf = vec![vec![false ; 4] ; row_dim * col_dim] ;
-    // let mut initf = vec![vec![false ; 4] ; 3 * 3] ;
     // let bucket = Array::from_shape_vec((3,3), initf.to_vec()).unwrap();
-    let mut bucket = get_bool_arr(tiles_per_pane_height, tiles_per_pane_width);
-    println!("bucket = {:?}" , &bucket);
-
-
-    // set the booleans to match the colour below
-    // all edges are automatically false.
-    // 3x3 pane of 9 tiles with the following colours 
-    // white, white, black
-    // green, white, white
-    // white, green, green
+    let mut bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_bool_arr(tiles_per_pane_height, tiles_per_pane_width);
+    // println!("bucket = {:?}" , &bucket);
 
     bucket[[0,0]][north] = false;
     bucket[[0,0]][east] = true;
@@ -199,10 +219,14 @@ fn main() {
     bucket[[2,2]][south] = false;
     bucket[[2,2]][west] = true;
 
-    println!("bucket[0,0][0] = {:?}" , bucket[[0,0]][0]);
-    println!("bucket = {:?}" , &bucket);
+    // println!("bucket[0,0][0] = {:?}" , bucket[[0,0]][0]);
+    // println!("bucket = {:?}" , &bucket);
+
+    bucket
 
 }
+
+
 
 // fn get_edges_bool(vec: &Vec<(Box2D<i32>, modtile::RGB)>, row_dim:usize, col_dim:usize) -> Array2<(Box2D<i32>, modtile::RGB)> {
 // {
