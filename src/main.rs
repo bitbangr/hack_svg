@@ -141,34 +141,51 @@ fn main() {
     println!("bucket[0,0][0] = {:?}" , line_bucket[[0,0]][0]);
     println!("bucket = {:?}" , &line_bucket);
 
-    draw_svg_grid (line_bucket);
+    // simple_draw_svg_grid (&line_bucket);
+
+    draw_svg_grid (line_bucket, pane_nd_arr);
     
+}
+
+fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
+                        pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>) 
+{
+    println!("draw_svg_grid");
+
+    for (row, rows) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
+        for (col, cardinal_dirs) in rows.iter().enumerate() {
+            println!("Row: {}, Col: {}, Cardinal Direction Bool: {:?}", row, col, cardinal_dirs);
+
+            println!("Tile info {:?}\n", pane_nd_arr[[row,col]]);
+            
+        }
+    }
+         
 }
 
 /// Use the boolean file to draw SVG lines for each 
 /// of the tiles based on the boolean values of the cardinal directions
-fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>) {
+fn simple_draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>) {
     // let shape = &line_bucket.shape();
     // let rows = &line_bucket.shape()[0];
     // let cols = &line_bucket.shape()[1];
     println!("draw_svg_grid");
     // println!("rows {} , cols {} ", rows, cols);
 
-    for (i, row) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
-        for (j, col) in row.iter().enumerate() {
-            println!("Row: {}, Col: {}, Value: {:?}", i, j, col);
+    // for (i, row) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
+    //     for (j, col) in row.iter().enumerate() {
+    //         println!("Row: {}, Col: {}, Value: {:?}", i, j, col);
 
-                
+    //     }
+    // }
 
+    for (row, rows) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
+        for (col, cardinal_dirs) in rows.iter().enumerate() {
+            println!("Row: {}, Col: {}, Cardinal Direction Bool: {:?}", row, col, cardinal_dirs);
+
+            
         }
     }
-
-    // for row 0..rows {
-    //     for col 0..cols
-    //     {
-    //         printlin!("row[{}] col[{}], Boolean {}", row, col, line_bucket[[row,col]]);
-    //     }
-    // } 
          
 
 }
