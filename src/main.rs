@@ -184,15 +184,27 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
 {
     println!("draw_svg_grid");
 
+    // all the lines to be held here
+    let mut line_data = Data::new();
+
+    line_data = line_data.move_to((0,0));
+  
     for (row, rows) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
         for (col, card_dir) in rows.iter().enumerate() {
             println!("Row: {}, Col: {}, Cardinal Direction Bool: {:?}", row, col, card_dir);
 
-            println!("Tile info {:?}", pane_nd_arr[[row,col]]);  
+            let cur_tile = pane_nd_arr[[row,col]];
+
+            
+
+            println!("Tile info {:?}", &cur_tile);  
             print!("Draw ->");
             if !card_dir[NORTH] {
                 print!(" NORTH ");
-                
+
+                add_north_line(&line_data , cur_tile);
+                // add_north_line(&line_data,&curr_tile);
+
             }
             if !card_dir[EAST] {
                 print!(" EAST ");
@@ -207,8 +219,62 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
         }
     }
     
-    create_non_overlapping_squares();
+    // let mut line_data = Data::new()
+    // .move_to((0,0))
+    // .line_to((100,0))
+    // .line_to((100,100))
+    // .line_to((0,100))
+    // .line_to((0,0))
+    // .close()
+    // .move_to((25,25))
+    // .line_to((75,25))
+    // .line_to((75,75))
+    // .line_to((25,75))
+    // .line_to((25,25))
+    // .close();
+
+    let path = Path::new()
+    .set("fill", "green")
+    .set("stroke", "black")
+    .set("stroke-width", 3)
+    .set("d", line_data)
+    .set("fill-rule", "evenodd");
+
+// Create the svg document
+    let document = Document::new()
+        .set("viewBox", (0, 0, WIDTH, HEIGHT))
+        .add(path);
+
+    // Write the svg document to a file
+    svg::save("hack_svg_test.svg", &document);
+   
+
+
 }
+
+/* TODO Wed Feb 8ty 2023
+    MGJ Need to figure out how to add move_to co_ords to line data to be 
+    passed back to calling function so that we can write out the svg lines to a file
+
+*/
+
+fn add_north_line(mut line_data: &Data, cur_tile: (Box2D<i32>, RGB))
+ {
+    println!("add_north_line cur_tile -> {:?}" , cur_tile );
+    let tile_box = cur_tile.0;
+    println! ("tile box min (top right) -> {:?}", tile_box.min);
+    println! ("tile box max (bot left) -> {:?}", tile_box.max);
+    let x0 = tile_box.min.x as usize;
+    let y0 = tile_box.min.y as usize;
+    let x1 = tile_box.max.x as usize;
+    let y1 = tile_box.max.y as usize;
+
+    line_data = &line_data.move_to((x0,y0)).line_to((x1,y0));
+
+    // .line_to((100,0))
+}
+
+
 
 
 ///
