@@ -136,12 +136,41 @@ fn main() {
     println!("Pane NDArray [2][2] {:?} ", &pane_nd_arr[[2,2]]);
 
     // get the test boolean array to build our svg path with
-    let mut bucket = get_test_bool_bucket();
+    let mut line_bucket = get_test_bool_bucket();
 
-    println!("bucket[0,0][0] = {:?}" , bucket[[0,0]][0]);
-    println!("bucket = {:?}" , &bucket);
+    println!("bucket[0,0][0] = {:?}" , line_bucket[[0,0]][0]);
+    println!("bucket = {:?}" , &line_bucket);
 
-   
+    draw_svg_grid (line_bucket);
+    
+}
+
+/// Use the boolean file to draw SVG lines for each 
+/// of the tiles based on the boolean values of the cardinal directions
+fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>) {
+    // let shape = &line_bucket.shape();
+    // let rows = &line_bucket.shape()[0];
+    // let cols = &line_bucket.shape()[1];
+    println!("draw_svg_grid");
+    // println!("rows {} , cols {} ", rows, cols);
+
+    for (i, row) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
+        for (j, col) in row.iter().enumerate() {
+            println!("Row: {}, Col: {}, Value: {:?}", i, j, col);
+
+                
+
+        }
+    }
+
+    // for row 0..rows {
+    //     for col 0..cols
+    //     {
+    //         printlin!("row[{}] col[{}], Boolean {}", row, col, line_bucket[[row,col]]);
+    //     }
+    // } 
+         
+
 }
 
 
@@ -227,12 +256,6 @@ fn get_test_bool_bucket() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, n
 }
 
 
-
-// fn get_edges_bool(vec: &Vec<(Box2D<i32>, modtile::RGB)>, row_dim:usize, col_dim:usize) -> Array2<(Box2D<i32>, modtile::RGB)> {
-// {
-
-// }
-
 ///
 /// Initialize an Array2D size row_dim by col_dim of a vector of [false,false,false,false]
 /// each boolean represents the [North, East, South, West] edges of a tile.  If the tile
@@ -245,13 +268,10 @@ fn get_bool_arr(row_dim:usize, col_dim:usize) -> Array2<Vec<bool>> {
     bool_bucket
 }
 
-
 fn vec_to_ndarray(vec: &Vec<i32>) -> Array2<i32> {
     let data = vec.as_slice();
     Array::from_shape_vec((3, 3), data.to_vec()).unwrap()
 }
-
-
 
 /// .
 ///
@@ -264,7 +284,6 @@ fn pane_vec_to_ndarray(vec: &Vec<(Box2D<i32>, modtile::RGB)>, row_dim:usize, col
     // Array::from_shape_vec((arr_dim, arr_dim), data.to_vec()).unwrap()
        Array::from_shape_vec((row_dim, col_dim), data.to_vec()).unwrap()
 }
-
 
 
 /// Takes a vector of ordered box points and returns vector of lines joining each of the
