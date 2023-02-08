@@ -3,6 +3,7 @@ mod modtile;
 use euclid::default::Box2D;
 use euclid::default::Point2D;
 use modtile::RGB;
+use ndarray::{Array, Array2};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Line {
@@ -20,7 +21,7 @@ impl Line {
 /// rectangular tiles.
 /// First tile is top left corner and ordered first by rows and then by columns
 fn main() {
-    println!("Hello, world!");
+    println!("Hack SVG");
 
     let p_start: Point2D<i32> = Point2D::new(0, 0);
     let p_end: Point2D<i32> = Point2D::new(10, 10);
@@ -82,7 +83,165 @@ fn main() {
     // create lines for each pair of points in
     let tile_lines: Vec<Line> = get_tile_lines(&box_points);
     println!("Lines are {:?} " , tile_lines);
+
+    let input_3x3_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> =  create_3x3_single_pane_data();
+
+    let _ = &svg_it(&input_3x3_window);
+
+    let ele = get_first_element(&input_3x3_window);
+
+    println!("******** \n input_3x3_window");
+    println!("First element {:?}", ele);
+
+    // The input window is just one long vector. implicetly ordered by row col but not.
+    // indexing for "row" "col" is done mathmatically.   
+    // i.e. cannot use tile_n = pane[row][col] 
+    //            could do tile_n = pane[row*col] 
+    println!("Second element {:?}", &input_3x3_window[0][1]);
+    println!("Last element {:?}", &input_3x3_window[0][8]);
+    println!("input_3x3_window \n ******** ");
+
+    // test to create a 2 dim NDArray from a vector
+    // Can use this to turn ordered vector of Tiles into row col array that will 
+    // be useful for checking for contiguous tiles.
+    // let vec = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
+    // let arr = vec_to_ndarray(&vec);
+    // println!("Vec {:?}", &vec);
+    // println!("NDArray {}", &arr);
+    // println!("NDArray [1][1] {}", arr[[1,1]]);
+
+    let tiles_per_pane_width: usize = 3;
+    let tiles_per_pane_height: usize = 3;
+
+    println!("tiles per pane width {}" , tiles_per_pane_width);
+    println!("tiles per pane height {}" , tiles_per_pane_height);
+
+    let mut pane_3x3_vec: Vec<Vec<(Box2D<i32>, modtile::RGB)>> =  create_3x3_single_pane_data();
+
+    // let elm = pane_3x3_vec[0].remove(8);
+    // println!("removed element {:?}", elm);
+
+    println!("pane_3x3_vec len = {}", &pane_3x3_vec[0].len());
+
+    let pane_nd_arr = pane_vec_to_ndarray(&pane_3x3_vec[0], tiles_per_pane_height, tiles_per_pane_width );
+    println!("Pane NDArray {:?} ", &pane_nd_arr);
+    println!("Pane NDArray [0][0] {:?} ", &pane_nd_arr[[0,0]]);
+    println!("Pane NDArray [0][1] {:?} ", &pane_nd_arr[[0,1]]);
+    println!("Pane NDArray [0][2] {:?} ", &pane_nd_arr[[0,2]]);
+    println!("Pane NDArray [1][0] {:?} ", &pane_nd_arr[[1,0]]);
+    println!("Pane NDArray [1][1] {:?} ", &pane_nd_arr[[1,1]]);
+    println!("Pane NDArray [1][2] {:?} ", &pane_nd_arr[[1,2]]);
+    println!("Pane NDArray [2][0] {:?} ", &pane_nd_arr[[2,0]]);
+    println!("Pane NDArray [2][1] {:?} ", &pane_nd_arr[[2,1]]);
+    println!("Pane NDArray [2][2] {:?} ", &pane_nd_arr[[2,2]]);
+
+    let north:usize = 0;
+    let east: usize = 1;
+    let south: usize = 2;
+    let west: usize = 3;
+
+    // let mut initf = vec![vec![false ; 4] ; row_dim * col_dim] ;
+    // let mut initf = vec![vec![false ; 4] ; 3 * 3] ;
+    // let bucket = Array::from_shape_vec((3,3), initf.to_vec()).unwrap();
+    let mut bucket = get_bool_arr(tiles_per_pane_height, tiles_per_pane_width);
+    println!("bucket = {:?}" , &bucket);
+
+
+    // set the booleans to match the colour below
+    // all edges are automatically false.
+    // 3x3 pane of 9 tiles with the following colours 
+    // white, white, black
+    // green, white, white
+    // white, green, green
+
+    bucket[[0,0]][north] = false;
+    bucket[[0,0]][east] = true;
+    bucket[[0,0]][south] = false;
+    bucket[[0,0]][west] = false;
+
+    bucket[[0,1]][north] = false;
+    bucket[[0,1]][east] = false;
+    bucket[[0,1]][south] = true;
+    bucket[[0,1]][west] = true;
+
+    bucket[[0,2]][north] = false;
+    bucket[[0,2]][east] = false;
+    bucket[[0,2]][south] = false;
+    bucket[[0,2]][west] = false;
+
+    bucket[[1,0]][north] = false;
+    bucket[[1,0]][east] = false;
+    bucket[[1,0]][south] = false;
+    bucket[[1,0]][west] = false;
+
+    bucket[[1,1]][north] = true;
+    bucket[[1,1]][east] = true;
+    bucket[[1,1]][south] = false;
+    bucket[[1,1]][west] = false;
+
+    bucket[[1,2]][north] = false;
+    bucket[[1,2]][east] = false;
+    bucket[[1,2]][south] = false;
+    bucket[[1,2]][west] = true;
+// 
+    bucket[[2,0]][north] = false;
+    bucket[[2,0]][east] = false;
+    bucket[[2,0]][south] = false;
+    bucket[[2,0]][west] = false;
+
+    bucket[[2,1]][north] = false;
+    bucket[[2,1]][east] = true;
+    bucket[[2,1]][south] = false;
+    bucket[[2,1]][west] = false;
+
+    bucket[[2,2]][north] = false;
+    bucket[[2,2]][east] = false;
+    bucket[[2,2]][south] = false;
+    bucket[[2,2]][west] = true;
+
+    println!("bucket[0,0][0] = {:?}" , bucket[[0,0]][0]);
+    println!("bucket = {:?}" , &bucket);
+
 }
+
+// fn get_edges_bool(vec: &Vec<(Box2D<i32>, modtile::RGB)>, row_dim:usize, col_dim:usize) -> Array2<(Box2D<i32>, modtile::RGB)> {
+// {
+
+// }
+
+///
+/// Initialize an Array2D size row_dim by col_dim of a vector of [false,false,false,false]
+/// each boolean represents the [North, East, South, West] edges of a tile.  If the tile
+/// matches the colour of an adjacent tile then the corresponding boolean is set to true.
+/// otherwise the value is false.
+/// This value will be used to construct the lines around contiguous colours
+fn get_bool_arr(row_dim:usize, col_dim:usize) -> Array2<Vec<bool>> {
+    let mut init_bool= vec![vec![false ; 4] ; row_dim * col_dim] ;
+    let bool_bucket = Array::from_shape_vec((row_dim,col_dim), init_bool.to_vec()).unwrap();    
+    bool_bucket
+}
+
+
+fn vec_to_ndarray(vec: &Vec<i32>) -> Array2<i32> {
+    let data = vec.as_slice();
+    Array::from_shape_vec((3, 3), data.to_vec()).unwrap()
+}
+
+
+
+/// .
+///
+/// # Panics
+///
+/// Panics if .
+fn pane_vec_to_ndarray(vec: &Vec<(Box2D<i32>, modtile::RGB)>, row_dim:usize, col_dim:usize) -> Array2<(Box2D<i32>, modtile::RGB)> {
+    let data = vec.as_slice();
+    // Array::from_shape_vec((3, 3), data.to_vec()).unwrap()
+    // Array::from_shape_vec((arr_dim, arr_dim), data.to_vec()).unwrap()
+       Array::from_shape_vec((row_dim, col_dim), data.to_vec()).unwrap()
+}
+
+
 
 /// Takes a vector of ordered box points and returns vector of lines joining each of the
 /// points in the vector. 
@@ -184,6 +343,78 @@ fn create_data(
     let rgb: modtile::RGB = modtile::RGB(rgb_val.0, rgb_val.1, rgb_val.2);
 
     (tile_box, rgb)
+}
+
+
+
+/// Create a 3x3 single pane of three colors white, black, green tiles for testing path
+/// creation.  To be used to generate SVG output doc
+/// hard code box width height for now as 10 
+pub fn create_3x3_single_pane_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+    let tile_width:i32 = 10;
+    let tile_height:i32 = 10;
+
+    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+
+    // ****************************
+    // Start the first pane
+    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+    // [
+    //     [(Box2D((0, 0), (24, 24)), RGB(45, 54, 147)),
+    //      (Box2D((25, 0), (49, 24)), RGB(45, 54, 147)),
+    //      (Box2D((0, 25), (24, 49)), RGB(245, 232, 18)),
+    //      (Box2D((25, 25), (49, 49)), RGB(109, 97, 91))],
+
+    println!("Function create_3x3_single_pane_data");
+    let mut x1:i32 = 0;
+    for row in 0..3 {
+        let mut y1:i32 = 0;
+        for col in 0..3 {            
+            println!("(row,col) -> ({},{})", row,col);
+            // let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((0, 0), (24, 24), (45, 54, 147));
+            x1 = col * tile_width;
+            y1 = row * tile_height;
+            let x2 = x1 + tile_width;
+            let y2 = y1 + tile_height;
+
+            println!("(x1,y1) -> ({},{})", x1,y1);
+            println!("(x2,y2) -> ({},{})\n", x2,y2);
+            
+            let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data(
+                            (x1, y1), 
+                            (x2, y2), 
+                            (255, 255, 255));
+            let _ = &pane_grid.push((tile_box, rgb));
+           
+        }
+
+    }
+
+    let rgb_white: modtile::RGB = modtile::RGB(255, 255, 255); // white
+    let rgb_black: modtile::RGB = modtile::RGB(0, 0, 0); // black
+    let rgb_green: modtile::RGB = modtile::RGB(0, 255, 0); // green
+
+    // set the colours
+    // 3x3 pane of 9 tiles with the following colours 
+    // white, white, black
+    // green, white, white
+    // white, green, green
+
+    pane_grid[0].1 = rgb_white;
+    pane_grid[1].1 = rgb_white;
+    pane_grid[2].1 = rgb_black;
+    pane_grid[3].1 = rgb_green;
+    pane_grid[4].1 = rgb_white;
+    pane_grid[5].1 = rgb_white;
+    pane_grid[6].1 = rgb_white;
+    pane_grid[7].1 = rgb_green;
+    pane_grid[8].1 = rgb_green;
+
+    // save the pane to the result window
+    let _ = &result_window.push(pane_grid);
+
+    result_window
+
 }
 
 pub fn create_test_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {

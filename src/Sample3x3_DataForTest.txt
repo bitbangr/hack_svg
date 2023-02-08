@@ -1,0 +1,24 @@
+// Feb 6th 2023
+// use this file as our test for creating an svg path
+
+3x3 pane of 9 tiles with the following colours 
+
+white, white, black
+green, white, white
+white, green, green
+
+each tile is 10x10 units
+
+[[
+    (Box2D((0, 0), (10, 10)),  RGB(255, 255, 255)), // white
+    (Box2D((10, 0), (20, 10)), RGB(255, 255, 255)), // white
+    (Box2D((20, 0), (30, 10)), RGB(0, 0, 0)), // black
+    
+    (Box2D((0, 10), (10, 20)), RGB(0, 255, 0)), // green
+    (Box2D((10, 10), (20, 20)), RGB(255, 255, 255)), // white
+    (Box2D((20, 10), (30, 20)), RGB(255, 255, 255)), // white
+    
+    (Box2D((0, 20), (10, 30)), RGB(255, 255, 255)), // white
+    (Box2D((10, 20), (20, 30)), RGB(0, 255, 0)), // green
+    (Box2D((20, 20), (30, 30)), RGB(0, 255, 0)), // green
+]]

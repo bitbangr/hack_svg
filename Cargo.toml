@@ -16,4 +16,5 @@ serde = { version = "1.0.104", features = ["derive"] }
 serde_json = "*"
 itertools = "*"
 regex = "*"
+ndarray = "*"
 
