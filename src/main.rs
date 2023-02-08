@@ -185,9 +185,11 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
     println!("draw_svg_grid");
 
     // all the lines to be held here
-    let mut line_data = Data::new();
+    let mut north_line_data = Data::new();
+    let mut east_line_data = Data::new();
+    let mut south_line_data = Data::new();
+    let mut west_line_data = Data::new();
 
-    line_data = line_data.move_to((0,0));
   
     for (row, rows) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
         for (col, card_dir) in rows.iter().enumerate() {
@@ -195,25 +197,55 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
 
             let cur_tile = pane_nd_arr[[row,col]];
 
-            
-
             println!("Tile info {:?}", &cur_tile);  
             print!("Draw ->");
             if !card_dir[NORTH] {
                 print!(" NORTH ");
 
-                add_north_line(&line_data , cur_tile);
-                // add_north_line(&line_data,&curr_tile);
+                let tile_box = &cur_tile.0;
+                let x0 = tile_box.min.x as usize;
+                let y0 = tile_box.min.y as usize;
+                let x1 = tile_box.max.x as usize;
+                let y1 = tile_box.max.y as usize;
+            
+                north_line_data = north_line_data.move_to((x0,y0)).line_to((x1,y0));           
 
             }
             if !card_dir[EAST] {
                 print!(" EAST ");
+
+                let tile_box = &cur_tile.0;
+                let x0 = tile_box.min.x as usize;
+                let y0 = tile_box.min.y as usize;
+                let x1 = tile_box.max.x as usize;
+                let y1 = tile_box.max.y as usize;
+            
+                east_line_data = east_line_data.move_to((x0,y0)).line_to((x0,y1));           
+
             }
             if !card_dir[SOUTH] {
                 print!(" SOUTH ");
+
+                let tile_box = &cur_tile.0;
+                let x0 = tile_box.min.x as usize;
+                let y0 = tile_box.min.y as usize;
+                let x1 = tile_box.max.x as usize;
+                let y1 = tile_box.max.y as usize;
+            
+                south_line_data = south_line_data.move_to((x0,y1)).line_to((x1,y1)); 
+
             }
             if !card_dir[WEST] {
                 print!(" WEST ");
+
+                let tile_box = &cur_tile.0;
+                let x0 = tile_box.min.x as usize;
+                let y0 = tile_box.min.y as usize;
+                let x1 = tile_box.max.x as usize;
+                let y1 = tile_box.max.y as usize;
+            
+                west_line_data = west_line_data.move_to((x1,y0)).line_to((x1,y1));           
+             
             }
             println!("edges\n");
         }
@@ -233,17 +265,42 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
     // .line_to((25,25))
     // .close();
 
-    let path = Path::new()
+    let north_path = Path::new()
     .set("fill", "green")
-    .set("stroke", "black")
-    .set("stroke-width", 3)
-    .set("d", line_data)
+    .set("stroke", "green")
+    .set("stroke-width", 1)
+    .set("d", north_line_data)
     .set("fill-rule", "evenodd");
+
+    let east_path = Path::new()
+    .set("fill", "red")
+    .set("stroke", "red")
+    .set("stroke-width", 1)
+    .set("d", east_line_data)
+    .set("fill-rule", "evenodd");
+
+    let south_path = Path::new()
+    .set("fill", "blue")
+    .set("stroke", "blue")
+    .set("stroke-width", 1)
+    .set("d", south_line_data)
+    .set("fill-rule", "evenodd");
+
+    let west_path = Path::new()
+    .set("fill", "orange")
+    .set("stroke", "orange")
+    .set("stroke-width", 1)
+    .set("d", west_line_data)
+    .set("fill-rule", "evenodd");
+
 
 // Create the svg document
     let document = Document::new()
         .set("viewBox", (0, 0, WIDTH, HEIGHT))
-        .add(path);
+        .add(north_path)
+        .add(east_path)
+        .add(south_path)
+        .add(west_path);
 
     // Write the svg document to a file
     svg::save("hack_svg_test.svg", &document);
@@ -258,22 +315,71 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
 
 */
 
-fn add_north_line(mut line_data: &Data, cur_tile: (Box2D<i32>, RGB))
- {
-    println!("add_north_line cur_tile -> {:?}" , cur_tile );
+// fn add_north_line(line_data: &mut Data, cur_tile: (Box2D<i32>, RGB))
+//  {
+//     println!("add_north_line cur_tile -> {:?}" , cur_tile );
+//     let tile_box = cur_tile.0;
+//     println! ("tile box min (top right) -> {:?}", tile_box.min);
+//     println! ("tile box max (bot left) -> {:?}", tile_box.max);
+//     let x0 = tile_box.min.x as usize;
+//     let y0 = tile_box.min.y as usize;
+//     let x1 = tile_box.max.x as usize;
+//     let y1 = tile_box.max.y as usize;
+
+//     line_data.move_to((x0,y0)).line_to((x1,y0));
+// }
+
+
+fn test_add_north_line(line_data:Data, cur_tile: (Box2D<i32>, RGB)) -> Data  {
+    println!("test_add_north_line cur_tile -> {:?}" , cur_tile );
+
+    let mut tile_data = line_data;
+    
     let tile_box = cur_tile.0;
-    println! ("tile box min (top right) -> {:?}", tile_box.min);
-    println! ("tile box max (bot left) -> {:?}", tile_box.max);
     let x0 = tile_box.min.x as usize;
     let y0 = tile_box.min.y as usize;
     let x1 = tile_box.max.x as usize;
     let y1 = tile_box.max.y as usize;
 
-    line_data = &line_data.move_to((x0,y0)).line_to((x1,y0));
+    tile_data = tile_data.move_to((x0,y0)).line_to((x1,y0));
 
-    // .line_to((100,0))
+    tile_data
 }
 
+
+
+fn create_round_path(data: Data) -> Data {
+    let mut square_data = data;
+    square_data = square_data.move_to((30., 30.)).line_to((40., 40.)).line_to((50., 50.));
+    square_data
+}
+
+
+// fn update_square_data(square_data: &mut Data) {
+//     square_data.move_to((0, 0));
+//     square_data.line_to((0, 100));
+//     square_data.line_to((100, 100));
+//     square_data.line_to((100, 0));
+//     square_data.line_to((0, 0));
+// }
+
+// let mut square_data = Data::new();
+// update_square_data(&mut square_data);
+
+// // You can call update_square_data multiple times with the same square_data value
+// update_square_data(&mut square_data);
+
+
+// fn create_square(mut square_data: Data) -> Data {
+//     square_data.move_to((0.0, 0.0))
+//         .line_by((0.0, 100.0))
+//         .line_by((100.0, 0.0))
+//         .line_by((0.0, -100.0))
+//         .line_by((-100.0, 0.0))
+//         .close();
+
+//     square_data
+// }
 
 
 
