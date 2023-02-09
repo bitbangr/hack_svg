@@ -14,6 +14,7 @@ use svg::Document;
 use svg::node::element::tag::Ellipse;
 use std::fmt::Write;
 
+use std::collections::HashSet;
 
 const BOARD_SIZE: i32 = 8;
 const RECT_SIZE: i32 = 50;
@@ -170,9 +171,63 @@ fn main() {
 
     // draw_svg_grid (line_bucket, pane_nd_arr);
 
-    draw_svg_grid_one(line_bucket, pane_nd_arr)
+    draw_svg_grid_one(line_bucket, pane_nd_arr);
+
+    let test_arr = vec![vec!["white".to_string(), "white".to_string(),"black".to_string()],
+                                         vec!["green".to_string(),"white".to_string(),"white".to_string()],
+                                         vec!["white".to_string(),"green".to_string(),"green".to_string()]];
+
+    let blk_test_arr: Vec<Vec<String>> = vec![vec!["white".to_string(); 3]; 3];
+
+    println!("test array {:?}", &test_arr);
+    let result = search_array(&test_arr);
+    println!("search array results {:?}", result);
+
+    println!("blk_test_arr {:?}", &blk_test_arr);
+    let result = search_array(&blk_test_arr);
+    println!("blk_test_arr search array results {:?}", result);
+
     
 }
+
+
+
+fn dfs(array: &Vec<Vec<String>>, row: isize, col: isize, color: &str, visited: &mut Vec<Vec<bool>>, rows: isize, cols: isize) -> Vec<(isize, isize)> {
+    if row < 0 || row >= rows || col < 0 || col >= cols || visited[row as usize ][col as usize] || array[row as usize][col as usize] != color {
+        return vec![];
+    }
+    visited[row as usize][col as usize] = true;
+    let dirs: Vec<(isize, isize)> = vec![(0, 1), (0, -1), (1, 0), (-1, 0)];
+    let mut curr_group = vec![(row, col)];
+    for d in dirs {
+        let r = row + d.0;
+        let c = col + d.1;
+        curr_group.extend(dfs(array, r, c, color, visited, rows, cols));
+    }
+    return curr_group;
+}
+
+fn search_array(array: &Vec<Vec<String>>) -> Vec<Vec<(isize, isize)>> {
+    let rows = array.len() as isize;
+    let cols = array[0].len() as isize;
+    let mut visited = vec![vec![false; cols as usize]; rows as usize];
+    let mut result = vec![];
+
+    for row in 0..rows {
+        for col in 0..cols {
+            if !visited[row as usize ][col as usize] {
+                let color = &array[row as usize][col as usize];
+                let curr_group = dfs(array, row, col, color, &mut visited, rows, cols);
+                if !curr_group.is_empty() {
+                    result.push(curr_group);
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
 
 
 /// iterate over each tile by row col and
@@ -187,14 +242,17 @@ fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool
     // Create the svg document
     let mut document = Document::new().set("viewBox", (0, 0, WIDTH, HEIGHT));
 
-    // all the lines to be held here
-    
+    // let stroke_colour =  "black";
+    let stroke_colour =  "purple";
+    let stroke_width =  0.25; 
 
     for (row, rows) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
         for (col, card_dir) in rows.iter().enumerate() {
-            println!("Row: {}, Col: {},\nCardinal Direction Bool: {:?}", row, col, card_dir);
+            println!("\nRow: {}, Col: {},\nCardinal Direction Bool: {:?}", row, col, card_dir);
 
             let cur_tile = pane_nd_arr[[row,col]];
+
+            println!("Tile info {:?}", &cur_tile);  
 
             let N = card_dir[NORTH];
             let E = card_dir[EAST];
@@ -208,9 +266,9 @@ fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool
             let y1 = tile_box.max.y as usize;
 
             let tile_rgb = &cur_tile.1;
-            let rgb_str = tile_rgb.to_string().replace(" ", "");;
+            let rgb_str = tile_rgb.to_string().replace(" ", "");
             println!("rgb string  {} ", rgb_str);
-            match (N, E, S, W) {
+            match (N, E, S, W) { //FFFF
                 (false, false, false, false) => {
                         println!("match -> false false false false - SQUARE");
                         print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
@@ -223,23 +281,57 @@ fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool
                                              .line_to((x0,y0))
                                              .close();
         
+                        println!("line data {:?}" , &line_data);
+
                             let tile_path = Path::new()
                             // .set("fill", "rgb(255, 0, 0)")
                             .set("fill", rgb_str.to_owned())
-                            .set("stroke", "red")
-                            .set("stroke-width", 0.25)
+                            .set("stroke", stroke_colour)
+                            .set("stroke-width", stroke_width)
                             .set("d", line_data);
                         
+                        
+
                         // add the tile path to the document
                         document = document.add(tile_path);
         
-                        },
-                (false, true,  false, false) => {
-                        println!("match -> false true false false EAST OPEN ")
-                        },
-                (false, false, false, true) => {
-                        println!("match -> false false false true WEST OPEN")
-                        },
+                        }, // FFFF
+                (false, true,  false, false) => {  // FTFF
+                        println!("match -> false true false false EAST OPEN ");
+                        let mut line_data = Data::new()
+                        .move_to((x1,y1))
+                        .line_to((x0,y1))
+                        .line_to((x0,y0))
+                        .line_to((x1,y0));
+    
+                        let tile_path = Path::new()
+                        .set("fill", rgb_str.to_owned())
+                        .set("stroke", stroke_colour)
+                        .set("stroke-width", stroke_width)
+                        .set("d", line_data);
+    
+                        // add the tile path to the document
+                        document = document.add(tile_path);
+    
+                        }, // FTFF
+                (false, false, false, true) => { // FFFT
+                        println!("match -> false false false true WEST OPEN");
+                        let mut line_data = Data::new()
+                        .move_to((x0,y0))
+                        .line_to((x1,y0))
+                        .line_to((x1,y1))
+                        .line_to((x0,y1));
+    
+                        let tile_path = Path::new()
+                        .set("fill", rgb_str.to_owned())
+                        .set("stroke", stroke_colour)
+                        .set("stroke-width", stroke_width)
+                        .set("d", line_data);
+    
+                        // add the tile path to the document
+                        document = document.add(tile_path);
+
+                        }, // FFFT
                 (false, false,  true, false) => {
                         println!("match -> false false true false SOUTH OPEN")
                         },
@@ -249,12 +341,41 @@ fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool
                 (false,  true,  true, false) => {
                     println!("match -> false, true , true, false NORTH WEST CORNER")
                     },
-                (false, false,  true, true) => {
-                    println!("match -> false, false , true, true NORTH EAST CORNER")
-                    },
-                ( true,  true, false, false) => {
-                    println!("match -> true, true , false, false SOUTH WEST CORNER")
-                    },
+                (false, false,  true, true) => { // FFTT
+                    println!("match -> false, false , true, true NORTH EAST CORNER");
+
+                    let mut line_data = Data::new()
+                    .move_to((x0,y0))
+                    .line_to((x1,y0))
+                    .line_to((x1,y1));
+
+                    let tile_path = Path::new()
+                    .set("fill", rgb_str.to_owned())
+                    .set("stroke", stroke_colour)
+                    .set("stroke-width", stroke_width)
+                    .set("d", line_data);
+
+                    // add the tile path to the document
+                    document = document.add(tile_path);
+
+                    }, // FFTT
+                ( true,  true, false, false) => { //TTFF
+                    println!("match -> true, true , false, false SOUTH WEST CORNER");
+                    let mut line_data = Data::new()
+                    .move_to((x1,y1))
+                    .line_to((x0,y1))
+                    .line_to((x0,y0));
+
+                    let tile_path = Path::new()
+                    .set("fill", rgb_str.to_owned())
+                    .set("stroke", stroke_colour)
+                    .set("stroke-width", stroke_width)
+                    .set("d", line_data);
+
+                    // add the tile path to the document
+                    document = document.add(tile_path);
+
+                    }, // TTFF
                 ( true, false, false, true) => {
                     println!("match -> true, false,  false, true SOUTH EAST CORNER")
                     },
@@ -283,107 +404,91 @@ fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool
                 _ => println!("The value does not match any of the options\n"),
             } // match 
 
-            print!("Cardininal Directions Match ->");
+            
 
-            println!("Tile info {:?}", &cur_tile);  
-            print!("Draw ->");
+            
+            // print!("Draw ->");
 
-            if !card_dir[NORTH]&&!card_dir[EAST]&&!card_dir[SOUTH]&&!card_dir[WEST]{ // FFFF NO COLOUR MATCH FOR ALL DIRECTIONS
-                // print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
+            // if !card_dir[NORTH]&&!card_dir[EAST]&&!card_dir[SOUTH]&&!card_dir[WEST]{ // FFFF NO COLOUR MATCH FOR ALL DIRECTIONS
+            //     // print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
     
-                // let mut line_data = Data::new()
-                //                      .move_to((x0,y0))
-                //                      .line_to((x1,y0))
-                //                      .line_to((x1,y1))
-                //                      .line_to((x0,y1))
-                //                      .line_to((x0,y0))
-                //                      .close();
+            //     // let mut line_data = Data::new()
+            //     //                      .move_to((x0,y0))
+            //     //                      .line_to((x1,y0))
+            //     //                      .line_to((x1,y1))
+            //     //                      .line_to((x0,y1))
+            //     //                      .line_to((x0,y0))
+            //     //                      .close();
 
-                //     let tile_path = Path::new()
-                //     .set("fill", "blue")
-                //     .set("stroke", "red")
-                //     .set("stroke-width", 0.25)
-                //     .set("d", line_data);
+            //     //     let tile_path = Path::new()
+            //     //     .set("fill", "blue")
+            //     //     .set("stroke", "red")
+            //     //     .set("stroke-width", 0.25)
+            //     //     .set("d", line_data);
                 
-                // // add the tile path to the document
-                // document = document.add(tile_path);
+            //     // // add the tile path to the document
+            //     // document = document.add(tile_path);
 
-            } else {
+            // } else {
 
-                if !card_dir[NORTH]&&card_dir[EAST]&&!card_dir[SOUTH]&&!card_dir[WEST]{ //FTFF  EAST MATCHES NEXT TILE COLOR
-                    print!(" FFTF EAST is OPEN ");
+            //     if !card_dir[NORTH]&&card_dir[EAST]&&!card_dir[SOUTH]&&!card_dir[WEST]{ //FTFF  EAST MATCHES NEXT TILE COLOR
+            //         print!(" FFTF EAST is OPEN ");
+            //     } // FTFF
 
-                    let mut line_data = Data::new()
-                    .move_to((x1,y1))
-                    .line_to((x0,y1))
-                    .line_to((x0,y0))
-                    .line_to((x1,y0));
-
-                    let tile_path = Path::new()
-                    .set("fill", rgb_str.to_owned())
-                    .set("stroke", "green")
-                    .set("stroke-width", 0.25)
-                    .set("d", line_data);
-
-                    // add the tile path to the document
-                    document = document.add(tile_path);
-
-                } // FTFF
-
-                if !card_dir[NORTH] {
-                    print!(" NORTH ");
+            //     if !card_dir[NORTH] {
+            //         print!(" NORTH ");
     
-                    // let tile_box = &cur_tile.0;
-                    // let x0 = tile_box.min.x as usize;
-                    // let y0 = tile_box.min.y as usize;
-                    // let x1 = tile_box.max.x as usize;
-                    // let y1 = tile_box.max.y as usize;
+            //         // let tile_box = &cur_tile.0;
+            //         // let x0 = tile_box.min.x as usize;
+            //         // let y0 = tile_box.min.y as usize;
+            //         // let x1 = tile_box.max.x as usize;
+            //         // let y1 = tile_box.max.y as usize;
                 
-                    // east_line_data = east_line_data.move_to((x1,y0)).line_to((x1,y1));           
+            //         // east_line_data = east_line_data.move_to((x1,y0)).line_to((x1,y1));           
     
-                }
+            //     }
 
 
-                if !card_dir[EAST] {
-                    print!(" EAST ");
+            //     if !card_dir[EAST] {
+            //         print!(" EAST ");
     
-                    // let tile_box = &cur_tile.0;
-                    // let x0 = tile_box.min.x as usize;
-                    // let y0 = tile_box.min.y as usize;
-                    // let x1 = tile_box.max.x as usize;
-                    // let y1 = tile_box.max.y as usize;
+            //         // let tile_box = &cur_tile.0;
+            //         // let x0 = tile_box.min.x as usize;
+            //         // let y0 = tile_box.min.y as usize;
+            //         // let x1 = tile_box.max.x as usize;
+            //         // let y1 = tile_box.max.y as usize;
                 
-                    // east_line_data = east_line_data.move_to((x1,y0)).line_to((x1,y1));           
+            //         // east_line_data = east_line_data.move_to((x1,y0)).line_to((x1,y1));           
     
-                }
-                if !card_dir[SOUTH] {
-                    print!(" SOUTH ");
+            //     }
+            //     if !card_dir[SOUTH] {
+            //         print!(" SOUTH ");
     
-                    // let tile_box = &cur_tile.0;
-                    // let x0 = tile_box.min.x as usize;
-                    // let y0 = tile_box.min.y as usize;
-                    // let x1 = tile_box.max.x as usize;
-                    // let y1 = tile_box.max.y as usize;
+            //         // let tile_box = &cur_tile.0;
+            //         // let x0 = tile_box.min.x as usize;
+            //         // let y0 = tile_box.min.y as usize;
+            //         // let x1 = tile_box.max.x as usize;
+            //         // let y1 = tile_box.max.y as usize;
                 
-                    // south_line_data = south_line_data.move_to((x0,y1)).line_to((x1,y1)); 
+            //         // south_line_data = south_line_data.move_to((x0,y1)).line_to((x1,y1)); 
     
-                }
-                if !card_dir[WEST] {
-                    print!(" WEST ");
+            //     }
+            //     if !card_dir[WEST] {
+            //         print!(" WEST ");
     
-                    // let tile_box = &cur_tile.0;
-                    // let x0 = tile_box.min.x as usize;
-                    // let y0 = tile_box.min.y as usize;
-                    // let x1 = tile_box.max.x as usize;
-                    // let y1 = tile_box.max.y as usize;
+            //         // let tile_box = &cur_tile.0;
+            //         // let x0 = tile_box.min.x as usize;
+            //         // let y0 = tile_box.min.y as usize;
+            //         // let x1 = tile_box.max.x as usize;
+            //         // let y1 = tile_box.max.y as usize;
                 
-                    // west_line_data = west_line_data.move_to((x0,y0)).line_to((x0,y1));           
+            //         // west_line_data = west_line_data.move_to((x0,y0)).line_to((x0,y1));           
                  
-                }
-                println!("edges\n");
+            //     }
+            //     println!("edges\n");
     
 
-            }
+            // }
             
         }// col iterator
     } // row iterator
