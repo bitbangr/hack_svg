@@ -11,6 +11,7 @@ use svg::node::element::Polygon;
 use svg::node::element::Polyline;
 use svg::node::element::Rectangle;
 use svg::Document;
+use svg::node::element::tag::Ellipse;
 use std::fmt::Write;
 
 
@@ -167,9 +168,267 @@ fn main() {
 
     // simple_draw_svg_grid (&line_bucket);
 
-    draw_svg_grid (line_bucket, pane_nd_arr);
+    // draw_svg_grid (line_bucket, pane_nd_arr);
+
+    draw_svg_grid_one(line_bucket, pane_nd_arr)
     
 }
+
+
+/// iterate over each tile by row col and
+/// Draw out all the pane lines matching the cardinal directors for that tile
+/// do not worry about duplicate line etc
+/// 
+fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
+                     pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>) {
+    
+    println!("\n ***********\nFUNCTION draw_svg_grid_one\n");
+
+    // Create the svg document
+    let mut document = Document::new().set("viewBox", (0, 0, WIDTH, HEIGHT));
+
+    // all the lines to be held here
+    
+
+    for (row, rows) in line_bucket.axis_iter(ndarray::Axis(0)).enumerate() {
+        for (col, card_dir) in rows.iter().enumerate() {
+            println!("Row: {}, Col: {},\nCardinal Direction Bool: {:?}", row, col, card_dir);
+
+            let cur_tile = pane_nd_arr[[row,col]];
+
+            let N = card_dir[NORTH];
+            let E = card_dir[EAST];
+            let S = card_dir[SOUTH];
+            let W = card_dir[WEST];
+
+            let tile_box = &cur_tile.0;
+            let x0 = tile_box.min.x as usize;
+            let y0 = tile_box.min.y as usize;
+            let x1 = tile_box.max.x as usize;
+            let y1 = tile_box.max.y as usize;
+
+            let tile_rgb = &cur_tile.1;
+            let rgb_str = tile_rgb.to_string().replace(" ", "");;
+            println!("rgb string  {} ", rgb_str);
+            match (N, E, S, W) {
+                (false, false, false, false) => {
+                        println!("match -> false false false false - SQUARE");
+                        print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
+    
+                        let mut line_data = Data::new()
+                                             .move_to((x0,y0))
+                                             .line_to((x1,y0))
+                                             .line_to((x1,y1))
+                                             .line_to((x0,y1))
+                                             .line_to((x0,y0))
+                                             .close();
+        
+                            let tile_path = Path::new()
+                            // .set("fill", "rgb(255, 0, 0)")
+                            .set("fill", rgb_str.to_owned())
+                            .set("stroke", "red")
+                            .set("stroke-width", 0.25)
+                            .set("d", line_data);
+                        
+                        // add the tile path to the document
+                        document = document.add(tile_path);
+        
+                        },
+                (false, true,  false, false) => {
+                        println!("match -> false true false false EAST OPEN ")
+                        },
+                (false, false, false, true) => {
+                        println!("match -> false false false true WEST OPEN")
+                        },
+                (false, false,  true, false) => {
+                        println!("match -> false false true false SOUTH OPEN")
+                        },
+                ( true, false, false, false) => {
+                        println!("match -> true false false false NORTH OPEN")
+                        },
+                (false,  true,  true, false) => {
+                    println!("match -> false, true , true, false NORTH WEST CORNER")
+                    },
+                (false, false,  true, true) => {
+                    println!("match -> false, false , true, true NORTH EAST CORNER")
+                    },
+                ( true,  true, false, false) => {
+                    println!("match -> true, true , false, false SOUTH WEST CORNER")
+                    },
+                ( true, false, false, true) => {
+                    println!("match -> true, false,  false, true SOUTH EAST CORNER")
+                    },
+                ( false, true, false, true) => {
+                    println!("match -> false, true, false, true NORTH SOUTH 2 HORIZONTAL LINES")
+                    },
+                ( true, false, true, false) => {
+                    println!("match -> true, false, true, false EAST WEST 2 VERTICAL LINES")
+                    },
+                ( false, true, true, true) => {
+                    println!("match -> false, true, true, true NORTH SINGLE LINE")
+                    },
+                ( true, false, true, true) => {
+                    println!("match -> true, false, true, true EAST SINGLE LINE")
+                    },
+                ( true, true, false, true) => {
+                    println!("match -> true, true, false, true SOUTH SINGLE LINE")
+                    },
+                ( true, true, true, false) => {
+                    println!("match -> true, true, true, false WEST SINGLE LINE")
+                    },
+                ( true, true, true, true) => {
+                    println!("match -> true, true, true, true OPEN INTERNAL TILE NO LINES ")
+                    },
+
+                _ => println!("The value does not match any of the options\n"),
+            } // match 
+
+            print!("Cardininal Directions Match ->");
+
+            println!("Tile info {:?}", &cur_tile);  
+            print!("Draw ->");
+
+            if !card_dir[NORTH]&&!card_dir[EAST]&&!card_dir[SOUTH]&&!card_dir[WEST]{ // FFFF NO COLOUR MATCH FOR ALL DIRECTIONS
+                // print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
+    
+                // let mut line_data = Data::new()
+                //                      .move_to((x0,y0))
+                //                      .line_to((x1,y0))
+                //                      .line_to((x1,y1))
+                //                      .line_to((x0,y1))
+                //                      .line_to((x0,y0))
+                //                      .close();
+
+                //     let tile_path = Path::new()
+                //     .set("fill", "blue")
+                //     .set("stroke", "red")
+                //     .set("stroke-width", 0.25)
+                //     .set("d", line_data);
+                
+                // // add the tile path to the document
+                // document = document.add(tile_path);
+
+            } else {
+
+                if !card_dir[NORTH]&&card_dir[EAST]&&!card_dir[SOUTH]&&!card_dir[WEST]{ //FTFF  EAST MATCHES NEXT TILE COLOR
+                    print!(" FFTF EAST is OPEN ");
+
+                    let mut line_data = Data::new()
+                    .move_to((x1,y1))
+                    .line_to((x0,y1))
+                    .line_to((x0,y0))
+                    .line_to((x1,y0));
+
+                    let tile_path = Path::new()
+                    .set("fill", rgb_str.to_owned())
+                    .set("stroke", "green")
+                    .set("stroke-width", 0.25)
+                    .set("d", line_data);
+
+                    // add the tile path to the document
+                    document = document.add(tile_path);
+
+                } // FTFF
+
+                if !card_dir[NORTH] {
+                    print!(" NORTH ");
+    
+                    // let tile_box = &cur_tile.0;
+                    // let x0 = tile_box.min.x as usize;
+                    // let y0 = tile_box.min.y as usize;
+                    // let x1 = tile_box.max.x as usize;
+                    // let y1 = tile_box.max.y as usize;
+                
+                    // east_line_data = east_line_data.move_to((x1,y0)).line_to((x1,y1));           
+    
+                }
+
+
+                if !card_dir[EAST] {
+                    print!(" EAST ");
+    
+                    // let tile_box = &cur_tile.0;
+                    // let x0 = tile_box.min.x as usize;
+                    // let y0 = tile_box.min.y as usize;
+                    // let x1 = tile_box.max.x as usize;
+                    // let y1 = tile_box.max.y as usize;
+                
+                    // east_line_data = east_line_data.move_to((x1,y0)).line_to((x1,y1));           
+    
+                }
+                if !card_dir[SOUTH] {
+                    print!(" SOUTH ");
+    
+                    // let tile_box = &cur_tile.0;
+                    // let x0 = tile_box.min.x as usize;
+                    // let y0 = tile_box.min.y as usize;
+                    // let x1 = tile_box.max.x as usize;
+                    // let y1 = tile_box.max.y as usize;
+                
+                    // south_line_data = south_line_data.move_to((x0,y1)).line_to((x1,y1)); 
+    
+                }
+                if !card_dir[WEST] {
+                    print!(" WEST ");
+    
+                    // let tile_box = &cur_tile.0;
+                    // let x0 = tile_box.min.x as usize;
+                    // let y0 = tile_box.min.y as usize;
+                    // let x1 = tile_box.max.x as usize;
+                    // let y1 = tile_box.max.y as usize;
+                
+                    // west_line_data = west_line_data.move_to((x0,y0)).line_to((x0,y1));           
+                 
+                }
+                println!("edges\n");
+    
+
+            }
+            
+        }// col iterator
+    } // row iterator
+
+//     let north_path = Path::new()
+//     .set("fill", "green")
+//     .set("stroke", "green")
+//     .set("stroke-width", 1)
+//     .set("d", north_line_data)
+//     .set("fill-rule", "evenodd");
+
+//     let east_path = Path::new()
+//     .set("fill", "red")
+//     .set("stroke", "red")
+//     .set("stroke-width", 1)
+//     .set("d", east_line_data)
+//     .set("fill-rule", "evenodd");
+
+//     let south_path = Path::new()
+//     .set("fill", "blue")
+//     .set("stroke", "blue")
+//     .set("stroke-width", 1)
+//     .set("d", south_line_data)
+//     .set("fill-rule", "evenodd");
+
+//     let west_path = Path::new()
+//     .set("fill", "orange")
+//     .set("stroke", "orange")
+//     .set("stroke-width", 1)
+//     .set("d", west_line_data)
+//     .set("fill-rule", "evenodd");
+
+
+// // Create the svg document
+//     let document = Document::new()
+//         .set("viewBox", (0, 0, WIDTH, HEIGHT))
+//         .add(north_path)
+//         .add(east_path)
+//         .add(south_path)
+//         .add(west_path);
+
+    // Write the svg document to a file
+    svg::save("test_1.svg", &document);
+   
+} // draw_sgv_grid_one
 
 ///
 /// Smush everthing together
