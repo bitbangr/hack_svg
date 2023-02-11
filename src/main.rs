@@ -229,6 +229,32 @@ fn search_array(array: &Vec<Vec<String>>) -> Vec<Vec<(isize, isize)>> {
 }
 
 
+///
+/// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
+/// Assumptions
+///   1) all contiguous tiles are bounded by a close border (i.e. there no open segments in the border)
+///   2) the end point of one line segment is always the start point of another line segent
+///   3) There is exactly one line exiting from an endpoint (otherwise it is not a simple enclosed shape)
+///   4) every tile has exactly 0, 1 , 2 , 3 or 4 edges that are lines to be drawn
+///   5) each tile is considered to be oriented North 
+///   6) each tile has a North, East, South and West edge
+///   6) Given two adjacent tiles A and B, ff a tile A is different colour from tile B then the edge between Tile A and Tile B is marked "FALSE"
+///         and a border line is drawn between these two tiles
+///   7) Conversly if Tile A is the same colour as tile B then the edge between Tile A and Tile B is marked TRUE
+///         and no border line is drawn betwee these two tiles
+///   8) each tile has an associated array (N,E,S,W) that holds (T/F,T/F,T/F,T/F) corresponding to whether the adjacent tile is the same colour or not
+///         a border is drawn for False Edges, A border is not dranw for True edges
+///   9) Tiles are never rotated
+///  10) Tile borders are always drawn in clockwise fashion in the output SVG
+///  11) SVG Lines(borders) are tile edges that are marked False. 
+///  12) There are 16 possible configurations of borders (false edges) for a Northbound tile ranging from none to all 4 edges being a border
+///  13) A collection of contigous tiles has been returned by a Depth First Search Algorithm
+///  14) All completely interior tiles (i.e zero borders) are to be removed as there are no lines to be drawn
+
+fn draw_polyline_borders()
+{
+    todo!()
+}
 
 /// iterate over each tile by row col and
 /// Draw out all the pane lines matching the cardinal directors for that tile
