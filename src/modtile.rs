@@ -78,8 +78,3 @@ pub fn _load_all_colors(path_str: &str) -> AllColors {
     // let tc1 = TileColor { rgb: RGB(0,0,0), name: "black".to_owned() , number: "0".to_owned() };
     // AllColors{name:"Hack".to_owned(),url:"none".to_owned(),description:"MadeUp".to_owned(), colors: vec![tc1] }
 }
-
-
-
-
-

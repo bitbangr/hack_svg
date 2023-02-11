@@ -1,20 +1,22 @@
+mod my_mod;
 mod modtile;
+mod dfs_tiles;
+
+mod single_tile;
 
 use euclid::default::Box2D;
 use euclid::default::Point2D;
-use modtile::RGB;
 use ndarray::{Array, Array2};
 
 use svg::node::element::path::Data;
 use svg::node::element::Path;
-use svg::node::element::Polygon;
-use svg::node::element::Polyline;
-use svg::node::element::Rectangle;
+
 use svg::Document;
-use svg::node::element::tag::Ellipse;
 use std::fmt::Write;
 
 use std::collections::HashSet;
+
+use crate::dfs_tiles::get_contiguous_tiles;
 
 const BOARD_SIZE: i32 = 8;
 const RECT_SIZE: i32 = 50;
@@ -24,7 +26,7 @@ const CELL_SIZE: i32 = 100;
 const COLOR_BLK: &str = "black";
 const COLOR_WHT: &str = "white";
 
-const NORTH:usize = 0;
+const NORTH: usize = 0;
 const EAST: usize = 1;
 const SOUTH: usize = 2;
 const WEST: usize = 3;
@@ -47,6 +49,8 @@ impl Line {
 /// rectangular tiles.
 /// First tile is top left corner and ordered first by rows and then by columns
 fn main() {
+
+    my_mod::function();
     println!("Hack SVG");
 
     let p_start: Point2D<i32> = Point2D::new(0, 0);
@@ -180,53 +184,20 @@ fn main() {
     let blk_test_arr: Vec<Vec<String>> = vec![vec!["white".to_string(); 3]; 3];
 
     println!("test array {:?}", &test_arr);
-    let result = search_array(&test_arr);
+    let result = get_contiguous_tiles(&test_arr);
     println!("search array results {:?}", result);
 
     println!("blk_test_arr {:?}", &blk_test_arr);
-    let result = search_array(&blk_test_arr);
+    let result = get_contiguous_tiles(&blk_test_arr);
     println!("blk_test_arr search array results {:?}", result);
 
+    // create a single tile mosaic and draw the corresponding SVG diagram    
+    let _ = single_tile::create_svg();
     
 }
 
 
 
-fn dfs(array: &Vec<Vec<String>>, row: isize, col: isize, color: &str, visited: &mut Vec<Vec<bool>>, rows: isize, cols: isize) -> Vec<(isize, isize)> {
-    if row < 0 || row >= rows || col < 0 || col >= cols || visited[row as usize ][col as usize] || array[row as usize][col as usize] != color {
-        return vec![];
-    }
-    visited[row as usize][col as usize] = true;
-    let dirs: Vec<(isize, isize)> = vec![(0, 1), (0, -1), (1, 0), (-1, 0)];
-    let mut curr_group = vec![(row, col)];
-    for d in dirs {
-        let r = row + d.0;
-        let c = col + d.1;
-        curr_group.extend(dfs(array, r, c, color, visited, rows, cols));
-    }
-    return curr_group;
-}
-
-fn search_array(array: &Vec<Vec<String>>) -> Vec<Vec<(isize, isize)>> {
-    let rows = array.len() as isize;
-    let cols = array[0].len() as isize;
-    let mut visited = vec![vec![false; cols as usize]; rows as usize];
-    let mut result = vec![];
-
-    for row in 0..rows {
-        for col in 0..cols {
-            if !visited[row as usize ][col as usize] {
-                let color = &array[row as usize][col as usize];
-                let curr_group = dfs(array, row, col, color, &mut visited, rows, cols);
-                if !curr_group.is_empty() {
-                    result.push(curr_group);
-                }
-            }
-        }
-    }
-
-    return result;
-}
 
 
 ///
@@ -286,7 +257,7 @@ fn draw_polyline_borders()
 /// do not worry about duplicate line etc
 /// 
 fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
-                     pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>) {
+                     pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>, ndarray::Dim<[usize; 2]>>) {
     
     println!("\n ***********\nFUNCTION draw_svg_grid_one\n");
 
@@ -595,7 +566,7 @@ fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool
 /// and write out to document
 
 fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
-                        pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>) 
+                        pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>, ndarray::Dim<[usize; 2]>>) 
 {
     println!("draw_svg_grid");
 
@@ -738,7 +709,7 @@ fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, 
 // }
 
 
-fn test_add_north_line(line_data:Data, cur_tile: (Box2D<i32>, RGB)) -> Data  {
+fn test_add_north_line(line_data:Data, cur_tile: (Box2D<i32>, modtile::RGB)) -> Data  {
     println!("test_add_north_line cur_tile -> {:?}" , cur_tile );
 
     let mut tile_data = line_data;
@@ -892,7 +863,8 @@ fn get_test_bool_bucket() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, n
 
     // let mut initf = vec![vec![false ; 4] ; row_dim * col_dim] ;
     // let bucket = Array::from_shape_vec((3,3), initf.to_vec()).unwrap();
-    let mut bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_bool_arr(tiles_per_pane_height, tiles_per_pane_width);
+    let mut bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = 
+                                    get_bool_arr(tiles_per_pane_height, tiles_per_pane_width);
     // println!("bucket = {:?}" , &bucket);
 
     bucket[[0,0]][NORTH] = false;
@@ -1027,7 +999,7 @@ pub fn box2d_to_points(box2d: Box2D<i32>) -> Vec<Point2D<i32>> {
     vec![top_left, top_right, bottom_right, bottom_left]
 }
 
-fn get_paths(first: &[(Box2D<i32>, RGB)], match_colour: RGB) -> Vec<Point2D<i32>> {
+fn get_paths(first: &[(Box2D<i32>, modtile::RGB)], match_colour: modtile::RGB) -> Vec<Point2D<i32>> {
     todo!()
 }
 
@@ -1153,7 +1125,6 @@ pub fn create_3x3_single_pane_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
 }
 
 pub fn create_test_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
-    // pub fn create_test_data() -> Vec<Vec<(euclid::Box2D<i32>, modtile::RGB)>> {
 
     let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
 
