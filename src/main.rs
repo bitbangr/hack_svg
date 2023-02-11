@@ -232,24 +232,49 @@ fn search_array(array: &Vec<Vec<String>>) -> Vec<Vec<(isize, isize)>> {
 ///
 /// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
 /// Assumptions
-///   1) all contiguous tiles are bounded by a close border (i.e. there no open segments in the border)
+///   1) all contiguous tiles are bounded by a closed border (i.e. there no open segments in the border)
 ///   2) the end point of one line segment is always the start point of another line segent
 ///   3) There is exactly one line exiting from an endpoint (otherwise it is not a simple enclosed shape)
-///   4) every tile has exactly 0, 1 , 2 , 3 or 4 edges that are lines to be drawn
+///   4) every tile has exactly 0, 1 , 2 , 3 or 4 edges that are borders to be drawn
 ///   5) each tile is considered to be oriented North 
 ///   6) each tile has a North, East, South and West edge
-///   6) Given two adjacent tiles A and B, ff a tile A is different colour from tile B then the edge between Tile A and Tile B is marked "FALSE"
-///         and a border line is drawn between these two tiles
+///   6) Given two adjacent tiles A and B, if tile A is a different colour from tile B then the edge between Tile A and Tile B is marked "FALSE"
+///         and a border line is drawn at this edge between these two tiles
+///      Edges/Borders of Adjacent Tiles will always be mirrors of each other i.e. Tile A East = Tile B West or Tile A North = Tile B South 
 ///   7) Conversly if Tile A is the same colour as tile B then the edge between Tile A and Tile B is marked TRUE
 ///         and no border line is drawn betwee these two tiles
 ///   8) each tile has an associated array (N,E,S,W) that holds (T/F,T/F,T/F,T/F) corresponding to whether the adjacent tile is the same colour or not
 ///         a border is drawn for False Edges, A border is not dranw for True edges
-///   9) Tiles are never rotated
+///   9) Tiles are never rotated. North edge cannot become east edge etc.
 ///  10) Tile borders are always drawn in clockwise fashion in the output SVG
-///  11) SVG Lines(borders) are tile edges that are marked False. 
-///  12) There are 16 possible configurations of borders (false edges) for a Northbound tile ranging from none to all 4 edges being a border
-///  13) A collection of contigous tiles has been returned by a Depth First Search Algorithm
-///  14) All completely interior tiles (i.e zero borders) are to be removed as there are no lines to be drawn
+///  11) SVG Lines(borders) are drawn for tile edges that are marked False. 
+///  12) There are 16 possible configurations of borders (tile edges which have been marked false) for a Northbound tile ranging from none to all 4 edges being a border
+///  13) A vector containing collections of contigous tiles has been returned by a Depth First Search Algorithm
+///  14) All completely interior tiles (i.e tiles with zero borders, all edges marked true) are to be removed from search collection as there are no lines to be drawn
+/// 
+/// Drawing Process is
+/// 1. Pick a tile from a result from the DFS collection. 
+///     1.a This is the "first" tile. This both the start point and end point of the SVG border path
+/// 2. Determine which of the 16 border configurations is present.
+///     2a. Find the start point for this configuration
+///     2b. If this is the very first tile then Store the Start Point 
+///     2c. draw the appropriate border for this tile
+///     2d. The end point is the end of the last line drawn for this tile
+///     2e. Mark all the borders (false edges) for this tile that have been drawn as visited.
+///       2e1 - if all borders visited the mark tile as completed and or remove from tiles to be inspected 
+///       if tile border is not contigous then we need to add code to handle interior voids i.e. 
+///       starting a new svg path drawing process for the non-contigous border (false edge)
+///      | | or _
+///             _
+/// 
+/// 3. Find the tile in the result collection that has the same start point and false edge as step 2d above
+///     3a.  Note that it's possible to have tiles with same start point and true edge.  These are not borders
+///     3b. Repeat step 2 and 3 
+///          until the endpoint is equal to the initial start point stored in 2b above
+///     3c. At this point the border is now complete so we close() the svg path and add it to the SVG document with the appropriate Fill colour
+/// 4. Repeat steps 2 and 3 for all the results returned from depth first search.
+///     4. once complete write the SVG document out to a file
+/// 
 
 fn draw_polyline_borders()
 {
