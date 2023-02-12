@@ -1,7 +1,5 @@
 /target
 .DS_Store
 Cargo.lock
-hack_svg_square_da_bug.svg
-hack_svg_test.svg
 my_mod.rs
 *.svg
