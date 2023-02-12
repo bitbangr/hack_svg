@@ -41,18 +41,30 @@ pub(crate) fn create_svg(){
 
     // lets create an svg file
     let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles);
-    // simple_draw_svg_grid (&line_bucket);
-
-    // draw_svg_grid (line_bucket, pane_nd_arr);
-
-    // draw_svg_grid_one(edge_booleans, pane_nd_arr);
 
 
 }
 
 
+/// The write_svgvfunction will create an output SVG file with the supplied input data.
+/// 
+/// # Arguments
+///
+/// `mosaic_nd_arr: ArrayBase<OwnedRepr<(Box2D<i32, UnknownUnit>, RGB)>, Dim<[usize; 2]>>` - Array of all tiles with Box Coordinates and associated tile colour
+/// 'edge_booleans: ArrayBase<OwnedRepr<Vec<bool>>, Dim<[usize; 2]>>' - Edge boolean for each tile
+/// 'contiguous_tiles: Vec<Vec<(isize, isize)>>'  - vector containing collections of contigous tiles
+///
+/// # Return
+///
+/// returns a result 
+///  
+/// # Examples
+///
+/// ```
+/// ```
 fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32, UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>, edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, contiguous_tiles: Vec<Vec<(isize, isize)>>) 
 {
+    // not sure if SVG specific code should reside here or in svg_utils.rs
     todo!()
 }
 
