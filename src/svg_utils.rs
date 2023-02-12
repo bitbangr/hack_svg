@@ -78,7 +78,7 @@ fn draw_polyline_borders()
 /// do not worry about duplicate line etc
 /// 
 pub fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
-                     pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>, ndarray::Dim<[usize; 2]>>) {
+                     pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, modtile::RGB)>, ndarray::Dim<[usize; 2]>>) {
     
     println!("\n ***********\nFUNCTION draw_svg_grid_one\n");
 
@@ -93,7 +93,7 @@ pub fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<
         for (col, card_dir) in rows.iter().enumerate() {
             println!("\nRow: {}, Col: {},\nCardinal Direction Bool: {:?}", row, col, card_dir);
 
-            let cur_tile = pane_nd_arr[[row,col]];
+            let cur_tile:(Box2D<i32>, RGB) = pane_nd_arr[[row,col]];
 
             println!("Tile info {:?}", &cur_tile);  
 
