@@ -1,8 +1,11 @@
 use euclid::{Box2D, UnknownUnit};
 use ndarray::{Array, Array2};
+use svg::Document;
+use svg::node::element::Path;
+use svg::node::element::path::Data;
 
 use crate::dfs_tiles::get_contiguous_tiles_mod;
-use crate::{pane_vec_to_ndarray, get_bool_arr, NORTH,EAST,SOUTH,WEST};
+use crate::{pane_vec_to_ndarray, get_bool_arr, NORTH,EAST,SOUTH,WEST, WIDTH, HEIGHT};
 use crate::{modtile::{RGB, self}, create_data};
 
 // For a single tile mosiac the dimension are 1 row by 1 col
@@ -62,10 +65,73 @@ pub(crate) fn create_svg(){
 ///
 /// ```
 /// ```
-fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32, UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>, edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, contiguous_tiles: Vec<Vec<(isize, isize)>>) 
+fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32, UnknownUnit>, RGB)>,ndarray::Dim<[usize; 2]>>, 
+            edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
+            contiguous_tiles: Vec<Vec<(isize, isize)>>) -> Result<(), std::io::Error> 
 {
     // not sure if SVG specific code should reside here or in svg_utils.rs
-    todo!()
+    
+    println!("write SVG -Contigous tiles -> {:?}", contiguous_tiles);
+    let row = contiguous_tiles[0][0].0 as usize;
+    let col = contiguous_tiles[0][0].1 as usize;
+    println!(" (row: {} col: {}) Tile data {:?} ",row, col, mosaic_nd_arr[[row,col]]);
+    println!("Tile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
+
+
+//***********
+// **********
+
+// *************
+// **********
+
+
+
+    let mut square_data = Data::new()
+    .move_to((0,0))
+    .line_to((100,0))
+    .line_to((100,100))
+    .line_to((0,100))
+    .line_to((0,0))
+    .close()
+    .move_to((25,25))
+    .line_to((75,25))
+    .line_to((75,75))
+    .line_to((25,75))
+    .line_to((25,25))
+    .close();
+
+    let path = Path::new()
+    .set("fill", "green")
+    .set("stroke", "black")
+    .set("stroke-width", 1)
+    .set("d", square_data)
+    .set("fill-rule", "evenodd");
+
+    let mut inner_square_data = Data::new()
+    .move_to((25,25))
+    .line_to((75,25))
+    .line_to((75,75))
+    .line_to((25,75))
+    .line_to((25,25))
+    .close();
+
+    let inner_sqr_path = Path::new()
+    .set("fill", "blue")
+    .set("stroke", "black")
+    .set("stroke-width", 1)
+    .set("d", inner_square_data)
+    .set("fill-rule", "evenodd");
+
+
+    // // Create the svg document
+    let document = Document::new()
+        .set("viewBox", (0, 0, WIDTH, HEIGHT))
+        .add(path)
+        .add(inner_sqr_path);
+
+    // Write the svg document to a file
+    svg::save("single_tile_write_svg.svg", &document)
+
 }
 
 ///
