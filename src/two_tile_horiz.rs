@@ -8,23 +8,21 @@ use crate::dfs_tiles::get_contiguous_tiles_mod;
 use crate::{pane_vec_to_ndarray, get_bool_arr, NORTH,EAST,SOUTH,WEST, WIDTH, HEIGHT};
 use crate::{modtile::{RGB, self}, create_data};
 
-// For a single tile mosiac the dimension are 1 row by 1 col
-const TILES_PER_PANE_WIDTH: usize = 1;
+// For a two tile horizontal mosiac the dimension are 1 row by 2 col
+const TILES_PER_PANE_WIDTH: usize = 2;
 const TILES_PER_PANE_HEIGHT: usize = 1;
 
 /*
-    This function creates a 1x1 mosaic of a single tile and then creates an SVG file with this info
+    This function creates a 1x2 mosaic of two white tiles and then creates an SVG file with this info
 */
-pub(crate) fn create_svg(){
+pub(crate) fn create_white_white_svg(){
 
     // Create a simple 1x1 mosaic
-    let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_single_tile_data();
-    println!("test of module call create_single_tile_data {:?}", &mosaic_vec);
-
-    // pane_vec_to_ndarray(&pane_3x3_vec[0], TILES_PER_PANE_HEIGHT, TILES_PER_PANE_WIDTH );
+    let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_double_white_tile_data();
+    println!("test of module call create_double_white_tile_data {:?}", &mosaic_vec);
 
     // grab the ND Array for this mosiac
-    let mosaic_nd_arr = get_single_tile_ndarray(&mosaic_vec[0]);
+    let mosaic_nd_arr = get_tile_ndarray(&mosaic_vec[0]);
     println!("Tile NDArray {:?} ", &mosaic_nd_arr);
 
     // get the test boolean array to build our svg path with
@@ -131,30 +129,32 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
         document = document.add(tile_path);
 
         }, // FFFF
-        _ => println!("The value does not match any of the options\n"),
+        _ => {
+            println!("The value does not match any of the options\n");
+            ()
+        }
 
     }
     // **********
     // **********
 
     // Write the svg document to a file
-    svg::save("single_tile.svg", &document)
+    svg::save("double_tile_horizontal.svg", &document)
 
 }
 
 ///
 /// Get the Array2 ND array for the tile 
-fn get_single_tile_ndarray (vec: &Vec<(Box2D<i32>, modtile::RGB)>) -> Array2<(Box2D<i32>, modtile::RGB)> {
+fn get_tile_ndarray (vec: &Vec<(Box2D<i32>, modtile::RGB)>) -> Array2<(Box2D<i32>, modtile::RGB)> {
 
    let pane_nd_array =  pane_vec_to_ndarray(&vec, TILES_PER_PANE_HEIGHT, TILES_PER_PANE_WIDTH );
    
    pane_nd_array
 }
 
-
-///  This function creates the simplest possible mosaic which consists of one window of one pane with a single tile
-/// 100 by 100 UnknownUnits size
-pub fn create_single_tile_data() -> Vec<Vec<( Box2D<i32>, modtile::RGB)>> {
+///  This function creates mosaic which consists of one window of one pane with two tiles
+/// 100 by 200 UnknownUnits size
+pub fn create_double_white_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
 
     let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
 
@@ -162,9 +162,12 @@ pub fn create_single_tile_data() -> Vec<Vec<( Box2D<i32>, modtile::RGB)>> {
     // Start the first pane
     let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
 
-    // [(Box2D((0, 0), (100, 100)), RGB(45, 54, 147)),]
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((0, 0), (100, 100), 
-                                                                                                    (255, 255, 255));
+    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((0, 0), (100, 100), (255, 255, 255));
+    let _ = &pane_grid.push((tile_box, rgb));
+    
+    // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((100, 0), (200, 100), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window
@@ -172,6 +175,8 @@ pub fn create_single_tile_data() -> Vec<Vec<( Box2D<i32>, modtile::RGB)>> {
 
     result_window
 }
+
+
 
 
 /// Create an Array2 nd array of booleans
@@ -196,9 +201,15 @@ fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i
     // and set the edges accordingly. As we only have one tile here we can set these manually
 
     edges[[0,0]][NORTH] = false;
-    edges[[0,0]][EAST] = false;
+    edges[[0,0]][EAST] = true;
     edges[[0,0]][SOUTH] = false;
     edges[[0,0]][WEST] = false;
+
+    edges[[0,1]][NORTH] = false;
+    edges[[0,1]][EAST] = false;
+    edges[[0,1]][SOUTH] = false;
+    edges[[0,1]][WEST] = true;
+
 
     println!("get_edge_bools = {:?}" , &edges);
     // println!("edges[0,0][0] = {:?}" , edges[[0,0]][0]);

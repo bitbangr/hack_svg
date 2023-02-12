@@ -1,9 +1,9 @@
-mod my_mod;
 mod modtile;
 mod dfs_tiles;
 mod svg_utils;
 
 mod single_tile;
+mod two_tile_horiz;
 
 use euclid::default::Box2D;
 use euclid::default::Point2D;
@@ -52,8 +52,11 @@ impl Line {
 /// First tile is top left corner and ordered first by rows and then by columns
 fn main() {
 
-    my_mod::function();
     println!("Hack SVG");
+    
+  /********************************************************/
+  /** Commenting out much of below code for now to concentrate on last two test */
+  /********************************************************
 
     let p_start: Point2D<i32> = Point2D::new(0, 0);
     let p_end: Point2D<i32> = Point2D::new(10, 10);
@@ -183,8 +186,16 @@ fn main() {
     let result = get_contiguous_tiles_orig(&blk_test_arr);
     println!("blk_test_arr search array results {:?}", result);
 
+    *********************************************************/
+    /********************************************************/
+    /** Commenting out above code for now to concentrate on lower two test */
+    /********************************************************/
+
     // create a single tile mosaic and draw the corresponding SVG diagram    
-    let _ = single_tile::create_svg();
+    // let _ = single_tile::create_svg();
+
+    // create a double tile horizontal mosaic of two white tiles and draw the corresponding SVG diagram    
+    let _ = two_tile_horiz::create_white_white_svg();
     
 }
 
