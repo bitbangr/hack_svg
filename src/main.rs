@@ -16,7 +16,7 @@ use std::fmt::Write;
 
 use std::collections::HashSet;
 
-use crate::dfs_tiles::get_contiguous_tiles;
+use crate::dfs_tiles::get_contiguous_tiles_orig;
 
 const BOARD_SIZE: i32 = 8;
 const RECT_SIZE: i32 = 50;
@@ -184,11 +184,11 @@ fn main() {
     let blk_test_arr: Vec<Vec<String>> = vec![vec!["white".to_string(); 3]; 3];
 
     println!("test array {:?}", &test_arr);
-    let result = get_contiguous_tiles(&test_arr);
+    let result = get_contiguous_tiles_orig(&test_arr);
     println!("search array results {:?}", result);
 
     println!("blk_test_arr {:?}", &blk_test_arr);
-    let result = get_contiguous_tiles(&blk_test_arr);
+    let result = get_contiguous_tiles_orig(&blk_test_arr);
     println!("blk_test_arr search array results {:?}", result);
 
     // create a single tile mosaic and draw the corresponding SVG diagram    

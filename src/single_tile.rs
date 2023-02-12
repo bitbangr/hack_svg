@@ -1,6 +1,7 @@
 use euclid::{Box2D, UnknownUnit};
 use ndarray::{Array, Array2};
 
+use crate::dfs_tiles::get_contiguous_tiles_mod;
 use crate::{pane_vec_to_ndarray, get_bool_arr, NORTH,EAST,SOUTH,WEST};
 use crate::{modtile::{RGB, self}, create_data};
 
@@ -23,13 +24,23 @@ pub(crate) fn create_svg(){
     let mosaic_nd_arr = get_single_tile_ndarray(&mosaic_vec[0]);
     println!("Tile NDArray {:?} ", &mosaic_nd_arr);
 
-
     // get the test boolean array to build our svg path with
     let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&mosaic_nd_arr);
 
     println!("edge_booleans[0,0][0] = {:?}" , edge_booleans[[0,0]][0]);
     println!("edge_booleans = {:?}" , &edge_booleans);
 
+    // call get_contiguous_tiles() to get contiguous tiles 
+    // need to decide if using 
+    //    get_contiguous_tiles (&mosaic_vec) This seems to work  
+    //       created get_contiguous_tiles_mod()
+    // or get_contiguous_tiles (&mosaic_nd_arr)
+
+    let contiguous_tiles = get_contiguous_tiles_mod(&mosaic_vec);
+    println!("dfs_mod search results - with mosaic_vec -> {:?}", &result);
+
+    // lets create an svg file
+    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles);
     // simple_draw_svg_grid (&line_bucket);
 
     // draw_svg_grid (line_bucket, pane_nd_arr);
