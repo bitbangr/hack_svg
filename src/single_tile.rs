@@ -37,7 +37,7 @@ pub(crate) fn create_svg(){
     // or get_contiguous_tiles (&mosaic_nd_arr)
 
     let contiguous_tiles = get_contiguous_tiles_mod(&mosaic_vec);
-    println!("dfs_mod search results - with mosaic_vec -> {:?}", &result);
+    println!("dfs_mod search results - with mosaic_vec -> {:?}", &contiguous_tiles);
 
     // lets create an svg file
     let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles);
@@ -48,7 +48,12 @@ pub(crate) fn create_svg(){
     // draw_svg_grid_one(edge_booleans, pane_nd_arr);
 
 
+}
 
+
+fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32, UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>, edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, contiguous_tiles: Vec<Vec<(isize, isize)>>) 
+{
+    todo!()
 }
 
 ///
@@ -93,13 +98,13 @@ pub fn create_single_tile_data() -> Vec<Vec<( Box2D<i32,UnknownUnit>, modtile::R
 // fn get_cardinal_edge_boolean() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> 
 fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32, UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>)  -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>
 {
-
     let mut edges: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = 
                                     get_bool_arr(TILES_PER_PANE_HEIGHT, TILES_PER_PANE_WIDTH);
 
     // go through mosaic_nd_arr and set the corresponding boolean edge 
     // As we only have a single tile with no edges we shall just set all the values to false.
     // For anything more complex we need to visit each tile and compare to neighbour to set the values properly 
+    // TODO need to impliment this algo.
     edges[[0,0]][NORTH] = false;
     edges[[0,0]][EAST] = false;
     edges[[0,0]][SOUTH] = false;
