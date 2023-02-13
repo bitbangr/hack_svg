@@ -5,6 +5,7 @@ use svg::Document;
 use svg::node::element::Path;
 use svg::node::element::path::Data;
 
+use crate::box_corners;
 use crate::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
 use crate::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 use crate::dfs_tiles::get_contiguous_tiles_mod;
@@ -157,17 +158,18 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
             let x1 = tile_box.max.x as usize;
             let y1 = tile_box.max.y as usize;
         
-            let corner_coords:Vec<Point2D<i32>> = box2d_to_points(*tile_box);
-            println!("tile_box corner Co-ords {:?}", corner_coords);
-            println!("tile_box top left corner Co-ords {:?}", corner_coords[TOP_LEFT]);
-            println!("tile_box North West corner Co-ords {:?}", corner_coords[NW_CORNER]);
-            println!("tile_box top right corner Co-ords {:?}", corner_coords[TOP_RIGHT]);
-            println!("tile_box North East corner Co-ords {:?}", corner_coords[NE_CORNER]);
-            println!("tile_box bottom right corner Co-ords {:?}", corner_coords[BOT_RIGHT]);
-            println!("tile_box South East corner Co-ords {:?}", corner_coords[SE_CORNER]);
-            println!("tile_box bottom left corner Co-ords {:?}", corner_coords[BOT_LEFT]);
-            println!("tile_box South West corner Co-ords {:?}", corner_coords[SW_CORNER]);
-
+            // let corners:Vec<Point2D<i32>> = box2d_to_points(*tile_box);
+            let corner:[(usize,usize);4] = box_corners(*tile_box);
+            
+            println!("tile_box corner Co-ords {:?}", corner);
+            println!("tile_box top left corner Co-ords {:?}", corner[TOP_LEFT]);
+            println!("tile_box North West corner Co-ords {:?}", corner[NW_CORNER]);
+            println!("tile_box top right corner Co-ords {:?}", corner[TOP_RIGHT]);
+            println!("tile_box North East corner Co-ords {:?}", corner[NE_CORNER]);
+            println!("tile_box bottom right corner Co-ords {:?}", corner[BOT_RIGHT]);
+            println!("tile_box South East corner Co-ords {:?}", corner[SE_CORNER]);
+            println!("tile_box bottom left corner Co-ords {:?}", corner[BOT_LEFT]);
+            println!("tile_box South West corner Co-ords {:?}", corner[SW_CORNER]);
 
 
             let atile_rgb = &cur_tile.1;
@@ -185,11 +187,25 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
                 println!("match -> false false false false - single tile");
                 print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
 
-                line_data = line_data.move_to((x0,y0))
-                                    .line_to((x1,y0))
-                                    .line_to((x1,y1))
-                                    .line_to((x0,y1))
-                                    .line_to((x0,y0));
+                line_data = line_data.move_to(corner[TOP_LEFT])
+                                    .line_to(corner[TOP_RIGHT])
+                                    .line_to(corner[BOT_RIGHT])
+                                    .line_to(corner[BOT_LEFT])
+                                    .line_to(corner[TOP_LEFT]);
+
+                // same as above but harder to visualize
+                // line_data = line_data.move_to(corner[NW_CORNER])
+                //                     .line_to(corner[NE_CORNER])
+                //                     .line_to(corner[SE_CORNER])
+                //                     .line_to(corner[SW_CORNER])
+                //                     .line_to(corner[NW_CORNER]);
+
+                // same as above but easy to mess up x and y so use corner array
+                // line_data = line_data.move_to((x0,y0))
+                //                     .line_to((x1,y0))
+                //                     .line_to((x1,y1))
+                //                     .line_to((x0,y1))
+                //                     .line_to((x0,y0));
                                     // .close();                           // will double close crap out
                 println!("line data {:?}" , &line_data);
                 }, // FFFF
@@ -256,6 +272,8 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
     svg::save(svg_file_name_str, &document)
 
 }
+
+
 
 ///
 /// Get the Array2 ND array for the tile 
