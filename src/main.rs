@@ -195,7 +195,9 @@ fn main() {
     // let _ = single_tile::create_svg();
 
     // create a double tile horizontal mosaic of two white tiles and draw the corresponding SVG diagram    
-    let _ = two_tile_horiz::create_white_white_svg();
+    // let _ = two_tile_horiz::create_white_white_svg();
+
+    let _ = two_tile_horiz::create_white_black_svg();
     
 }
 
@@ -213,69 +215,69 @@ fn main() {
 /// white, white, black
 /// green, white, white
 /// white, green, green
-fn get_test_bool_bucket() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> 
-{
+// fn get_test_bool_bucket() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> 
+// {
 
-    let tiles_per_pane_width: usize = 3;
-    let tiles_per_pane_height: usize = 3;
+//     let tiles_per_pane_width: usize = 3;
+//     let tiles_per_pane_height: usize = 3;
 
-    // let mut initf = vec![vec![false ; 4] ; row_dim * col_dim] ;
-    // let bucket = Array::from_shape_vec((3,3), initf.to_vec()).unwrap();
-    let mut bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = 
-                                    get_bool_arr(tiles_per_pane_height, tiles_per_pane_width);
-    // println!("bucket = {:?}" , &bucket);
+//     // let mut initf = vec![vec![false ; 4] ; row_dim * col_dim] ;
+//     // let bucket = Array::from_shape_vec((3,3), initf.to_vec()).unwrap();
+//     let mut bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = 
+//                                     get_bool_arr(tiles_per_pane_height, tiles_per_pane_width);
+//     // println!("bucket = {:?}" , &bucket);
 
-    bucket[[0,0]][NORTH] = false;
-    bucket[[0,0]][EAST] = true;
-    bucket[[0,0]][SOUTH] = false;
-    bucket[[0,0]][WEST] = false;
+//     bucket[[0,0]][NORTH] = false;
+//     bucket[[0,0]][EAST] = true;
+//     bucket[[0,0]][SOUTH] = false;
+//     bucket[[0,0]][WEST] = false;
 
-    bucket[[0,1]][NORTH] = false;
-    bucket[[0,1]][EAST] = false;
-    bucket[[0,1]][SOUTH] = true;
-    bucket[[0,1]][WEST] = true;
+//     bucket[[0,1]][NORTH] = false;
+//     bucket[[0,1]][EAST] = false;
+//     bucket[[0,1]][SOUTH] = true;
+//     bucket[[0,1]][WEST] = true;
 
-    bucket[[0,2]][NORTH] = false;
-    bucket[[0,2]][EAST] = false;
-    bucket[[0,2]][SOUTH] = false;
-    bucket[[0,2]][WEST] = false;
+//     bucket[[0,2]][NORTH] = false;
+//     bucket[[0,2]][EAST] = false;
+//     bucket[[0,2]][SOUTH] = false;
+//     bucket[[0,2]][WEST] = false;
 
-    bucket[[1,0]][NORTH] = false;
-    bucket[[1,0]][EAST] = false;
-    bucket[[1,0]][SOUTH] = false;
-    bucket[[1,0]][WEST] = false;
+//     bucket[[1,0]][NORTH] = false;
+//     bucket[[1,0]][EAST] = false;
+//     bucket[[1,0]][SOUTH] = false;
+//     bucket[[1,0]][WEST] = false;
 
-    bucket[[1,1]][NORTH] = true;
-    bucket[[1,1]][EAST] = true;
-    bucket[[1,1]][SOUTH] = false;
-    bucket[[1,1]][WEST] = false;
+//     bucket[[1,1]][NORTH] = true;
+//     bucket[[1,1]][EAST] = true;
+//     bucket[[1,1]][SOUTH] = false;
+//     bucket[[1,1]][WEST] = false;
 
-    bucket[[1,2]][NORTH] = false;
-    bucket[[1,2]][EAST] = false;
-    bucket[[1,2]][SOUTH] = false;
-    bucket[[1,2]][WEST] = true;
-// 
-    bucket[[2,0]][NORTH] = false;
-    bucket[[2,0]][EAST] = false;
-    bucket[[2,0]][SOUTH] = false;
-    bucket[[2,0]][WEST] = false;
+//     bucket[[1,2]][NORTH] = false;
+//     bucket[[1,2]][EAST] = false;
+//     bucket[[1,2]][SOUTH] = false;
+//     bucket[[1,2]][WEST] = true;
+// // 
+//     bucket[[2,0]][NORTH] = false;
+//     bucket[[2,0]][EAST] = false;
+//     bucket[[2,0]][SOUTH] = false;
+//     bucket[[2,0]][WEST] = false;
 
-    bucket[[2,1]][NORTH] = false;
-    bucket[[2,1]][EAST] = true;
-    bucket[[2,1]][SOUTH] = false;
-    bucket[[2,1]][WEST] = false;
+//     bucket[[2,1]][NORTH] = false;
+//     bucket[[2,1]][EAST] = true;
+//     bucket[[2,1]][SOUTH] = false;
+//     bucket[[2,1]][WEST] = false;
 
-    bucket[[2,2]][NORTH] = false;
-    bucket[[2,2]][EAST] = false;
-    bucket[[2,2]][SOUTH] = false;
-    bucket[[2,2]][WEST] = true;
+//     bucket[[2,2]][NORTH] = false;
+//     bucket[[2,2]][EAST] = false;
+//     bucket[[2,2]][SOUTH] = false;
+//     bucket[[2,2]][WEST] = true;
 
-    // println!("bucket[0,0][0] = {:?}" , bucket[[0,0]][0]);
-    // println!("bucket = {:?}" , &bucket);
+//     // println!("bucket[0,0][0] = {:?}" , bucket[[0,0]][0]);
+//     // println!("bucket = {:?}" , &bucket);
 
-    bucket
+//     bucket
 
-}
+// }
 
 
 ///

@@ -156,9 +156,8 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
         
             let atile_rgb = &cur_tile.1;
             let atile_rgb_str = &atile_rgb.to_string().replace(" ", "");
-            println!("rgb string  {} ", rgb_str);
             rgb_str = atile_rgb_str.to_string(); 
-        
+            println!("rgb string  {} ", rgb_str);        
             // TODO Feb 12 - See notes 
 
             // let mut line_data = Data::new();
@@ -170,13 +169,12 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
                 println!("match -> false false false false - single tile");
                 print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
 
-                let mut line_data = Data::new()
-                                    .move_to((x0,y0))
+                line_data = line_data.move_to((x0,y0))
                                     .line_to((x1,y0))
                                     .line_to((x1,y1))
                                     .line_to((x0,y1))
                                     .line_to((x0,y0));
-                                    // .close(); // no close as this is done below
+                                    // .close();                           // will double close crap out
                 println!("line data {:?}" , &line_data);
                 }, // FFFF
                 // **********************************
@@ -218,6 +216,8 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
         // at this point all the tiles of the contig group have been processed so close the line 
         line_data = line_data.close();
 
+        println!(" ^^^^^^^^^^^^^\n after contig_group line_data close() {:?}\n ---------- " , &line_data);
+
         // create a path and add it to the svg document
         let tile_path = Path::new()
         .set("fill", rgb_str.to_owned()) // ie -> .set("fill", "rgb(255, 0, 0)")
@@ -236,7 +236,7 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
 
     // Write the svg document to a file
 
-    let svg_file_name_str = "double_tile_horizontal.svg";
+    // let svg_file_name_str = "double_tile_horizontal.svg";
     svg::save(svg_file_name_str, &document)
 
 }
