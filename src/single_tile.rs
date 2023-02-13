@@ -91,10 +91,10 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
 
     println!("Tile info {:?}", &cur_tile);  
 
-    let N = edge_booleans[[0,0]][NORTH];
-    let E = edge_booleans[[0,0]][EAST];
-    let S = edge_booleans[[0,0]][SOUTH];
-    let W = edge_booleans[[0,0]][WEST];
+    let n = edge_booleans[[0,0]][NORTH];
+    let e = edge_booleans[[0,0]][EAST];
+    let s = edge_booleans[[0,0]][SOUTH];
+    let w = edge_booleans[[0,0]][WEST];
 
     let tile_box = &cur_tile.0;
     let x0 = tile_box.min.x as usize;
@@ -105,7 +105,7 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
     let tile_rgb = &cur_tile.1;
     let rgb_str = tile_rgb.to_string().replace(" ", "");
     println!("rgb string  {} ", rgb_str);
-    match (N, E, S, W) { //FFFF
+    match (n, e, s, w) { //FFFF
         (false, false, false, false) => {
         println!("match -> false false false false - single tile");
         print!(" NORTH EAST SOUTH WEST fully closed single tile\n");

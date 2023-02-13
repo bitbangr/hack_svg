@@ -17,7 +17,7 @@ use std::fmt::Write;
 
 use std::collections::HashSet;
 
-use crate::dfs_tiles::get_contiguous_tiles_orig;
+use crate::dfs_tiles::_get_contiguous_tiles_orig;
 use crate::svg_utils::draw_svg_grid_one;
 
 const BOARD_SIZE: i32 = 8;

@@ -65,7 +65,7 @@ pub fn get_contiguous_tiles_mod(pane_vec: &Vec<Vec<(Box2D<i32, UnknownUnit>, RGB
  */
 // CODE Below works but needed to refactor
 
-fn dfs_orig(array: &Vec<Vec<String>>, row: isize, col: isize, color: &str, visited: &mut Vec<Vec<bool>>, rows: isize, cols: isize) -> Vec<(isize, isize)> {
+fn _dfs_orig(array: &Vec<Vec<String>>, row: isize, col: isize, color: &str, visited: &mut Vec<Vec<bool>>, rows: isize, cols: isize) -> Vec<(isize, isize)> {
     if row < 0 || row >= rows || col < 0 || col >= cols || visited[row as usize ][col as usize] || array[row as usize][col as usize] != color {
         return vec![];
     }
@@ -75,12 +75,12 @@ fn dfs_orig(array: &Vec<Vec<String>>, row: isize, col: isize, color: &str, visit
     for d in dirs {
         let r = row + d.0;
         let c = col + d.1;
-        curr_group.extend(dfs_orig(array, r, c, color, visited, rows, cols));
+        curr_group.extend(_dfs_orig(array, r, c, color, visited, rows, cols));
     }
     return curr_group;
 }
 
-pub fn get_contiguous_tiles_orig(array: &Vec<Vec<String>>) -> Vec<Vec<(isize, isize)>> {
+pub fn _get_contiguous_tiles_orig(array: &Vec<Vec<String>>) -> Vec<Vec<(isize, isize)>> {
     let rows = array.len() as isize;
     let cols = array[0].len() as isize;
     let mut visited = vec![vec![false; cols as usize]; rows as usize];
@@ -90,7 +90,7 @@ pub fn get_contiguous_tiles_orig(array: &Vec<Vec<String>>) -> Vec<Vec<(isize, is
         for col in 0..cols {
             if !visited[row as usize ][col as usize] {
                 let color = &array[row as usize][col as usize];
-                let curr_group = dfs_orig(array, row, col, color, &mut visited, rows, cols);
+                let curr_group = _dfs_orig(array, row, col, color, &mut visited, rows, cols);
                 if !curr_group.is_empty() {
                     result.push(curr_group);
                 }
