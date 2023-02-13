@@ -19,30 +19,7 @@ use std::fmt::Write;
 use std::collections::HashSet;
 
 use crate::dfs_tiles::_get_contiguous_tiles_orig;
-
-
-const BOARD_SIZE: i32 = 8;
-const RECT_SIZE: i32 = 50;
-const WIDTH: i32 = 100;
-const HEIGHT: i32 = 100;
-const CELL_SIZE: i32 = 100;
-const COLOR_BLK: &str = "black";
-const COLOR_WHT: &str = "white";
-
-const NORTH: usize = 0;
-const EAST: usize = 1;
-const SOUTH: usize = 2;
-const WEST: usize = 3;
-
-const  TOP_LEFT: usize = 0 ;
-const TOP_RIGHT: usize = 1; 
-const BOT_RIGHT: usize = 2;
-const  BOT_LEFT: usize = 3;
-
-const NW_CORNER: usize = 0 ;
-const NE_CORNER: usize = 1; 
-const SE_CORNER: usize = 2;
-const SW_CORNER: usize = 3;
+use crate::two_tile_horiz::create_white_black_svg;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Line {
@@ -201,13 +178,13 @@ fn main() {
     /********************************************************/
 
     // create a single tile mosaic and draw the corresponding SVG diagram    
-    // let _ = single_tile::create_svg();
+    let _ = single_tile::create_svg();
 
     // create a double tile horizontal mosaic of two white tiles and draw the corresponding SVG diagram    
     // let _ = two_tile_horiz::create_white_white_svg();
-        let _ = test_corner();
+        // let _ = test_corner();
 
-    let _ = two_tile_horiz::create_white_black_svg();
+    let _ = create_white_black_svg();
     
 }
 
