@@ -1,24 +1,18 @@
+mod svg_utils {
+
+
+
+use crate::box_corners;
 use crate::modtile::{RGB, self};
+use crate::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
+use crate::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
+use crate::constants::{NORTH,EAST,SOUTH,WEST,};
 
 
 use euclid::default::Box2D;
 use svg::node::element::path::Data;
 use svg::node::element::Path;
 use svg::Document;
-
-// TODO get rid of duplications.  Centralize contants in a single file
-const BOARD_SIZE: i32 = 8;
-const RECT_SIZE: i32 = 50;
-const WIDTH: i32 = 100;
-const HEIGHT: i32 = 100;
-const CELL_SIZE: i32 = 100;
-const COLOR_BLK: &str = "black";
-const COLOR_WHT: &str = "white";
-
-const NORTH: usize = 0;
-const EAST: usize = 1;
-const SOUTH: usize = 2;
-const WEST: usize = 3;
 
 
 ///
@@ -73,6 +67,192 @@ fn draw_polyline_borders()
     todo!()
 }
 
+
+
+/// The write_svgvfunction will create an output SVG file with the supplied input data.
+/// 
+/// # Arguments
+///
+/// `mosaic_nd_arr: ArrayBase<OwnedRepr<(Box2D<i32>, RGB)>, Dim<[usize; 2]>>` - Array of all tiles with Box Coordinates and associated tile colour
+/// 'edge_booleans: ArrayBase<OwnedRepr<Vec<bool>>, Dim<[usize; 2]>>' - Edge boolean for each tile
+/// 'contiguous_tiles: Vec<Vec<(isize, isize)>>'  - vector containing collections of contigous tiles
+/// 'svg_file_name_str'": &str string holding name of SVG file to write to
+///
+/// # Return
+///
+/// returns a result 
+///  
+/// # Examples
+///
+/// ```
+/// ```
+fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>, 
+            edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
+            contiguous_tiles: Vec<Vec<(isize, isize)>>,
+            svg_file_name_str: &str,
+            viewbox_width: usize,
+            viewbox_height: usize ) -> Result<(), std::io::Error> 
+{
+    // not sure if SVG specific code should reside here or in svg_utils.rs
+    
+    // Create the svg document
+    // TODO set width and heigh to match rows/cols * tile size
+    let mut document = Document::new().set("viewBox", (0, 0, viewbox_width, viewbox_height));
+
+    // let stroke_colour =  "black";
+    let stroke_colour =  "purple";
+    let stroke_width =  0.25; 
+
+
+    //***********
+    // **********
+    println!("\nfn write_svg - Vector of contigous tiles -> {:?}", contiguous_tiles);
+
+    // store all the edges 
+
+    // Grab a collection of contigous tiles
+    for contig_group in &contiguous_tiles{
+
+        let mut line_data = Data::new();
+        let mut rgb_str: String = String::new();
+    
+        for contig_tile in contig_group{
+            
+            let row = *&contig_tile.0 as usize;
+            let col = *&contig_tile.1 as usize;
+        
+            println!("*** contigous tile {:?}", &contig_tile);
+            println!("*** contig_tile row {}", &row);
+            println!("*** contig_tile col {}", &col);
+
+            // println!("mosaic_nd_arr [x][y] -> {:?} ",mosaic_nd_arr[[row,col]] );
+
+            let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
+            println!("\n(row: {} col: {})\n\tCur Tile Info {:?} ",row, col, &cur_tile);
+            println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
+        
+            let n = edge_booleans[[row,col]][NORTH];
+            let e = edge_booleans[[row,col]][EAST];
+            let s = edge_booleans[[row,col]][SOUTH];
+            let w = edge_booleans[[row,col]][WEST];
+        
+            let tile_box = &cur_tile.0;
+            let corner:[(usize,usize);4] = box_corners(*tile_box);
+            
+            println!("corner Co-ords {:?}", corner);
+            println!("top left corner {:?}", corner[TOP_LEFT]);
+            println!("North West corner {:?}", corner[NW_CORNER]);
+            println!("top right corner {:?}", corner[TOP_RIGHT]);
+            println!("North East corner {:?}", corner[NE_CORNER]);
+            println!("bottom right corner {:?}", corner[BOT_RIGHT]);
+            println!("South East corner {:?}", corner[SE_CORNER]);
+            println!("bottom left corner {:?}", corner[BOT_LEFT]);
+            println!("South West corner {:?}", corner[SW_CORNER]);
+
+            let atile_rgb = &cur_tile.1;
+            let atile_rgb_str = &atile_rgb.to_string().replace(" ", "");
+            rgb_str = atile_rgb_str.to_string(); 
+            println!("rgb string  {} ", rgb_str);        
+            // TODO Feb 12 - See notes 
+
+            // let mut line_data = Data::new();
+            match (n, e, s, w) { //FTFF
+
+            // *******************************************
+            // Fully closed tiles are by definition the only element in the contigous tile collection
+            (false, false, false, false) => {
+                println!("match -> false false false false - single tile");
+                print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
+
+                line_data = line_data.move_to(corner[TOP_LEFT])
+                                    .line_to(corner[TOP_RIGHT])
+                                    .line_to(corner[BOT_RIGHT])
+                                    .line_to(corner[BOT_LEFT])
+                                    .line_to(corner[TOP_LEFT]);
+
+                // same as above but harder to visualize
+                // line_data = line_data.move_to(corner[NW_CORNER])
+                //                     .line_to(corner[NE_CORNER])
+                //                     .line_to(corner[SE_CORNER])
+                //                     .line_to(corner[SW_CORNER])
+                //                     .line_to(corner[NW_CORNER]);
+
+                // same as above but easy to mess up x and y so use corner array
+                // line_data = line_data.move_to((x0,y0))
+                //                     .line_to((x1,y0))
+                //                     .line_to((x1,y1))
+                //                     .line_to((x0,y1))
+                //                     .line_to((x0,y0));
+                                    // .close();                           // will double close crap out
+                println!("line data {:?}" , &line_data);
+                }, // FFFF
+                // **********************************
+            (false, true, false, false) => {
+                println!("match -> false true false false - east open");
+                print!(" NORTH SOUTH WEST Closed - East Open tile\n");
+
+                line_data = line_data.move_to(corner[BOT_RIGHT])
+                    .line_to(corner[BOT_LEFT])
+                    .line_to(corner[TOP_LEFT])
+                    .line_to(corner[TOP_RIGHT]);
+
+                    println!("line data {:?}\n ----------- " , &line_data);
+
+                }, // FFFF
+                // **********************************    
+            (false, false, false, true) => { //FFFT
+                    println!("match -> false false false true - west open");
+                    print!(" NORTH EAST SOUTH Closed - West/left side Open tile\n");
+    
+                    // open West tiles cannot be first tile in results so no need for absolute 'move_to'.
+                    // just continue to draw from last point
+                    line_data = line_data.line_to(corner[TOP_RIGHT])
+                    .line_to(corner[BOT_RIGHT])
+                    .line_to(corner[BOT_LEFT]);
+
+                    println!("line data {:?}\n ---------- " , &line_data);
+
+                }, // FFFT
+                // **********************************
+                _ => {
+                    println!("The EDGE Boolean does not match any of the options\n");  
+                },
+
+            } // match
+
+        } // tile in contig_group
+        
+        // at this point all the tiles of the contig group have been processed so close the line 
+        line_data = line_data.close();
+
+        println!(" ^^^^^^^^^^^^^\n after contig_group line_data close() {:?}\n ---------- " , &line_data);
+
+        // create a path and add it to the svg document
+        let tile_path = Path::new()
+        .set("fill", rgb_str.to_owned()) // ie -> .set("fill", "rgb(255, 0, 0)")
+        .set("stroke", stroke_colour)
+        .set("stroke-width", stroke_width)
+        .set("d", line_data);
+
+        // add the tile path to the document
+        document = document.add(tile_path);
+    
+    } // contig_group
+
+    // let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
+    // println!("\n(row: {} col: {})\n\tTile Info {:?} ",row, col, &cur_tile);
+    // println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
+
+    // Write the svg document to a file
+
+    println!("writing to file {} ", &svg_file_name_str);// let svg_file_name_str = "double_tile_horizontal.svg";
+    svg::save(svg_file_name_str, &document)
+
+}
+
+
+
+
 /// iterate over each tile by row col and
 /// Draw out all the pane lines matching the cardinal directors for that tile
 /// do not worry about duplicate line etc
@@ -83,7 +263,8 @@ pub fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<
     println!("\n ***********\nFUNCTION draw_svg_grid_one\n");
 
     // Create the svg document
-    let mut document = Document::new().set("viewBox", (0, 0, WIDTH, HEIGHT));
+    // let mut document = Document::new().set("viewBox", (0, 0, WIDTH, HEIGHT));
+    let mut document = Document::new().set("viewBox", (0, 0, 200, 100));
 
     // let stroke_colour =  "black";
     let stroke_colour =  "purple";
@@ -387,7 +568,9 @@ pub fn draw_svg_grid_one(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<
 /// and write out to document
 
 pub fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
-                        pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>, ndarray::Dim<[usize; 2]>>) 
+                        pane_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>, ndarray::Dim<[usize; 2]>>,
+                        viewbox_width: usize,
+                        viewbox_height: usize) 
 {
     println!("draw_svg_grid");
 
@@ -496,7 +679,7 @@ pub fn draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool
 
 // Create the svg document
     let document = Document::new()
-        .set("viewBox", (0, 0, WIDTH, HEIGHT))
+        .set("viewBox", (0, 0, viewbox_width, viewbox_height))
         .add(north_path)
         .add(east_path)
         .add(south_path)
@@ -627,7 +810,7 @@ fn create_non_overlapping_squares() -> Result<(), std::io::Error> {
 
     // // Create the svg document
     let document = Document::new()
-        .set("viewBox", (0, 0, WIDTH, HEIGHT))
+        .set("viewBox", (0, 0, 100, 100))
         .add(path)
         .add(inner_sqr_path);
 
@@ -662,3 +845,4 @@ fn simple_draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<b
          
 }
 
+} // mod svg_utils
