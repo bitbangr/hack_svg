@@ -6,11 +6,16 @@ use svg::node::element::Path;
 use svg::node::element::path::Data;
 
 use crate::box_corners;
-use crate::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
-use crate::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
+use crate::constants::{NORTH,EAST,SOUTH,WEST};
+use crate::constants::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
+use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 use crate::dfs_tiles::get_contiguous_tiles_mod;
-use crate::{pane_vec_to_ndarray, get_bool_arr, NORTH,EAST,SOUTH,WEST, box2d_to_points};
+use crate::svg_utils;
+use crate::svg_utils::write_svg;
+use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
 use crate::{modtile::{RGB, self}, create_data};
+
+
 
 // For a two tile horizontal mosiac the dimension are 1 row by 2 col
 const TILES_PER_PANE_WIDTH: usize = 2;
@@ -47,16 +52,16 @@ pub(crate) fn create_white_white_svg(){
     let svg_file_name_str = "double_tile_horizontal.svg";
 
     // lets create an svg file
-    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str);
+    let _ = svg_utils::write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,100 as usize,200 as usize);
 
 
 }
 
 
-/*
+/* 
     This function creates a 1x2 mosaic of one white and one black tile and then creates an SVG file with this info
 */
-pub(crate) fn create_white_black_svg(){
+pub fn create_white_black_svg(){
 
     // Create a simple 1x2 mosaic
     let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_white_black_tile_data(); 
@@ -82,13 +87,13 @@ pub(crate) fn create_white_black_svg(){
     println!("fn dfs_mod search results -> {:?}", &contiguous_tiles);
 
     let svg_file_name_str = "white_black_1x2.svg";
-    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str);
+    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str, 200 as usize, 100 as usize );
 
 }
 
 
 
-/// The write_svgvfunction will create an output SVG file with the supplied input data.
+/// The write_svg function will create an output SVG file with the supplied input data.
 /// 
 /// # Arguments
 ///
@@ -104,167 +109,171 @@ pub(crate) fn create_white_black_svg(){
 ///
 /// ```
 /// ```
-fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>, 
-            edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
-            contiguous_tiles: Vec<Vec<(isize, isize)>>,
-            svg_file_name_str: &str ) -> Result<(), std::io::Error> 
-{
-    // not sure if SVG specific code should reside here or in svg_utils.rs
+/// 
+
+
+
+// fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>, 
+//             edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
+//             contiguous_tiles: Vec<Vec<(isize, isize)>>,
+//             svg_file_name_str: &str ) -> Result<(), std::io::Error> 
+// {
+//     // not sure if SVG specific code should reside here or in svg_utils.rs
     
-    // Create the svg document
-    // TODO set width and heigh to match rows/cols * tile size
-    let mut document = Document::new().set("viewBox", (0, 0, 200, 100));
+//     // Create the svg document
+//     // TODO set width and heigh to match rows/cols * tile size
+//     let mut document = Document::new().set("viewBox", (0, 0, 200, 100));
 
-    // let stroke_colour =  "black";
-    let stroke_colour =  "purple";
-    let stroke_width =  0.25; 
+//     // let stroke_colour =  "black";
+//     let stroke_colour =  "purple";
+//     let stroke_width =  0.25; 
 
 
-    //***********
-    // **********
-    println!("\nfn write_svg - Vector of contigous tiles -> {:?}", contiguous_tiles);
+//     //***********
+//     // **********
+//     println!("\nfn write_svg - Vector of contigous tiles -> {:?}", contiguous_tiles);
 
-    // store all the edges 
+//     // store all the edges 
 
-    // Grab a collection of contigous tiles
-    for contig_group in &contiguous_tiles{
+//     // Grab a collection of contigous tiles
+//     for contig_group in &contiguous_tiles{
 
-        let mut line_data = Data::new();
-        let mut rgb_str: String = String::new();
+//         let mut line_data = Data::new();
+//         let mut rgb_str: String = String::new();
     
-        for contig_tile in contig_group{
+//         for contig_tile in contig_group{
             
-            let row = *&contig_tile.0 as usize;
-            let col = *&contig_tile.1 as usize;
+//             let row = *&contig_tile.0 as usize;
+//             let col = *&contig_tile.1 as usize;
         
-            println!("*** contigous tile {:?}", &contig_tile);
-            println!("*** contig_tile row {}", &row);
-            println!("*** contig_tile col {}", &col);
+//             println!("*** contigous tile {:?}", &contig_tile);
+//             println!("*** contig_tile row {}", &row);
+//             println!("*** contig_tile col {}", &col);
 
-            // println!("mosaic_nd_arr [x][y] -> {:?} ",mosaic_nd_arr[[row,col]] );
+//             // println!("mosaic_nd_arr [x][y] -> {:?} ",mosaic_nd_arr[[row,col]] );
 
-            let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
-            println!("\n(row: {} col: {})\n\tCur Tile Info {:?} ",row, col, &cur_tile);
-            println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
+//             let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
+//             println!("\n(row: {} col: {})\n\tCur Tile Info {:?} ",row, col, &cur_tile);
+//             println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
         
-            let n = edge_booleans[[row,col]][NORTH];
-            let e = edge_booleans[[row,col]][EAST];
-            let s = edge_booleans[[row,col]][SOUTH];
-            let w = edge_booleans[[row,col]][WEST];
+//             let n = edge_booleans[[row,col]][NORTH];
+//             let e = edge_booleans[[row,col]][EAST];
+//             let s = edge_booleans[[row,col]][SOUTH];
+//             let w = edge_booleans[[row,col]][WEST];
         
-            let tile_box = &cur_tile.0;
-            let corner:[(usize,usize);4] = box_corners(*tile_box);
+//             let tile_box = &cur_tile.0;
+//             let corner:[(usize,usize);4] = box_corners(*tile_box);
             
-            println!("corner Co-ords {:?}", corner);
-            println!("top left corner {:?}", corner[TOP_LEFT]);
-            println!("North West corner {:?}", corner[NW_CORNER]);
-            println!("top right corner {:?}", corner[TOP_RIGHT]);
-            println!("North East corner {:?}", corner[NE_CORNER]);
-            println!("bottom right corner {:?}", corner[BOT_RIGHT]);
-            println!("South East corner {:?}", corner[SE_CORNER]);
-            println!("bottom left corner {:?}", corner[BOT_LEFT]);
-            println!("South West corner {:?}", corner[SW_CORNER]);
+//             println!("corner Co-ords {:?}", corner);
+//             println!("top left corner {:?}", corner[TOP_LEFT]);
+//             println!("North West corner {:?}", corner[NW_CORNER]);
+//             println!("top right corner {:?}", corner[TOP_RIGHT]);
+//             println!("North East corner {:?}", corner[NE_CORNER]);
+//             println!("bottom right corner {:?}", corner[BOT_RIGHT]);
+//             println!("South East corner {:?}", corner[SE_CORNER]);
+//             println!("bottom left corner {:?}", corner[BOT_LEFT]);
+//             println!("South West corner {:?}", corner[SW_CORNER]);
 
-            let atile_rgb = &cur_tile.1;
-            let atile_rgb_str = &atile_rgb.to_string().replace(" ", "");
-            rgb_str = atile_rgb_str.to_string(); 
-            println!("rgb string  {} ", rgb_str);        
-            // TODO Feb 12 - See notes 
+//             let atile_rgb = &cur_tile.1;
+//             let atile_rgb_str = &atile_rgb.to_string().replace(" ", "");
+//             rgb_str = atile_rgb_str.to_string(); 
+//             println!("rgb string  {} ", rgb_str);        
+//             // TODO Feb 12 - See notes 
 
-            // let mut line_data = Data::new();
-            match (n, e, s, w) { //FTFF
+//             // let mut line_data = Data::new();
+//             match (n, e, s, w) { //FTFF
 
-            // *******************************************
-            // Fully closed tiles are by definition the only element in the contigous tile collection
-            (false, false, false, false) => {
-                println!("match -> false false false false - single tile");
-                print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
+//             // *******************************************
+//             // Fully closed tiles are by definition the only element in the contigous tile collection
+//             (false, false, false, false) => {
+//                 println!("match -> false false false false - single tile");
+//                 print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
 
-                line_data = line_data.move_to(corner[TOP_LEFT])
-                                    .line_to(corner[TOP_RIGHT])
-                                    .line_to(corner[BOT_RIGHT])
-                                    .line_to(corner[BOT_LEFT])
-                                    .line_to(corner[TOP_LEFT]);
+//                 line_data = line_data.move_to(corner[TOP_LEFT])
+//                                     .line_to(corner[TOP_RIGHT])
+//                                     .line_to(corner[BOT_RIGHT])
+//                                     .line_to(corner[BOT_LEFT])
+//                                     .line_to(corner[TOP_LEFT]);
 
-                // same as above but harder to visualize
-                // line_data = line_data.move_to(corner[NW_CORNER])
-                //                     .line_to(corner[NE_CORNER])
-                //                     .line_to(corner[SE_CORNER])
-                //                     .line_to(corner[SW_CORNER])
-                //                     .line_to(corner[NW_CORNER]);
+//                 // same as above but harder to visualize
+//                 // line_data = line_data.move_to(corner[NW_CORNER])
+//                 //                     .line_to(corner[NE_CORNER])
+//                 //                     .line_to(corner[SE_CORNER])
+//                 //                     .line_to(corner[SW_CORNER])
+//                 //                     .line_to(corner[NW_CORNER]);
 
-                // same as above but easy to mess up x and y so use corner array
-                // line_data = line_data.move_to((x0,y0))
-                //                     .line_to((x1,y0))
-                //                     .line_to((x1,y1))
-                //                     .line_to((x0,y1))
-                //                     .line_to((x0,y0));
-                                    // .close();                           // will double close crap out
-                println!("line data {:?}" , &line_data);
-                }, // FFFF
-                // **********************************
-            (false, true, false, false) => {
-                println!("match -> false true false false - east open");
-                print!(" NORTH SOUTH WEST Closed - East Open tile\n");
+//                 // same as above but easy to mess up x and y so use corner array
+//                 // line_data = line_data.move_to((x0,y0))
+//                 //                     .line_to((x1,y0))
+//                 //                     .line_to((x1,y1))
+//                 //                     .line_to((x0,y1))
+//                 //                     .line_to((x0,y0));
+//                                     // .close();                           // will double close crap out
+//                 println!("line data {:?}" , &line_data);
+//                 }, // FFFF
+//                 // **********************************
+//             (false, true, false, false) => {
+//                 println!("match -> false true false false - east open");
+//                 print!(" NORTH SOUTH WEST Closed - East Open tile\n");
 
-                line_data = line_data.move_to(corner[BOT_RIGHT])
-                    .line_to(corner[BOT_LEFT])
-                    .line_to(corner[TOP_LEFT])
-                    .line_to(corner[TOP_RIGHT]);
+//                 line_data = line_data.move_to(corner[BOT_RIGHT])
+//                     .line_to(corner[BOT_LEFT])
+//                     .line_to(corner[TOP_LEFT])
+//                     .line_to(corner[TOP_RIGHT]);
 
-                    println!("line data {:?}\n ----------- " , &line_data);
+//                     println!("line data {:?}\n ----------- " , &line_data);
 
-                }, // FFFF
-                // **********************************    
-            (false, false, false, true) => { //FFFT
-                    println!("match -> false false false true - west open");
-                    print!(" NORTH EAST SOUTH Closed - West/left side Open tile\n");
+//                 }, // FFFF
+//                 // **********************************    
+//             (false, false, false, true) => { //FFFT
+//                     println!("match -> false false false true - west open");
+//                     print!(" NORTH EAST SOUTH Closed - West/left side Open tile\n");
     
-                    // open West tiles cannot be first tile in results so no need for absolute 'move_to'.
-                    // just continue to draw from last point
-                    line_data = line_data.line_to(corner[TOP_RIGHT])
-                    .line_to(corner[BOT_RIGHT])
-                    .line_to(corner[BOT_LEFT]);
+//                     // open West tiles cannot be first tile in results so no need for absolute 'move_to'.
+//                     // just continue to draw from last point
+//                     line_data = line_data.line_to(corner[TOP_RIGHT])
+//                     .line_to(corner[BOT_RIGHT])
+//                     .line_to(corner[BOT_LEFT]);
 
-                    println!("line data {:?}\n ---------- " , &line_data);
+//                     println!("line data {:?}\n ---------- " , &line_data);
 
-                }, // FFFT
-                // **********************************
-                _ => {
-                    println!("The EDGE Boolean does not match any of the options\n");  
-                },
+//                 }, // FFFT
+//                 // **********************************
+//                 _ => {
+//                     println!("The EDGE Boolean does not match any of the options\n");  
+//                 },
 
-            } // match
+//             } // match
 
-        } // tile in contig_group
+//         } // tile in contig_group
         
-        // at this point all the tiles of the contig group have been processed so close the line 
-        line_data = line_data.close();
+//         // at this point all the tiles of the contig group have been processed so close the line 
+//         line_data = line_data.close();
 
-        println!(" ^^^^^^^^^^^^^\n after contig_group line_data close() {:?}\n ---------- " , &line_data);
+//         println!(" ^^^^^^^^^^^^^\n after contig_group line_data close() {:?}\n ---------- " , &line_data);
 
-        // create a path and add it to the svg document
-        let tile_path = Path::new()
-        .set("fill", rgb_str.to_owned()) // ie -> .set("fill", "rgb(255, 0, 0)")
-        .set("stroke", stroke_colour)
-        .set("stroke-width", stroke_width)
-        .set("d", line_data);
+//         // create a path and add it to the svg document
+//         let tile_path = Path::new()
+//         .set("fill", rgb_str.to_owned()) // ie -> .set("fill", "rgb(255, 0, 0)")
+//         .set("stroke", stroke_colour)
+//         .set("stroke-width", stroke_width)
+//         .set("d", line_data);
 
-        // add the tile path to the document
-        document = document.add(tile_path);
+//         // add the tile path to the document
+//         document = document.add(tile_path);
     
-    } // contig_group
+//     } // contig_group
 
-    // let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
-    // println!("\n(row: {} col: {})\n\tTile Info {:?} ",row, col, &cur_tile);
-    // println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
+//     // let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
+//     // println!("\n(row: {} col: {})\n\tTile Info {:?} ",row, col, &cur_tile);
+//     // println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
 
-    // Write the svg document to a file
+//     // Write the svg document to a file
 
-    println!("writing to file {} ", &svg_file_name_str);// let svg_file_name_str = "double_tile_horizontal.svg";
-    svg::save(svg_file_name_str, &document)
+//     println!("writing to file {} ", &svg_file_name_str);// let svg_file_name_str = "double_tile_horizontal.svg";
+//     svg::save(svg_file_name_str, &document)
 
-}
+// }
 
 
 
