@@ -33,7 +33,15 @@ const EAST: usize = 1;
 const SOUTH: usize = 2;
 const WEST: usize = 3;
 
+const  TOP_LEFT: usize = 0 ;
+const TOP_RIGHT: usize = 1; 
+const BOT_RIGHT: usize = 2;
+const  BOT_LEFT: usize = 3;
 
+const NW_CORNER: usize = 0 ;
+const NE_CORNER: usize = 1; 
+const SE_CORNER: usize = 2;
+const SW_CORNER: usize = 3;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Line {

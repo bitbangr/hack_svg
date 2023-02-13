@@ -1,11 +1,14 @@
 use euclid::default::Box2D;
+use euclid::default::Point2D;
 use ndarray::{Array, Array2};
 use svg::Document;
 use svg::node::element::Path;
 use svg::node::element::path::Data;
 
+use crate::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
+use crate::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 use crate::dfs_tiles::get_contiguous_tiles_mod;
-use crate::{pane_vec_to_ndarray, get_bool_arr, NORTH,EAST,SOUTH,WEST};
+use crate::{pane_vec_to_ndarray, get_bool_arr, NORTH,EAST,SOUTH,WEST, box2d_to_points};
 use crate::{modtile::{RGB, self}, create_data};
 
 // For a two tile horizontal mosiac the dimension are 1 row by 2 col
@@ -154,6 +157,19 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
             let x1 = tile_box.max.x as usize;
             let y1 = tile_box.max.y as usize;
         
+            let corner_coords:Vec<Point2D<i32>> = box2d_to_points(*tile_box);
+            println!("tile_box corner Co-ords {:?}", corner_coords);
+            println!("tile_box top left corner Co-ords {:?}", corner_coords[TOP_LEFT]);
+            println!("tile_box North West corner Co-ords {:?}", corner_coords[NW_CORNER]);
+            println!("tile_box top right corner Co-ords {:?}", corner_coords[TOP_RIGHT]);
+            println!("tile_box North East corner Co-ords {:?}", corner_coords[NE_CORNER]);
+            println!("tile_box bottom right corner Co-ords {:?}", corner_coords[BOT_RIGHT]);
+            println!("tile_box South East corner Co-ords {:?}", corner_coords[SE_CORNER]);
+            println!("tile_box bottom left corner Co-ords {:?}", corner_coords[BOT_LEFT]);
+            println!("tile_box South West corner Co-ords {:?}", corner_coords[SW_CORNER]);
+
+
+
             let atile_rgb = &cur_tile.1;
             let atile_rgb_str = &atile_rgb.to_string().replace(" ", "");
             rgb_str = atile_rgb_str.to_string(); 
