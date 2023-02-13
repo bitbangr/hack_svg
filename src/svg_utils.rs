@@ -1,19 +1,14 @@
-mod svg_utils {
-
-
-
 use crate::box_corners;
 use crate::modtile::{RGB, self};
-use crate::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
-use crate::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 use crate::constants::{NORTH,EAST,SOUTH,WEST,};
-
+use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
+use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
+use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
 use euclid::default::Box2D;
 use svg::node::element::path::Data;
 use svg::node::element::Path;
 use svg::Document;
-
 
 ///
 /// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
@@ -86,7 +81,7 @@ fn draw_polyline_borders()
 ///
 /// ```
 /// ```
-fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>, 
+pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>,
             edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
             contiguous_tiles: Vec<Vec<(isize, isize)>>,
             svg_file_name_str: &str,
@@ -842,7 +837,4 @@ fn simple_draw_svg_grid(line_bucket: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<b
             println!("Row: {}, Col: {}, Cardinal Direction Bool: {:?}", row, col, cardinal_dirs);            
         }
     }
-         
 }
-
-} // mod svg_utils
