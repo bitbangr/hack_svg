@@ -153,24 +153,17 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
             let w = edge_booleans[[row,col]][WEST];
         
             let tile_box = &cur_tile.0;
-            let x0 = tile_box.min.x as usize;
-            let y0 = tile_box.min.y as usize;
-            let x1 = tile_box.max.x as usize;
-            let y1 = tile_box.max.y as usize;
-        
-            // let corners:Vec<Point2D<i32>> = box2d_to_points(*tile_box);
             let corner:[(usize,usize);4] = box_corners(*tile_box);
             
-            println!("tile_box corner Co-ords {:?}", corner);
-            println!("tile_box top left corner Co-ords {:?}", corner[TOP_LEFT]);
-            println!("tile_box North West corner Co-ords {:?}", corner[NW_CORNER]);
-            println!("tile_box top right corner Co-ords {:?}", corner[TOP_RIGHT]);
-            println!("tile_box North East corner Co-ords {:?}", corner[NE_CORNER]);
-            println!("tile_box bottom right corner Co-ords {:?}", corner[BOT_RIGHT]);
-            println!("tile_box South East corner Co-ords {:?}", corner[SE_CORNER]);
-            println!("tile_box bottom left corner Co-ords {:?}", corner[BOT_LEFT]);
-            println!("tile_box South West corner Co-ords {:?}", corner[SW_CORNER]);
-
+            println!("corner Co-ords {:?}", corner);
+            println!("top left corner {:?}", corner[TOP_LEFT]);
+            println!("North West corner {:?}", corner[NW_CORNER]);
+            println!("top right corner {:?}", corner[TOP_RIGHT]);
+            println!("North East corner {:?}", corner[NE_CORNER]);
+            println!("bottom right corner {:?}", corner[BOT_RIGHT]);
+            println!("South East corner {:?}", corner[SE_CORNER]);
+            println!("bottom left corner {:?}", corner[BOT_LEFT]);
+            println!("South West corner {:?}", corner[SW_CORNER]);
 
             let atile_rgb = &cur_tile.1;
             let atile_rgb_str = &atile_rgb.to_string().replace(" ", "");
@@ -219,13 +212,7 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
                     .line_to(corner[TOP_LEFT])
                     .line_to(corner[TOP_RIGHT]);
 
-                // line_data = line_data.move_to((x1,y1))
-                //     .line_to((x0,y1))
-                //     .line_to((x0,y0))
-                //     .line_to((x1,y0));
-
                     println!("line data {:?}\n ----------- " , &line_data);
-
 
                 }, // FFFF
                 // **********************************    
@@ -238,11 +225,6 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
                     line_data = line_data.line_to(corner[TOP_RIGHT])
                     .line_to(corner[BOT_RIGHT])
                     .line_to(corner[BOT_LEFT]);
-
-                    // // line_data = line_data.move_to((x0,y0))
-                    // line_data = line_data.line_to((x1,y0))
-                    // .line_to((x1,y1))
-                    // .line_to((x0,y1));
 
                     println!("line data {:?}\n ---------- " , &line_data);
 
