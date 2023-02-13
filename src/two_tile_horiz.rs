@@ -214,10 +214,15 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
                 println!("match -> false true false false - east open");
                 print!(" NORTH SOUTH WEST Closed - East Open tile\n");
 
-                line_data = line_data.move_to((x1,y1))
-                    .line_to((x0,y1))
-                    .line_to((x0,y0))
-                    .line_to((x1,y0));
+                line_data = line_data.move_to(corner[BOT_RIGHT])
+                    .line_to(corner[BOT_LEFT])
+                    .line_to(corner[TOP_LEFT])
+                    .line_to(corner[TOP_RIGHT]);
+
+                // line_data = line_data.move_to((x1,y1))
+                //     .line_to((x0,y1))
+                //     .line_to((x0,y0))
+                //     .line_to((x1,y0));
 
                     println!("line data {:?}\n ----------- " , &line_data);
 
@@ -226,12 +231,18 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
                 // **********************************    
             (false, false, false, true) => { //FFFT
                     println!("match -> false false false true - west open");
-                    print!(" NORTH EAST SOUTH Closed - West Open tile\n");
+                    print!(" NORTH EAST SOUTH Closed - West/left side Open tile\n");
     
-                    // line_data = line_data.move_to((x0,y0))
-                    line_data = line_data.line_to((x1,y0))
-                    .line_to((x1,y1))
-                    .line_to((x0,y1));
+                    // open West tiles cannot be first tile in results so no need for absolute 'move_to'.
+                    // just continue to draw from last point
+                    line_data = line_data.line_to(corner[TOP_RIGHT])
+                    .line_to(corner[BOT_RIGHT])
+                    .line_to(corner[BOT_LEFT]);
+
+                    // // line_data = line_data.move_to((x0,y0))
+                    // line_data = line_data.line_to((x1,y0))
+                    // .line_to((x1,y1))
+                    // .line_to((x0,y1));
 
                     println!("line data {:?}\n ---------- " , &line_data);
 
@@ -268,7 +279,7 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
 
     // Write the svg document to a file
 
-    // let svg_file_name_str = "double_tile_horizontal.svg";
+    println!("writing to file {} ", &svg_file_name_str);// let svg_file_name_str = "double_tile_horizontal.svg";
     svg::save(svg_file_name_str, &document)
 
 }
