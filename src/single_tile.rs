@@ -1,3 +1,5 @@
+
+
 use euclid::default::Box2D;
 use ndarray::{Array, Array2};
 use svg::Document;
@@ -5,8 +7,15 @@ use svg::node::element::Path;
 use svg::node::element::path::Data;
 
 use crate::dfs_tiles::get_contiguous_tiles_mod;
-use crate::{pane_vec_to_ndarray, get_bool_arr, NORTH,EAST,SOUTH,WEST, WIDTH, HEIGHT};
+use crate::{pane_vec_to_ndarray, get_bool_arr};
+
+use crate::constants::{NORTH,EAST,SOUTH,WEST,};
+use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
+use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
+use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
+
 use crate::{modtile::{RGB, self}, create_data};
+use crate::svg_utils::write_svg;
 
 // For a single tile mosiac the dimension are 1 row by 1 col
 const TILES_PER_PANE_WIDTH: usize = 1;
@@ -43,7 +52,9 @@ pub(crate) fn create_svg(){
     println!("dfs_mod search results - with mosaic_vec -> {:?}", &contiguous_tiles);
 
     // lets create an svg file
-    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles);
+    // let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles);
+    let svg_file_name_str = "single_tile_refactored.svg";
+    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,100 as usize,100 as usize);
 
 
 }
@@ -66,81 +77,82 @@ pub(crate) fn create_svg(){
 ///
 /// ```
 /// ```
-fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>, 
-            edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
-            contiguous_tiles: Vec<Vec<(isize, isize)>>) -> Result<(), std::io::Error> 
-{
-    // not sure if SVG specific code should reside here or in svg_utils.rs
+
+// fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>, 
+//             edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
+//             contiguous_tiles: Vec<Vec<(isize, isize)>>) -> Result<(), std::io::Error> 
+// {
+//     // not sure if SVG specific code should reside here or in svg_utils.rs
     
-    // Create the svg document
-    let mut document = Document::new().set("viewBox", (0, 0, WIDTH, HEIGHT));
+//     // Create the svg document
+//     let mut document = Document::new().set("viewBox", (0, 0, WIDTH, HEIGHT));
 
-    // let stroke_colour =  "black";
-    let stroke_colour =  "purple";
-    let stroke_width =  0.25; 
+//     // let stroke_colour =  "black";
+//     let stroke_colour =  "purple";
+//     let stroke_width =  0.25; 
 
-    println!("write SVG -Contigous tiles -> {:?}", contiguous_tiles);
-    let row = contiguous_tiles[0][0].0 as usize;
-    let col = contiguous_tiles[0][0].1 as usize;
-    println!(" (row: {} col: {}) Tile data {:?} ",row, col, mosaic_nd_arr[[row,col]]);
-    println!("Tile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
+//     println!("write SVG -Contigous tiles -> {:?}", contiguous_tiles);
+//     let row = contiguous_tiles[0][0].0 as usize;
+//     let col = contiguous_tiles[0][0].1 as usize;
+//     println!(" (row: {} col: {}) Tile data {:?} ",row, col, mosaic_nd_arr[[row,col]]);
+//     println!("Tile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
 
-    //***********
-    // **********
-    let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
+//     //***********
+//     // **********
+//     let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
 
-    println!("Tile info {:?}", &cur_tile);  
+//     println!("Tile info {:?}", &cur_tile);  
 
-    let n = edge_booleans[[0,0]][NORTH];
-    let e = edge_booleans[[0,0]][EAST];
-    let s = edge_booleans[[0,0]][SOUTH];
-    let w = edge_booleans[[0,0]][WEST];
+//     let n = edge_booleans[[0,0]][NORTH];
+//     let e = edge_booleans[[0,0]][EAST];
+//     let s = edge_booleans[[0,0]][SOUTH];
+//     let w = edge_booleans[[0,0]][WEST];
 
-    let tile_box = &cur_tile.0;
-    let x0 = tile_box.min.x as usize;
-    let y0 = tile_box.min.y as usize;
-    let x1 = tile_box.max.x as usize;
-    let y1 = tile_box.max.y as usize;
+//     let tile_box = &cur_tile.0;
+//     let x0 = tile_box.min.x as usize;
+//     let y0 = tile_box.min.y as usize;
+//     let x1 = tile_box.max.x as usize;
+//     let y1 = tile_box.max.y as usize;
 
-    let tile_rgb = &cur_tile.1;
-    let rgb_str = tile_rgb.to_string().replace(" ", "");
-    println!("rgb string  {} ", rgb_str);
-    match (n, e, s, w) { //FFFF
-        (false, false, false, false) => {
-        println!("match -> false false false false - single tile");
-        print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
+//     let tile_rgb = &cur_tile.1;
+//     let rgb_str = tile_rgb.to_string().replace(" ", "");
+//     println!("rgb string  {} ", rgb_str);
+//     match (n, e, s, w) { //FFFF
+//         (false, false, false, false) => {
+//         println!("match -> false false false false - single tile");
+//         print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
 
-        let mut line_data = Data::new()
-                            .move_to((x0,y0))
-                            .line_to((x1,y0))
-                            .line_to((x1,y1))
-                            .line_to((x0,y1))
-                            .line_to((x0,y0))
-                            .close();
+//         let mut line_data = Data::new()
+//                             .move_to((x0,y0))
+//                             .line_to((x1,y0))
+//                             .line_to((x1,y1))
+//                             .line_to((x0,y1))
+//                             .line_to((x0,y0))
+//                             .close();
 
-        println!("line data {:?}" , &line_data);
+//         println!("line data {:?}" , &line_data);
 
-            let tile_path = Path::new()
-            // .set("fill", "rgb(255, 0, 0)")
-            .set("fill", rgb_str.to_owned())
-            .set("stroke", stroke_colour)
-            .set("stroke-width", stroke_width)
-            .set("d", line_data);
+//             let tile_path = Path::new()
+//             // .set("fill", "rgb(255, 0, 0)")
+//             .set("fill", rgb_str.to_owned())
+//             .set("stroke", stroke_colour)
+//             .set("stroke-width", stroke_width)
+//             .set("d", line_data);
         
-        // add the tile path to the document
-        document = document.add(tile_path);
+//         // add the tile path to the document
+//         document = document.add(tile_path);
 
-        }, // FFFF
-        _ => println!("The value does not match any of the options\n"),
+//         }, // FFFF
+//         _ => println!("The value does not match any of the options\n"),
 
-    }
-    // **********
-    // **********
+//     }
+//     // **********
+//     // **********
 
-    // Write the svg document to a file
-    svg::save("single_tile.svg", &document)
+//     // Write the svg document to a file
+//     svg::save("single_tile.svg", &document)
 
-}
+// }
 
 ///
 /// Get the Array2 ND array for the tile 
