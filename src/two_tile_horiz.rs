@@ -17,7 +17,7 @@ const TILES_PER_PANE_HEIGHT: usize = 1;
 */
 pub(crate) fn create_white_white_svg(){
 
-    // Create a simple 1x1 mosaic
+    // Create a simple 1x2 mosaic
     let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_double_white_tile_data(); 
     println!("test of module call create_double_white_tile_data {:?}", &mosaic_vec);
 
@@ -40,9 +40,45 @@ pub(crate) fn create_white_white_svg(){
     let contiguous_tiles = get_contiguous_tiles_mod(&mosaic_vec);
     println!("fn dfs_mod search results -> {:?}", &contiguous_tiles);
 
-    // lets create an svg file
-    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles);
+    let svg_file_name_str = "double_tile_horizontal.svg";
 
+    // lets create an svg file
+    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str);
+
+
+}
+
+
+/*
+    This function creates a 1x2 mosaic of one white and one black tile and then creates an SVG file with this info
+*/
+pub(crate) fn create_white_black_svg(){
+
+    // Create a simple 1x2 mosaic
+    let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_white_black_tile_data(); 
+    println!("test of module call create_white_black_tile_data {:?}", &mosaic_vec);
+
+    // grab the ND Array for this mosiac
+    let mosaic_nd_arr = get_tile_ndarray(&mosaic_vec[0]);
+    println!("Tile NDArray {:?} ", &mosaic_nd_arr);
+
+    // get the test boolean array to build our svg path with
+    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&mosaic_nd_arr);
+
+    println!("edge_booleans[0,0][0] = {:?}" , edge_booleans[[0,0]][0]);
+    println!("edge_booleans = {:?}" , &edge_booleans);
+
+    // call get_contiguous_tiles() to get contiguous tiles 
+    // need to decide if using 
+    //    get_contiguous_tiles (&mosaic_vec) This seems to work  
+    //       created get_contiguous_tiles_mod()
+    // or get_contiguous_tiles (&mosaic_nd_arr)
+
+    let contiguous_tiles = get_contiguous_tiles_mod(&mosaic_vec);
+    println!("fn dfs_mod search results -> {:?}", &contiguous_tiles);
+
+    let svg_file_name_str = "white_black_1x2.svg";
+    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str);
 
 }
 
@@ -66,7 +102,8 @@ pub(crate) fn create_white_white_svg(){
 /// ```
 fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>, 
             edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
-            contiguous_tiles: Vec<Vec<(isize, isize)>>) -> Result<(), std::io::Error> 
+            contiguous_tiles: Vec<Vec<(isize, isize)>>,
+            svg_file_name_str: &str ) -> Result<(), std::io::Error> 
 {
     // not sure if SVG specific code should reside here or in svg_utils.rs
     
@@ -127,7 +164,23 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
             // let mut line_data = Data::new();
             match (n, e, s, w) { //FTFF
 
-                (false, true, false, false) => {
+            // *******************************************
+            // Fully closed tiles are by definition the only element in the contigous tile collection
+            (false, false, false, false) => {
+                println!("match -> false false false false - single tile");
+                print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
+
+                let mut line_data = Data::new()
+                                    .move_to((x0,y0))
+                                    .line_to((x1,y0))
+                                    .line_to((x1,y1))
+                                    .line_to((x0,y1))
+                                    .line_to((x0,y0));
+                                    // .close(); // no close as this is done below
+                println!("line data {:?}" , &line_data);
+                }, // FFFF
+                // **********************************
+            (false, true, false, false) => {
                 println!("match -> false true false false - east open");
                 print!(" NORTH SOUTH WEST Closed - East Open tile\n");
 
@@ -140,9 +193,8 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
 
 
                 }, // FFFF
-                
-                (false, false, false, true) => { //FFFT
-
+                // **********************************    
+            (false, false, false, true) => { //FFFT
                     println!("match -> false false false true - west open");
                     print!(" NORTH EAST SOUTH Closed - West Open tile\n");
     
@@ -154,6 +206,7 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
                     println!("line data {:?}\n ---------- " , &line_data);
 
                 }, // FFFT
+                // **********************************
                 _ => {
                     println!("The EDGE Boolean does not match any of the options\n");  
                 },
@@ -182,7 +235,9 @@ fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, R
     // println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
 
     // Write the svg document to a file
-    svg::save("double_tile_horizontal.svg", &document)
+
+    let svg_file_name_str = "double_tile_horizontal.svg";
+    svg::save(svg_file_name_str, &document)
 
 }
 
@@ -220,9 +275,33 @@ pub fn create_double_white_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
 }
 
 
+///  This function creates mosaic which consists of one window of one pane with two tiles
+/// left tile is white, right tile is black
+/// 100 by 200 UnknownUnits size
+pub fn create_white_black_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+
+    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+
+    // ****************************
+    // Start the first pane
+    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+
+    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((0, 0), (100, 100), (255, 255, 255));
+    let _ = &pane_grid.push((tile_box, rgb));
+    
+    // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((100, 0), (200, 100), (0, 0, 0));
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // save the pane to the result window
+    let _ = &result_window.push(pane_grid);
+
+    result_window
+}
 
 
-/// Create an Array2 nd array of booleans
+/// Create an Array2 nd array of booleans.
 /// 
 /// Each tile has a north, east, south and west edge
 /// If a tile matches the colour of its neighbour then corresponding cardinal edge boolean is set to true
@@ -235,28 +314,34 @@ fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i
     let mut edges: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = 
                                     get_bool_arr(TILES_PER_PANE_HEIGHT, TILES_PER_PANE_WIDTH);
 
-    // go through mosaic_nd_arr and set the corresponding boolean edge 
-    // As we only have a single tile with no edges we shall just set all the values to false.
-    // For anything more complex we need to visit each tile and compare to neighbour to set the values properly 
-    // **********
-    // **********
-    // TODO need to impliment this algorithm to iterate over rows and cols and compare colours to adjacent cells
-    // and set the edges accordingly. As we only have one tile here we can set these manually
+    let rows = mosaic_nd_arr.dim().0;
+    let cols = mosaic_nd_arr.dim().1;
 
-    edges[[0,0]][NORTH] = false;
-    edges[[0,0]][EAST] = true;
-    edges[[0,0]][SOUTH] = false;
-    edges[[0,0]][WEST] = false;
+    for i in 0..rows {
+        for j in 0..cols {
+            let curtile_rgb = mosaic_nd_arr[(i, j)].1;
+            let north_tile_bool: bool = { if i > 0 {curtile_rgb == mosaic_nd_arr[(i - 1, j)].1 } else { false } };
+            let south_tile_bool: bool = { if i < rows - 1 { curtile_rgb == mosaic_nd_arr[(i + 1, j)].1 } else { false } };
+            let  west_tile_bool: bool = { if j > 0 { curtile_rgb == mosaic_nd_arr[(i, j - 1)].1 } else { false } };
+            let  east_tile_bool: bool = { if j < cols - 1 { curtile_rgb == mosaic_nd_arr[(i, j + 1)].1 } else { false } };
 
-    edges[[0,1]][NORTH] = false;
-    edges[[0,1]][EAST] = false;
-    edges[[0,1]][SOUTH] = false;
-    edges[[0,1]][WEST] = true;
+            println!("get_edge_bools() ({},{}) \n\tNorth {}\n\tEast {}\n\tSouth {}\n\tWest {}", i,j, north_tile_bool, east_tile_bool, south_tile_bool, west_tile_bool);
 
+            edges[[i,j]][NORTH] = north_tile_bool;
+            edges[[i,j]][EAST] = east_tile_bool;
+            edges[[i,j]][SOUTH] = south_tile_bool;
+            edges[[i,j]][WEST] = west_tile_bool;
+        
+            // if curtile_rgb == north_tile_rgb {println!("north tile same colour");}
+            // if curtile_rgb == east_tile_rgb {println!("east tile same colour");}
+            // if curtile_rgb == south_tile_rgb {println!("south tile same colour");}
+            // if curtile_rgb == west_tile_rgb {println!("west tile same colour");}
 
-    println!("get_edge_bools = {:?}" , &edges);
-    // println!("edges[0,0][0] = {:?}" , edges[[0,0]][0]);
+        } // cols
+    } // rows
 
+    // println!("get_edge_bools = {:?}" , &edges);
+    
     edges
 
 }
