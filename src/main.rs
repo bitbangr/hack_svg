@@ -5,10 +5,14 @@ mod constants;
 
 mod single_tile;
 mod two_tile_horiz;
+mod four_tile_square;
 
 use euclid::default::Box2D;
 use euclid::default::Point2D;
 use ndarray::{Array, Array2};
+
+use modtile::RGB;
+use constants::{NORTH,EAST,SOUTH,WEST};
 
 /// This application will create an SVG files from a various window pane/tile configurations
 /// 
@@ -17,16 +21,19 @@ fn main() {
 
     println!("Hack SVG");
     
-    let _ = test_corner();
+    // test getting Box2D corners 
+    // let _ = test_corner();
 
     // create a single tile mosaic and draw the corresponding SVG doc    
-    let _ = single_tile::create_svg();
+    // let _ = single_tile::create_svg();
 
     // create a double tile horizontal mosaic of two white tiles and draw the corresponding SVG doc    
-    let _ = two_tile_horiz::create_white_white_svg();
+    // let _ = two_tile_horiz::create_white_white_svg();
     
     // create a double tile horizontal mosaic of one white and one black tile and create svg file
-    let _ = two_tile_horiz::create_white_black_svg();
+    // let _ = two_tile_horiz::create_white_black_svg();
+
+    let _ = four_tile_square::create_2x2_white_svg();
     
 }
 
@@ -61,7 +68,8 @@ fn get_bool_arr(row_dim:usize, col_dim:usize) -> Array2<Vec<bool>> {
 }
 
 
-/// .
+/// Given a vector of (Box2D,RGB) values representing a single pane construct a 2 dimensional NDArray
+/// that matches the Tiles Per Pane Width (cols) and Tiles Per Pane Height (rows) Dimensions
 ///
 /// # Panics
 ///
@@ -151,10 +159,12 @@ fn box_corners(box2d: Box2D<i32>) -> [(usize, usize); 4] {
 
 /// Create a mosaic tile with the supplied info
 ///
+/// : top_left and bottom_right coord of each tile, tile colour.
 /// # Return
 ///
-/// returns tuple of
-///  Box2D containing top_left and bottom_right coord of each tile  Box2D<i32> , and modtile:RGB value which is the tile colour.
+/// returns 
+///  ('Box2D<i32>', modtile::RGB)
+///  
 pub fn create_tile(
     top_left: (i32, i32),
     bot_right: (i32, i32),
@@ -169,4 +179,54 @@ pub fn create_tile(
     let rgb: modtile::RGB = modtile::RGB(rgb_val.0, rgb_val.1, rgb_val.2);
 
     (tile_box, rgb)
+}
+
+
+/// Create an Array2 nd array of booleans.
+/// 
+/// Each tile has a north, east, south and west edge
+/// If a tile matches the colour of its neighbour then corresponding cardinal edge boolean is set to true
+/// if it does not or if it is an edge then direction boolean is set to false
+/// Lines are drawn for all false edges. No lines are drawn for true edges
+/// 
+// fn get_cardinal_edge_boolean() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> 
+//pub fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>, ndarray::Dim<[usize; 2]>>)  -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>
+pub fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>) 
+                        -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> 
+{
+    let rows = mosaic_nd_arr.dim().0;
+    let cols = mosaic_nd_arr.dim().1;
+
+    // TODO check row_dim and rows below
+    // are we using mosaic_nd_arr dimensions or are we using the passed Tiles Per Pane Width Height to construct the boolean
+    let mut edges: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = 
+                                    get_bool_arr(rows, cols);
+
+    for i in 0..rows {
+        for j in 0..cols {
+            let curtile_rgb = mosaic_nd_arr[(i, j)].1;
+            let north_tile_bool: bool = { if i > 0 {curtile_rgb == mosaic_nd_arr[(i - 1, j)].1 } else { false } };
+            let south_tile_bool: bool = { if i < rows - 1 { curtile_rgb == mosaic_nd_arr[(i + 1, j)].1 } else { false } };
+            let  west_tile_bool: bool = { if j > 0 { curtile_rgb == mosaic_nd_arr[(i, j - 1)].1 } else { false } };
+            let  east_tile_bool: bool = { if j < cols - 1 { curtile_rgb == mosaic_nd_arr[(i, j + 1)].1 } else { false } };
+
+            println!("get_edge_bools() ({},{}) \n\tNorth {}\n\tEast {}\n\tSouth {}\n\tWest {}", i,j, north_tile_bool, east_tile_bool, south_tile_bool, west_tile_bool);
+
+            edges[[i,j]][NORTH] = north_tile_bool;
+            edges[[i,j]][EAST] = east_tile_bool;
+            edges[[i,j]][SOUTH] = south_tile_bool;
+            edges[[i,j]][WEST] = west_tile_bool;
+        
+            // if curtile_rgb == north_tile_rgb {println!("north tile same colour");}
+            // if curtile_rgb == east_tile_rgb {println!("east tile same colour");}
+            // if curtile_rgb == south_tile_rgb {println!("south tile same colour");}
+            // if curtile_rgb == west_tile_rgb {println!("west tile same colour");}
+
+        } // cols
+    } // rows
+
+    // println!("get_edge_bools = {:?}" , &edges);
+    
+    edges
+
 }
