@@ -1,3 +1,16 @@
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Line {
+    start: Point2D<i32>,
+    end: Point2D<i32>,
+}
+
+impl Line {
+    pub fn new(start: Point2D<i32>, end: Point2D<i32>) -> Line {
+        Line { start, end }
+    }
+}
+
 /// Create an Array2 nd array of booleans
 /// 
 /// Each tile has a north, east, SOUTH and west direction
@@ -110,6 +123,7 @@ fn create_data(
 
     (tile_box, rgb)
 }
+
 
 
 /// Create a 3x3 single pane of three colors white, black, green tiles for testing path
