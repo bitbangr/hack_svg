@@ -13,7 +13,7 @@ use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 use crate::dfs_tiles::get_contiguous_tiles_mod;
 use crate::svg_utils;
 use crate::svg_utils::write_svg;
-use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
+use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points, get_edge_bools};
 use crate::{modtile::{RGB, self}};
 
 
@@ -335,50 +335,4 @@ pub fn create_white_black_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
     let _ = &result_window.push(pane_grid);
 
     result_window
-}
-
-
-/// Create an Array2 nd array of booleans.
-/// 
-/// Each tile has a north, east, south and west edge
-/// If a tile matches the colour of its neighbour then corresponding cardinal edge boolean is set to true
-/// if it does not or if it is an edge then direction boolean is set to false
-/// Lines are drawn for all false edges. No lines are drawn for true edges
-/// 
-// fn get_cardinal_edge_boolean() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> 
-fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>, ndarray::Dim<[usize; 2]>>)  -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>
-{
-    let mut edges: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = 
-                                    get_bool_arr(TILES_PER_PANE_HEIGHT, TILES_PER_PANE_WIDTH);
-
-    let rows = mosaic_nd_arr.dim().0;
-    let cols = mosaic_nd_arr.dim().1;
-
-    for i in 0..rows {
-        for j in 0..cols {
-            let curtile_rgb = mosaic_nd_arr[(i, j)].1;
-            let north_tile_bool: bool = { if i > 0 {curtile_rgb == mosaic_nd_arr[(i - 1, j)].1 } else { false } };
-            let south_tile_bool: bool = { if i < rows - 1 { curtile_rgb == mosaic_nd_arr[(i + 1, j)].1 } else { false } };
-            let  west_tile_bool: bool = { if j > 0 { curtile_rgb == mosaic_nd_arr[(i, j - 1)].1 } else { false } };
-            let  east_tile_bool: bool = { if j < cols - 1 { curtile_rgb == mosaic_nd_arr[(i, j + 1)].1 } else { false } };
-
-            println!("get_edge_bools() ({},{}) \n\tNorth {}\n\tEast {}\n\tSouth {}\n\tWest {}", i,j, north_tile_bool, east_tile_bool, south_tile_bool, west_tile_bool);
-
-            edges[[i,j]][NORTH] = north_tile_bool;
-            edges[[i,j]][EAST] = east_tile_bool;
-            edges[[i,j]][SOUTH] = south_tile_bool;
-            edges[[i,j]][WEST] = west_tile_bool;
-        
-            // if curtile_rgb == north_tile_rgb {println!("north tile same colour");}
-            // if curtile_rgb == east_tile_rgb {println!("east tile same colour");}
-            // if curtile_rgb == south_tile_rgb {println!("south tile same colour");}
-            // if curtile_rgb == west_tile_rgb {println!("west tile same colour");}
-
-        } // cols
-    } // rows
-
-    // println!("get_edge_bools = {:?}" , &edges);
-    
-    edges
-
 }
