@@ -98,6 +98,15 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
     let stroke_colour =  "purple";
     let stroke_width =  0.25; 
 
+    // TODO dfs_mod returns a vect of matching entries to the position in the Vec
+    //         This does not match the array inde position to the NDarray
+    //         So need to modify DFS_MOD to return array index and not Vec position
+    // see dfs_tiles.rs for implimentaion
+
+    // fn dfs_mod search results -> [[(0, 0), (0, 1), (0, 2), (0, 3)]]
+    // fn write_svg - Vector of contigous tiles -> [[(0, 0), (0, 1), (0, 2), (0, 3)]]
+
+
 
     //***********
     // **********

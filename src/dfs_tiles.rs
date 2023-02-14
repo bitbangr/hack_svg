@@ -2,6 +2,15 @@ use euclid::{Box2D, UnknownUnit};
 
 use crate::modtile::RGB;
 
+    // TODO dfs_mod returns a vect of matching entries to the position in the Vec
+    //         This does not match the array inde position to the NDarray
+    //         So need to modify DFS_MOD to return array index and not Vec position
+    // see main.rs write_svg where it crashes
+
+    // fn dfs_mod search results -> [[(0, 0), (0, 1), (0, 2), (0, 3)]]
+    // fn write_svg - Vector of contigous tiles -> [[(0, 0), (0, 1), (0, 2), (0, 3)]]
+
+
 // fn dfs_mod(array: &Vec<Vec<String>>, row: isize, col: isize, color: &str, visited: &mut Vec<Vec<bool>>, rows: isize, cols: isize) -> Vec<(isize, isize)> {
 fn dfs_mod(pane_vec: &Vec<Vec<(Box2D<i32, UnknownUnit>, RGB)>>, row: isize, col: isize, color: &RGB, visited: &mut Vec<Vec<bool>>, rows: isize, cols: isize) -> Vec<(isize, isize)> {    
 
