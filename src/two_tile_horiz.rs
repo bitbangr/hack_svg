@@ -6,6 +6,7 @@ use svg::node::element::Path;
 use svg::node::element::path::Data;
 
 use crate::box_corners;
+use crate::create_tile;
 use crate::constants::{NORTH,EAST,SOUTH,WEST};
 use crate::constants::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
@@ -13,7 +14,7 @@ use crate::dfs_tiles::get_contiguous_tiles_mod;
 use crate::svg_utils;
 use crate::svg_utils::write_svg;
 use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
-use crate::{modtile::{RGB, self}, create_data};
+use crate::{modtile::{RGB, self}};
 
 
 
@@ -52,7 +53,7 @@ pub(crate) fn create_white_white_svg(){
     let svg_file_name_str = "double_tile_horizontal.svg";
 
     // lets create an svg file
-    let _ = svg_utils::write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,100 as usize,200 as usize);
+    let _ = svg_utils::write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,200 as usize,100 as usize);
 
 
 }
@@ -297,11 +298,11 @@ pub fn create_double_white_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
     let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
 
     // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((0, 0), (100, 100), (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
     
     // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((100, 0), (200, 100), (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((100, 0), (200, 100), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window
@@ -323,11 +324,11 @@ pub fn create_white_black_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
     let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
 
     // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((0, 0), (100, 100), (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
     
     // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((100, 0), (200, 100), (0, 0, 0));
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((100, 0), (200, 100), (0, 0, 0));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window

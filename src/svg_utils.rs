@@ -239,8 +239,7 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
     // println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
 
     // Write the svg document to a file
-
-    println!("writing to file {} ", &svg_file_name_str);// let svg_file_name_str = "double_tile_horizontal.svg";
+    println!("writing to file {} ", &svg_file_name_str);
     svg::save(svg_file_name_str, &document)
 
 }

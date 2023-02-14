@@ -1,6 +1,7 @@
 
 
 use euclid::default::Box2D;
+use euclid::default::Point2D;
 use ndarray::{Array, Array2};
 use svg::Document;
 use svg::node::element::Path;
@@ -14,8 +15,9 @@ use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
 use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
-use crate::{modtile::{RGB, self}, create_data};
+use crate::modtile::{RGB, self};
 use crate::svg_utils::write_svg;
+use crate::create_tile;
 
 // For a single tile mosiac the dimension are 1 row by 1 col
 const TILES_PER_PANE_WIDTH: usize = 1;
@@ -175,8 +177,7 @@ pub fn create_single_tile_data() -> Vec<Vec<( Box2D<i32>, modtile::RGB)>> {
     let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
 
     // [(Box2D((0, 0), (100, 100)), RGB(45, 54, 147)),]
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_data((0, 0), (100, 100), 
-                                                                                                    (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100),(255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window
@@ -184,6 +185,7 @@ pub fn create_single_tile_data() -> Vec<Vec<( Box2D<i32>, modtile::RGB)>> {
 
     result_window
 }
+
 
 
 /// Create an Array2 nd array of booleans
