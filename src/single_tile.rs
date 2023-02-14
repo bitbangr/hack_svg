@@ -1,5 +1,3 @@
-
-
 use euclid::default::Box2D;
 use euclid::default::Point2D;
 use ndarray::{Array, Array2};
@@ -8,6 +6,7 @@ use svg::node::element::Path;
 use svg::node::element::path::Data;
 
 use crate::dfs_tiles::get_contiguous_tiles_mod;
+use crate::get_edge_bools;
 use crate::{pane_vec_to_ndarray, get_bool_arr};
 
 use crate::constants::{NORTH,EAST,SOUTH,WEST,};
@@ -188,35 +187,3 @@ pub fn create_single_tile_data() -> Vec<Vec<( Box2D<i32>, modtile::RGB)>> {
 
 
 
-/// Create an Array2 nd array of booleans
-/// 
-/// Each tile has a north, east, south and west edge
-/// If a tile matches the colour of its neighbour then corresponding cardinal edge boolean is set to true
-/// if it does not or if it is an edge then direction boolean is set to false
-/// Lines are drawn for all false edges. No lines are drawn for true edges
-/// 
-// fn get_cardinal_edge_boolean() -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> 
-fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>, ndarray::Dim<[usize; 2]>>)  -> ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>
-{
-    let mut edges: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = 
-                                    get_bool_arr(TILES_PER_PANE_HEIGHT, TILES_PER_PANE_WIDTH);
-
-    // go through mosaic_nd_arr and set the corresponding boolean edge 
-    // As we only have a single tile with no edges we shall just set all the values to false.
-    // For anything more complex we need to visit each tile and compare to neighbour to set the values properly 
-    // **********
-    // **********
-    // TODO need to impliment this algorithm to iterate over rows and cols and compare colours to adjacent cells
-    // and set the edges accordingly. As we only have one tile here we can set these manually
-
-    edges[[0,0]][NORTH] = false;
-    edges[[0,0]][EAST] = false;
-    edges[[0,0]][SOUTH] = false;
-    edges[[0,0]][WEST] = false;
-
-    println!("get_edge_bools = {:?}" , &edges);
-    // println!("edges[0,0][0] = {:?}" , edges[[0,0]][0]);
-
-    edges
-
-}
