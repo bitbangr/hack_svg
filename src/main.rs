@@ -10,29 +10,6 @@ use euclid::default::Box2D;
 use euclid::default::Point2D;
 use ndarray::{Array, Array2};
 
-use svg::node::element::path::Data;
-use svg::node::element::Path;
-
-use svg::Document;
-use std::fmt::Write;
-
-use std::collections::HashSet;
-
-use crate::dfs_tiles::_get_contiguous_tiles_orig;
-use crate::two_tile_horiz::create_white_black_svg;
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub struct Line {
-    start: Point2D<i32>,
-    end: Point2D<i32>,
-}
-
-impl Line {
-    pub fn new(start: Point2D<i32>, end: Point2D<i32>) -> Line {
-        Line { start, end }
-    }
-}
-
 /// This application will create an SVG files from a various window pane/tile configurations
 /// 
 /// Tile configs should be done in their own file and call the svg_utils::write_svg() with the required params
