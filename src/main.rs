@@ -11,6 +11,7 @@ mod four_tile_square;
 
 use euclid::default::Box2D;
 use euclid::default::Point2D;
+use ndarray::Axis;
 use ndarray::{Array, Array2};
 
 use modtile::RGB;
@@ -35,7 +36,7 @@ fn main() {
     // create a double tile horizontal mosaic of one white and one black tile and create svg file
     let _ = two_tile_horiz::create_white_black_svg();
 
-    // let _ = four_tile_square::create_2x2_white_svg();
+    let _ = four_tile_square::create_2x2_white_svg();
 
     // let _ = four_tile_square::test_2x2_dfs_arr();
 
@@ -240,5 +241,19 @@ pub fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euc
     // println!("get_edge_bools = {:?}" , &edges);
     
     edges
+
+}
+
+
+fn pane_to_2d_vec(pane_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>, ndarray::Dim<[usize; 2]>>, tiles_per_pane_height: usize, tiles_per_pane_width: usize) -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>> {
+    
+    // Convert the ndarray into a Vec<Vec>
+    let v: Vec<Vec<_>> = pane_nd_arr
+    .axis_iter(Axis(0))
+    .map(|row| row.to_vec())
+    .collect();
+
+//    println!("{:?}", &v);
+ v
 
 }

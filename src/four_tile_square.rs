@@ -12,6 +12,7 @@ use crate::constants::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 use crate::dfs_tiles::get_contiguous_tiles_mod;
 use crate::get_edge_bools;
+use crate::pane_to_2d_vec;
 use crate::svg_utils;
 use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
 use crate::{modtile::{RGB, self}};
@@ -27,29 +28,36 @@ const TILES_PER_PANE_HEIGHT: usize = 2;
 */
 pub(crate) fn create_2x2_white_svg(){
 
+    let tiles_per_pane_width: usize = 2;
+    let tiles_per_pane_height: usize = 2;
+
     // Create a simple 2x2 mosaic
     let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_2x2_white_tile_data(); 
     println!("test of module call create_2x2_white_tile_data {:?}", &mosaic_vec);
 
-    // grab the ND Array for this mosiac
-    let mosaic_nd_arr = get_tile_ndarray(&mosaic_vec[0]);
-    println!("Tile NDArray {:?} ", &mosaic_nd_arr);
+    // grab the ND Array for this mosiac pane
+    // again only 1 pane so just the first element of the mosaic vec
+    let pane_nd_arr = pane_vec_to_ndarray(&mosaic_vec[0],tiles_per_pane_height, tiles_per_pane_width );
+    println!("\n\npane nd array {:?} ", &pane_nd_arr);
+
+    // convert the pane_ds_arr back to a 2D vector so we can use it for the Depth First Search Algorithm
+    let pane_2d_vec: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = pane_to_2d_vec(&pane_nd_arr, tiles_per_pane_height, tiles_per_pane_width);
+    println!("\n\n2D Pane Vec -> {:?}", pane_2d_vec);
 
     // get the test boolean array to build our svg path with
-    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&mosaic_nd_arr);
+    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
 
     println!("edge_booleans[0,0][0] = {:?}" , edge_booleans[[0,0]][0]);
     println!("edge_booleans = {:?}" , &edge_booleans);
 
     // call get the contiguous tiles
-    let contiguous_tiles = get_contiguous_tiles_mod(&mosaic_vec);
-    println!("fn dfs_mod search results -> {:?}", &contiguous_tiles);
+    let contiguous_tiles = get_contiguous_tiles_mod(&pane_2d_vec);
+    println!("fn get_contiguous_tiles_mod search results -> {:?}", &contiguous_tiles);
 
     let svg_file_name_str = "create_2x2_white_square.svg";
 
     // lets create an svg file
-    let _ = svg_utils::write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,200 as usize,100 as usize);
-
+    let _ = svg_utils::write_svg(pane_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,200 as usize,100 as usize);
 
 }
 
