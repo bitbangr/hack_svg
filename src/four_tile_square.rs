@@ -59,7 +59,49 @@ pub(crate) fn create_2x2_white_svg(){
     // lets create an svg file
     let _ = svg_utils::write_svg(pane_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,200 as usize,200 as usize);
 
-}
+} // create_2x2_white_svg
+
+/*
+    This function creates a 2x2 mosaic of four tiles
+    1x2 white tiles first row
+    1x2 black tiles second and then create an SVG file with this info
+*/
+pub(crate) fn create_white_row_black_row_svg(){
+
+    let tiles_per_pane_width: usize = 2;
+    let tiles_per_pane_height: usize = 2;
+
+    // Create a white row/black row 2x2 mosaic
+    let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_white_row_black_row_tile_data(); 
+    println!("test of module call create_white_row_black_row_tile_data {:?}", &mosaic_vec);
+
+    // grab the ND Array for this mosiac pane
+    // again only 1 pane so just the first element of the mosaic vec
+    let pane_nd_arr = pane_vec_to_ndarray(&mosaic_vec[0],tiles_per_pane_height, tiles_per_pane_width );
+    println!("\n\npane nd array {:?} ", &pane_nd_arr);
+
+    // convert the pane_ds_arr back to a 2D vector so we can use it for the Depth First Search Algorithm
+    let pane_2d_vec: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = pane_to_2d_vec(&pane_nd_arr, tiles_per_pane_height, tiles_per_pane_width);
+    println!("\n\n2D Pane Vec -> {:?}", pane_2d_vec);
+
+    // get the test boolean array to build our svg path with
+    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
+
+    println!("edge_booleans[0,0][0] = {:?}" , edge_booleans[[0,0]][0]);
+    println!("edge_booleans = {:?}" , &edge_booleans);
+
+    // call get the contiguous tiles
+    let contiguous_tiles = get_contiguous_tiles_mod(&pane_2d_vec);
+    println!("fn get_contiguous_tiles_mod search results -> {:?}", &contiguous_tiles);
+
+    let svg_file_name_str = "create_2x2_white_row_black_row_square.svg";
+
+    // lets create an svg file
+    let _ = svg_utils::write_svg(pane_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,200 as usize,200 as usize);
+
+} // create_white_row_black_row_svg
+
+
 
 /// Make a 2x2 mosaic of a single pane of all white tiles
 /// 
@@ -100,6 +142,52 @@ fn create_2x2_white_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUn
     result_window
 
 } //create_2x2_white_tile_data
+
+/// Make a 2x2 mosaic of a single pane of two white and two black
+/// 1 white row
+/// 1 black row
+fn create_white_row_black_row_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
+    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+
+    // ****************************
+    // Start the first pane
+    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+
+    // white row
+    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
+    let top_left :(i32,i32) = (0,0);
+    let bot_right:(i32,i32) = (100,100);
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let _ = &pane_grid.push((tile_box, rgb));
+    
+    // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
+    let top_left :(i32,i32) = (100,0);
+    let bot_right:(i32,i32) = (200,100);
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // black row
+    // (Box2D((0,100), (100, 200)), RGB(0, 0, 0)),
+    let top_left :(i32,i32) = (0,100);
+    let bot_right:(i32,i32) = (100,200);
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile(top_left, bot_right , (0, 0, 0));
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // (Box2D((100,100), (200, 200)), RGB(0, 0, 0)),
+    let top_left :(i32,i32) = (100,100);
+    let bot_right:(i32,i32) = (200,200);
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile(top_left, bot_right , (0, 0, 0));
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // save the pane to the result window
+    let _ = &result_window.push(pane_grid);
+
+    result_window
+
+} //create_2x2_white_tile_data
+
+
+
 
 
 ///

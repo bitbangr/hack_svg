@@ -223,6 +223,7 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
                     println!("match -> false true true false - east/south open");
                     print!(" NORTH/WEST (top/left) Closed - EAST/South (right/bottom) side open tile\n");
     
+                    // TODO mgj Feb 15th See Test Case notes pg 12
                     // closed West tiles may not be first tile so need to check if first for absolute 'move_to'.
                     // otherewise just continue to draw from last point
                     line_data = line_data.move_to(corner[BOT_LEFT])

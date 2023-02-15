@@ -36,7 +36,9 @@ fn main() {
     // create a double tile horizontal mosaic of one white and one black tile and create svg file
     // let _ = two_tile_horiz::create_white_black_svg();
 
-    let _ = four_tile_square::create_2x2_white_svg();
+    // let _ = four_tile_square::create_2x2_white_svg();
+
+    let _ = four_tile_square::create_white_row_black_row_svg();
 
     // let _ = four_tile_square::test_2x2_dfs_arr();
 
