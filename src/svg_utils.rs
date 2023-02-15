@@ -143,20 +143,21 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
             let tile_box = &cur_tile.0;
             let corner:[(usize,usize);4] = box_corners(*tile_box);
             
-            println!("corner Co-ords {:?}", corner);
-            println!("top left corner {:?}", corner[TOP_LEFT]);
-            println!("North West corner {:?}", corner[NW_CORNER]);
+            println!("\nCorner Co-ords {:?}", corner);
+            println!("\ntop left corner {:?}", corner[TOP_LEFT]);
             println!("top right corner {:?}", corner[TOP_RIGHT]);
-            println!("North East corner {:?}", corner[NE_CORNER]);
             println!("bottom right corner {:?}", corner[BOT_RIGHT]);
-            println!("South East corner {:?}", corner[SE_CORNER]);
             println!("bottom left corner {:?}", corner[BOT_LEFT]);
+
+            println!("\nNorth West corner {:?}", corner[NW_CORNER]);
+            println!("North East corner {:?}", corner[NE_CORNER]);
+            println!("South East corner {:?}", corner[SE_CORNER]);
             println!("South West corner {:?}", corner[SW_CORNER]);
 
             let atile_rgb = &cur_tile.1;
             let atile_rgb_str = &atile_rgb.to_string().replace(" ", "");
             rgb_str = atile_rgb_str.to_string(); 
-            println!("rgb string  {} ", rgb_str);        
+            println!("\nrgb string  {} ", rgb_str);        
             // TODO Feb 12 - See notes 
 
             // let mut line_data = Data::new();
@@ -217,6 +218,60 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
                     println!("line data {:?}\n ---------- " , &line_data);
 
                 }, // FFFT
+                // **********************************    
+                (false, true, true, false) => { //FTTF
+                    println!("match -> false true true false - east/south open");
+                    print!(" NORTH/WEST (top/left) Closed - EAST/South (right/bottom) side open tile\n");
+    
+                    // closed West tiles may not be first tile so need to check if first for absolute 'move_to'.
+                    // otherewise just continue to draw from last point
+                    line_data = line_data.move_to(corner[BOT_LEFT])
+                    .line_to(corner[TOP_LEFT])
+                    .line_to(corner[TOP_RIGHT]);
+
+                    println!("line data {:?}\n ---------- " , &line_data);
+
+                }, // FTTF
+                // **********************************    
+                (false, false, true, true) => { //FFTT
+                    println!("match -> false false true true - south/west open");
+                    print!(" NORTH/EAST (top/right) Closed - SOUTH/WEST (bottom/left) side open tile\n");
+    
+                    // can't be first tile so no need absolute 'move_to'.
+                    // continue to draw from last point
+                    line_data = line_data.line_to(corner[TOP_RIGHT])
+                    .line_to(corner[BOT_RIGHT]);
+
+                    println!("line data {:?}\n ---------- " , &line_data);
+
+                }, // FFTT
+                // **********************************    
+                (true, false, false, true) => { //TFFT
+                    println!("match -> true false false true - north/east open");
+                    print!(" SOUTH/EAST (bottom/right) Closed - NORTH/WEST (top/left) side open tile\n");
+    
+                    // can't be first tile so no need absolute 'move_to'.
+                    // continue to draw from last point
+                    line_data = line_data.line_to(corner[BOT_RIGHT])
+                    .line_to(corner[BOT_LEFT]);
+
+                    println!("line data {:?}\n ---------- " , &line_data);
+
+                }, // TFFT
+                // **********************************    
+                (true, true, false, false) => { //TTFF
+                    println!("match -> true true false false - north/west open");
+                    print!(" SOUTH/WEST (bottom/left) Closed - NORTH/EAST (top/right) side open tile\n");
+    
+                    // can't be first tile so no need absolute 'move_to'.
+                    // continue to draw from last point
+                    line_data = line_data.line_to(corner[BOT_LEFT])
+                    .line_to(corner[TOP_LEFT]);
+
+                    println!("line data {:?}\n ---------- " , &line_data);
+
+                }, // TTFF
+
                 // **********************************
                 _ => {
                     println!("The EDGE Boolean does not match any of the options\n");  
