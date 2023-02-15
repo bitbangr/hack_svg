@@ -57,7 +57,7 @@ pub(crate) fn create_2x2_white_svg(){
     let svg_file_name_str = "create_2x2_white_square.svg";
 
     // lets create an svg file
-    let _ = svg_utils::write_svg(pane_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,200 as usize,100 as usize);
+    let _ = svg_utils::write_svg(pane_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,200 as usize,200 as usize);
 
 }
 
