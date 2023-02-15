@@ -53,9 +53,9 @@ pub fn reshape_min() {
    // get the test boolean array to build our svg path with
    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
 
-println!("hey edge booleans {:?} ", &edge_booleans);
-     // call get the contiguous tiles
-    // TODO change this to dfs_arr::get_cont_tiles()
+    println!("hey edge booleans {:?} ", &edge_booleans);
+    
+    // call get the contiguous tiles
     let contiguous_tiles = get_contiguous_tiles_mod(&pane_2d_vec);
     println!("fn dfs_mod search results -> {:?}", &contiguous_tiles);
 
