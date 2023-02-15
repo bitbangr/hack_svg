@@ -1,20 +1,18 @@
+use std::usize;
+
 use euclid::default::Box2D;
 use euclid::default::Point2D;
+use ndarray::Axis;
 use ndarray::{Array, Array2};
-use svg::Document;
-use svg::node::element::Path;
-use svg::node::element::path::Data;
 
 use crate::box_corners;
 use crate::create_tile;
-// use crate::get_edge_bools;
 use crate::constants::{NORTH,EAST,SOUTH,WEST};
 use crate::constants::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 use crate::dfs_tiles::get_contiguous_tiles_mod;
 use crate::get_edge_bools;
 use crate::svg_utils;
-use crate::svg_utils::write_svg;
 use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
 use crate::{modtile::{RGB, self}};
 
@@ -29,7 +27,7 @@ const TILES_PER_PANE_HEIGHT: usize = 2;
 */
 pub(crate) fn create_2x2_white_svg(){
 
-    // Create a simple 1x2 mosaic
+    // Create a simple 2x2 mosaic
     let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_2x2_white_tile_data(); 
     println!("test of module call create_2x2_white_tile_data {:?}", &mosaic_vec);
 
@@ -110,4 +108,56 @@ fn get_tile_ndarray (vec: &Vec<(Box2D<i32>, modtile::RGB)>) -> Array2<(Box2D<i32
     pane_nd_array
  }
  
- 
+ /*
+    This function creates a 2x2 mosaic of four white tiles and then 
+    calls the dfs_arr function to test it
+*/
+pub(crate) fn test_2x2_dfs_arr(){
+
+    // Create a simple 2x2 mosaic
+    let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_2x2_white_tile_data(); 
+    println!("test of module call create_2x2_white_tile_data {:?}", &mosaic_vec);
+
+    // grab the ND Array for this mosiac
+    let mosaic_nd_arr = get_tile_ndarray(&mosaic_vec[0]);
+    println!("Tile NDArray {:?} ", &mosaic_nd_arr);
+
+    // get the test boolean array to build our svg path with
+    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&mosaic_nd_arr);
+
+    println!("edge_booleans[0,0][0] = {:?}" , edge_booleans[[0,0]][0]);
+    println!("edge_booleans = {:?}" , &edge_booleans);
+
+
+    let _ = reshape_vec(mosaic_vec, TILES_PER_PANE_HEIGHT, TILES_PER_PANE_WIDTH ) ;
+
+
+    // call get the contiguous tiles
+    // TODO change this to dfs_arr::get_cont_tiles()
+    // let contiguous_tiles = get_cont_tiles_arr(&mosaic_nd_arr);
+    // println!("fn dfs_mod search results -> {:?}", &contiguous_tiles);
+
+    // let svg_file_name_str = "create_2x2_white_square.svg";
+  
+    // lets create an svg file
+    // let _ = svg_utils::write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,200 as usize,100 as usize);
+
+}
+
+// pub fn get_contiguous_tiles_mod(array: &Vec<Vec<String>>) -> Vec<Vec<(isize, isize)>> {
+// pub fn reshape_vec(pane_vec: Vec<Vec<(Box2D<i32>, RGB)>>, rows: usize, cols:usize ) -> Vec<Vec<(Box2D<i32>, RGB)>> {
+    pub fn reshape_vec(pane_vec: Vec<Vec<(Box2D<i32>, RGB)>>, rows: usize, cols:usize )  {    
+
+        println!("pane_vec -> {:?}", &pane_vec);
+        println!("(rows,cols) -> ({},{})", &rows,&cols);
+
+        let a = Array2::from_shape_vec((rows-1, cols-1), pane_vec).unwrap();
+
+        println!("a {:?}", &a);
+
+        let v: Vec<Vec<_>> = a.axis_iter(Axis(0)).map(|row| row.to_vec()).collect();
+
+    println!("output as vector {:?}", &v);
+
+}
+    

@@ -13,7 +13,7 @@ use crate::constants::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
 use crate::dfs_tiles::get_contiguous_tiles_mod;
-use crate::dfs_arr::get_cont_tiles_arr;
+
 
 use crate::get_edge_bools;
 

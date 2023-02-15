@@ -3,6 +3,8 @@ mod dfs_tiles;
 mod svg_utils;
 mod constants;
 
+mod reshape;
+
 mod single_tile;
 mod two_tile_horiz;
 mod four_tile_square;
@@ -25,16 +27,26 @@ fn main() {
     // let _ = test_corner();
 
     // create a single tile mosaic and draw the corresponding SVG doc    
-    // let _ = single_tile::create_svg();
+    let _ = single_tile::create_svg();
 
     // create a double tile horizontal mosaic of two white tiles and draw the corresponding SVG doc    
-    // let _ = two_tile_horiz::create_white_white_svg();
+    let _ = two_tile_horiz::create_white_white_svg();
     
     // create a double tile horizontal mosaic of one white and one black tile and create svg file
-    // let _ = two_tile_horiz::create_white_black_svg();
+    let _ = two_tile_horiz::create_white_black_svg();
 
-    let _ = four_tile_square::create_2x2_white_svg();
+    // let _ = four_tile_square::create_2x2_white_svg();
+
+    // let _ = four_tile_square::test_2x2_dfs_arr();
+
+    // let _ = reshape::reshape_vec_1();
+
+    let _ = reshape::reshape_min();
     
+    // let _ = reshape::reshape_vec_axis_iter();
+    
+    // let _ = four_tile_square::test_2x2_dfs_arr();
+
 }
 
 /// Function test the box_corners() call.
