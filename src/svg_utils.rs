@@ -1,4 +1,4 @@
-use crate::box_corners;
+use crate::{box_corners, dfs_tiles};
 use crate::modtile::{RGB, self};
 use crate::constants::{NORTH,EAST,SOUTH,WEST,};
 use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
@@ -9,6 +9,13 @@ use euclid::default::Box2D;
 use svg::node::element::path::Data;
 use svg::node::element::Path;
 use svg::Document;
+
+use crate::dfs_tiles::get_contiguous_tiles_mod;
+use crate::get_edge_bools;
+use crate::pane_to_2d_vec;
+use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
+
+
 
 ///
 /// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
@@ -61,6 +68,61 @@ fn draw_polyline_borders()
 {
     todo!()
 }
+
+
+/// General helper function called to create an svg output file
+/// 
+/// Arguments
+/// op_svg_file_name
+/// svg_width
+/// svg_height
+/// pane_rows - how many rows of panes are in whole mosaic 
+/// pane_cols - how many columns of panes in whole mosaic 
+/// tiles_per_pane_height: usize, <- this is redundant
+/// tiles_per_pane_width: usize,  <- this is redundant
+pub(crate) fn create_svg(op_svg_file_name: &str, 
+    svg_width: i32, 
+    svg_height: i32, 
+    pane_rows: usize, 
+    pane_cols: usize, 
+    tiles_per_pane_height: usize,  // = number of rows
+    tiles_per_pane_width: usize,   // = number of cols
+    create_mosaic_data_fn: fn() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>>) 
+{
+println!("svg_utils::create_svg");
+
+// lets call the create data function 
+let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_mosaic_data_fn(); 
+println!(" create_mosaic_data_fn {:?}", &mosaic_vec);
+
+// grab the ND Array for the first mosiac pane
+// which is the first element of the mosaic vec
+// TODO In future need to iterate over all panes 
+let pane_nd_arr = pane_vec_to_ndarray(&mosaic_vec[0],tiles_per_pane_height , tiles_per_pane_width ); // rows, cols
+println!("\n\npane nd array {:?} ", &pane_nd_arr);
+
+// convert the pane_ds_arr back to a 2D vector so we can use it for the Depth First Search Algorithm
+let pane_2d_vec: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = pane_to_2d_vec(&pane_nd_arr, tiles_per_pane_height, tiles_per_pane_width);
+println!("\n\n2D Pane Vec -> {:?}", pane_2d_vec);
+
+// get the test boolean array to build our svg path with
+let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
+
+println!("edge_booleans = {:?}" , &edge_booleans);
+
+// get Vec of Vec of contigous tiles
+let contiguous_tiles = dfs_tiles::get_contiguous_tiles_mod(&pane_2d_vec);
+println!("fn get_contiguous_tiles_mod search results -> {:?}", &contiguous_tiles);
+
+// where the majic happens. lets create an svg file
+let _ = write_svg(pane_nd_arr, 
+                       edge_booleans, 
+                       contiguous_tiles, 
+                       op_svg_file_name ,
+                       svg_width as usize,
+                       svg_height as usize);
+} // create_svg
+
 
 
 
@@ -272,6 +334,37 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
                     println!("line data {:?}\n ---------- " , &line_data);
 
                 }, // TTFF
+                // **********************************    
+                (false, false, true, false) => { //FFTF
+                    println!("match -> false false true false - south open");
+                    print!(" NORTH/WEST/EAST (top/left/right) Closed - SOUTH (bottom) side open tile\n");
+    
+                    // west closed so may be a move too here if no  'move_to'.
+                    // continue to draw from last point
+                    // if not first tile then don't do absolute 'move_to'.  TODO CHECK THIS 
+                    line_data = line_data.move_to(corner[BOT_LEFT])
+                    .line_to(corner[TOP_LEFT])
+                    .line_to(corner[TOP_RIGHT])
+                    .line_to(corner[BOT_RIGHT]);
+
+                    println!("line data {:?}\n ---------- " , &line_data);
+
+                }, // FFTF
+                // **********************************    
+                (true, false, false, false) => { //TFFF
+                    println!("match -> true false false false - north open");
+                    print!(" SOUTH/EAST/WEST (bottom/right/left) Closed - NORTH (top) side open tile\n");
+    
+                    // continue to draw from last point
+                    // can't be first tile so no need absolute 'move_to'.
+                    // line_data.move_to(corner[BOT_LEFT])
+                    line_data = line_data.line_to(corner[BOT_RIGHT])
+                    .line_to(corner[BOT_LEFT])
+                    .line_to(corner[TOP_LEFT]);
+
+                    println!("line data {:?}\n ---------- " , &line_data);
+
+                }, // TFFF
 
                 // **********************************
                 _ => {
