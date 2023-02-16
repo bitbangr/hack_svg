@@ -17,6 +17,7 @@ use ndarray::{Array, Array2};
 use modtile::RGB;
 use constants::{NORTH,EAST,SOUTH,WEST};
 
+
 /// This application will create an SVG files from a various window pane/tile configurations
 /// 
 /// Tile configs should be done in their own file and call the svg_utils::write_svg() with the required params
@@ -24,6 +25,17 @@ fn main() {
 
     println!("Hack SVG");
     
+    // let _ = four_tile_square::svg_1();
+    // let _ = four_tile_square::svg_2();
+    // let _ = four_tile_square::svg_3();
+
+    // let _ = four_tile_square::svg_4();
+
+    // let _ = two_tile_horiz::svg_1();
+    // let _ = two_tile_horiz::svg_2();
+    let _ = two_tile_horiz::svg_3();
+    // let _ = two_tile_horiz::svg_4();
+
     // test getting Box2D corners 
     // let _ = test_corner();
 
@@ -38,7 +50,7 @@ fn main() {
 
     // let _ = four_tile_square::create_2x2_white_svg();
 
-    let _ = four_tile_square::create_white_row_black_row_svg();
+    // let _ = four_tile_square::create_white_row_black_row_svg();
 
     // let _ = four_tile_square::test_2x2_dfs_arr();
 
@@ -50,7 +62,8 @@ fn main() {
     
     // let _ = four_tile_square::test_2x2_dfs_arr();
 
-}
+
+} // main
 
 /// Function test the box_corners() call.
 /// Create a box2d and check that the corner coordinates from box_corners match
