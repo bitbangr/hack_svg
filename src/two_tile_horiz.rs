@@ -1,295 +1,93 @@
 use euclid::default::Box2D;
-use euclid::default::Point2D;
-use ndarray::{Array, Array2};
-use svg::Document;
-use svg::node::element::Path;
-use svg::node::element::path::Data;
-
-use crate::box_corners;
 use crate::create_tile;
-use crate::constants::{NORTH,EAST,SOUTH,WEST};
-use crate::constants::{NE_CORNER,NW_CORNER, SW_CORNER, SE_CORNER};
-use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
-use crate::dfs_tiles::get_contiguous_tiles_mod;
-use crate::svg_utils;
-use crate::svg_utils::write_svg;
-use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points, get_edge_bools};
+use crate::svg_utils::create_svg;
 use crate::{modtile::{RGB, self}};
 
+// For a two tile mosiac the dimension are 1 row by 2 col or 2 rows by 1 col
+// For each orientation there are two options - both tiles same colour, or each tile a different colour
+// There is one test for each option
 
+pub(crate) fn svg_1(){
+    let op_svg_file_name = "./svg_output/one_two/horiz_1.svg";
+    let rows: usize = 1;
+    let cols: usize = 2;
+    let tiles_per_pane_height: usize = 1; 
+    let tiles_per_pane_width: usize = 2; 
+    let svg_width = 200;
+    let svg_height = 100;
 
-// For a two tile horizontal mosiac the dimension are 1 row by 2 col
-const TILES_PER_PANE_WIDTH: usize = 2;
-const TILES_PER_PANE_HEIGHT: usize = 1;
+    let _ = create_svg(op_svg_file_name,
+        svg_width,
+        svg_height, 
+        rows, 
+        cols, 
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        create_double_white_horiz_tile_data);
+} // svg1
 
-/*
-    This function creates a 1x2 mosaic of two white tiles and then creates an SVG file with this info
-*/
-pub(crate) fn create_white_white_svg(){
+pub(crate) fn svg_2(){
+    let op_svg_file_name = "./svg_output/one_two/horiz_2.svg";
+    let rows: usize = 1;
+    let cols: usize = 2;
+    let tiles_per_pane_height: usize = 1; 
+    let tiles_per_pane_width: usize = 2; 
+    let svg_width = 200;
+    let svg_height = 100;
 
-    // Create a simple 1x2 mosaic
-    let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_double_white_tile_data(); 
-    println!("test of module call create_double_white_tile_data {:?}", &mosaic_vec);
+    let _ = create_svg(op_svg_file_name,
+        svg_width,
+        svg_height, 
+        rows, 
+        cols, 
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        create_white_black_horiz_tile_data);
+} // svg2
 
-    // grab the ND Array for this mosiac
-    let mosaic_nd_arr = get_tile_ndarray(&mosaic_vec[0]);
-    println!("Tile NDArray {:?} ", &mosaic_nd_arr);
+pub(crate) fn svg_3(){
+    let op_svg_file_name = "./svg_output/one_two/vert_1.svg";
+    let rows: usize = 2;
+    let cols: usize = 1;
+    let tiles_per_pane_height: usize = 2; 
+    let tiles_per_pane_width: usize = 1; 
+    let svg_width = 100;
+    let svg_height = 200;
 
-    // get the test boolean array to build our svg path with
-    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&mosaic_nd_arr);
+    let _ = create_svg(op_svg_file_name,
+        svg_width,
+        svg_height, 
+        rows, 
+        cols, 
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        create_white_vert_tile_data);
+} // svg3
 
-    println!("edge_booleans[0,0][0] = {:?}" , edge_booleans[[0,0]][0]);
-    println!("edge_booleans = {:?}" , &edge_booleans);
+pub(crate) fn svg_4(){
+    let op_svg_file_name = "./svg_output/one_two/vert_2.svg";
+    let rows: usize = 2;
+    let cols: usize = 1;
+    let tiles_per_pane_height: usize = 2; 
+    let tiles_per_pane_width: usize = 1; 
+    let svg_width = 100;
+    let svg_height = 200;
 
-    // call get_contiguous_tiles() to get contiguous tiles 
-    // need to decide if using 
-    //    get_contiguous_tiles (&mosaic_vec) This seems to work  
-    //       created get_contiguous_tiles_mod()
-    // or get_contiguous_tiles (&mosaic_nd_arr)
+    let _ = create_svg(op_svg_file_name,
+        svg_width,
+        svg_height, 
+        rows, 
+        cols, 
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        create_white_black_vert_tile_data);
+} // svg4
 
-    let contiguous_tiles = get_contiguous_tiles_mod(&mosaic_vec);
-    println!("fn dfs_mod search results -> {:?}", &contiguous_tiles);
-
-    let svg_file_name_str = "double_tile_horizontal.svg";
-
-    // lets create an svg file
-    let _ = svg_utils::write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str,200 as usize,100 as usize);
-
-
-}
-
-
-/* 
-    This function creates a 1x2 mosaic of one white and one black tile and then creates an SVG file with this info
-*/
-pub fn create_white_black_svg(){
-
-    // Create a simple 1x2 mosaic
-    let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_white_black_tile_data(); 
-    println!("test of module call create_white_black_tile_data {:?}", &mosaic_vec);
-
-    // grab the ND Array for this mosiac
-    let mosaic_nd_arr = get_tile_ndarray(&mosaic_vec[0]);
-    println!("Tile NDArray {:?} ", &mosaic_nd_arr);
-
-    // get the test boolean array to build our svg path with
-    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&mosaic_nd_arr);
-
-    println!("edge_booleans[0,0][0] = {:?}" , edge_booleans[[0,0]][0]);
-    println!("edge_booleans = {:?}" , &edge_booleans);
-
-    // call get_contiguous_tiles() to get contiguous tiles 
-    // need to decide if using 
-    //    get_contiguous_tiles (&mosaic_vec) This seems to work  
-    //       created get_contiguous_tiles_mod()
-    // or get_contiguous_tiles (&mosaic_nd_arr)
-
-    let contiguous_tiles = get_contiguous_tiles_mod(&mosaic_vec);
-    println!("fn dfs_mod search results -> {:?}", &contiguous_tiles);
-
-    let svg_file_name_str = "white_black_1x2.svg";
-    let _ = write_svg(mosaic_nd_arr, edge_booleans, contiguous_tiles, svg_file_name_str, 200 as usize, 100 as usize );
-
-}
-
-
-
-/// The write_svg function will create an output SVG file with the supplied input data.
-/// 
-/// # Arguments
-///
-/// `mosaic_nd_arr: ArrayBase<OwnedRepr<(Box2D<i32>, RGB)>, Dim<[usize; 2]>>` - Array of all tiles with Box Coordinates and associated tile colour
-/// 'edge_booleans: ArrayBase<OwnedRepr<Vec<bool>>, Dim<[usize; 2]>>' - Edge boolean for each tile
-/// 'contiguous_tiles: Vec<Vec<(isize, isize)>>'  - vector containing collections of contigous tiles
-///
-/// # Return
-///
-/// returns a result 
-///  
-/// # Examples
-///
-/// ```
-/// ```
-/// 
-
-
-
-// fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>, 
-//             edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
-//             contiguous_tiles: Vec<Vec<(isize, isize)>>,
-//             svg_file_name_str: &str ) -> Result<(), std::io::Error> 
-// {
-//     // not sure if SVG specific code should reside here or in svg_utils.rs
-    
-//     // Create the svg document
-//     // TODO set width and heigh to match rows/cols * tile size
-//     let mut document = Document::new().set("viewBox", (0, 0, 200, 100));
-
-//     // let stroke_colour =  "black";
-//     let stroke_colour =  "purple";
-//     let stroke_width =  0.25; 
-
-
-//     //***********
-//     // **********
-//     println!("\nfn write_svg - Vector of contigous tiles -> {:?}", contiguous_tiles);
-
-//     // store all the edges 
-
-//     // Grab a collection of contigous tiles
-//     for contig_group in &contiguous_tiles{
-
-//         let mut line_data = Data::new();
-//         let mut rgb_str: String = String::new();
-    
-//         for contig_tile in contig_group{
-            
-//             let row = *&contig_tile.0 as usize;
-//             let col = *&contig_tile.1 as usize;
-        
-//             println!("*** contigous tile {:?}", &contig_tile);
-//             println!("*** contig_tile row {}", &row);
-//             println!("*** contig_tile col {}", &col);
-
-//             // println!("mosaic_nd_arr [x][y] -> {:?} ",mosaic_nd_arr[[row,col]] );
-
-//             let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
-//             println!("\n(row: {} col: {})\n\tCur Tile Info {:?} ",row, col, &cur_tile);
-//             println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
-        
-//             let n = edge_booleans[[row,col]][NORTH];
-//             let e = edge_booleans[[row,col]][EAST];
-//             let s = edge_booleans[[row,col]][SOUTH];
-//             let w = edge_booleans[[row,col]][WEST];
-        
-//             let tile_box = &cur_tile.0;
-//             let corner:[(usize,usize);4] = box_corners(*tile_box);
-            
-//             println!("corner Co-ords {:?}", corner);
-//             println!("top left corner {:?}", corner[TOP_LEFT]);
-//             println!("North West corner {:?}", corner[NW_CORNER]);
-//             println!("top right corner {:?}", corner[TOP_RIGHT]);
-//             println!("North East corner {:?}", corner[NE_CORNER]);
-//             println!("bottom right corner {:?}", corner[BOT_RIGHT]);
-//             println!("South East corner {:?}", corner[SE_CORNER]);
-//             println!("bottom left corner {:?}", corner[BOT_LEFT]);
-//             println!("South West corner {:?}", corner[SW_CORNER]);
-
-//             let atile_rgb = &cur_tile.1;
-//             let atile_rgb_str = &atile_rgb.to_string().replace(" ", "");
-//             rgb_str = atile_rgb_str.to_string(); 
-//             println!("rgb string  {} ", rgb_str);        
-//             // TODO Feb 12 - See notes 
-
-//             // let mut line_data = Data::new();
-//             match (n, e, s, w) { //FTFF
-
-//             // *******************************************
-//             // Fully closed tiles are by definition the only element in the contigous tile collection
-//             (false, false, false, false) => {
-//                 println!("match -> false false false false - single tile");
-//                 print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
-
-//                 line_data = line_data.move_to(corner[TOP_LEFT])
-//                                     .line_to(corner[TOP_RIGHT])
-//                                     .line_to(corner[BOT_RIGHT])
-//                                     .line_to(corner[BOT_LEFT])
-//                                     .line_to(corner[TOP_LEFT]);
-
-//                 // same as above but harder to visualize
-//                 // line_data = line_data.move_to(corner[NW_CORNER])
-//                 //                     .line_to(corner[NE_CORNER])
-//                 //                     .line_to(corner[SE_CORNER])
-//                 //                     .line_to(corner[SW_CORNER])
-//                 //                     .line_to(corner[NW_CORNER]);
-
-//                 // same as above but easy to mess up x and y so use corner array
-//                 // line_data = line_data.move_to((x0,y0))
-//                 //                     .line_to((x1,y0))
-//                 //                     .line_to((x1,y1))
-//                 //                     .line_to((x0,y1))
-//                 //                     .line_to((x0,y0));
-//                                     // .close();                           // will double close crap out
-//                 println!("line data {:?}" , &line_data);
-//                 }, // FFFF
-//                 // **********************************
-//             (false, true, false, false) => {
-//                 println!("match -> false true false false - east open");
-//                 print!(" NORTH SOUTH WEST Closed - East Open tile\n");
-
-//                 line_data = line_data.move_to(corner[BOT_RIGHT])
-//                     .line_to(corner[BOT_LEFT])
-//                     .line_to(corner[TOP_LEFT])
-//                     .line_to(corner[TOP_RIGHT]);
-
-//                     println!("line data {:?}\n ----------- " , &line_data);
-
-//                 }, // FFFF
-//                 // **********************************    
-//             (false, false, false, true) => { //FFFT
-//                     println!("match -> false false false true - west open");
-//                     print!(" NORTH EAST SOUTH Closed - West/left side Open tile\n");
-    
-//                     // open West tiles cannot be first tile in results so no need for absolute 'move_to'.
-//                     // just continue to draw from last point
-//                     line_data = line_data.line_to(corner[TOP_RIGHT])
-//                     .line_to(corner[BOT_RIGHT])
-//                     .line_to(corner[BOT_LEFT]);
-
-//                     println!("line data {:?}\n ---------- " , &line_data);
-
-//                 }, // FFFT
-//                 // **********************************
-//                 _ => {
-//                     println!("The EDGE Boolean does not match any of the options\n");  
-//                 },
-
-//             } // match
-
-//         } // tile in contig_group
-        
-//         // at this point all the tiles of the contig group have been processed so close the line 
-//         line_data = line_data.close();
-
-//         println!(" ^^^^^^^^^^^^^\n after contig_group line_data close() {:?}\n ---------- " , &line_data);
-
-//         // create a path and add it to the svg document
-//         let tile_path = Path::new()
-//         .set("fill", rgb_str.to_owned()) // ie -> .set("fill", "rgb(255, 0, 0)")
-//         .set("stroke", stroke_colour)
-//         .set("stroke-width", stroke_width)
-//         .set("d", line_data);
-
-//         // add the tile path to the document
-//         document = document.add(tile_path);
-    
-//     } // contig_group
-
-//     // let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
-//     // println!("\n(row: {} col: {})\n\tTile Info {:?} ",row, col, &cur_tile);
-//     // println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
-
-//     // Write the svg document to a file
-
-//     println!("writing to file {} ", &svg_file_name_str);// let svg_file_name_str = "double_tile_horizontal.svg";
-//     svg::save(svg_file_name_str, &document)
-
-// }
-
-
-
-///
-/// Get the Array2 ND array for the tile 
-fn get_tile_ndarray (vec: &Vec<(Box2D<i32>, modtile::RGB)>) -> Array2<(Box2D<i32>, modtile::RGB)> {
-
-   let pane_nd_array =  pane_vec_to_ndarray(&vec, TILES_PER_PANE_HEIGHT, TILES_PER_PANE_WIDTH );
-   
-   pane_nd_array
-}
-
-///  This function creates mosaic which consists of one window of one pane with two tiles
-/// 100 by 200 UnknownUnits size
-pub fn create_double_white_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+// ******************************************************************* 
+// ******************************************************************* 
+/// Creates data for a single row of two white tiles
+/// of 100 by 200 UnknownUnits size
+pub fn create_double_white_horiz_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
 
     let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
 
@@ -311,11 +109,12 @@ pub fn create_double_white_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
     result_window
 }
 
-
-///  This function creates mosaic which consists of one window of one pane with two tiles
+// ******************************************************************* 
+// ******************************************************************* 
+/// Creates data for a single row of two tiles
 /// left tile is white, right tile is black
 /// 100 by 200 UnknownUnits size
-pub fn create_white_black_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+pub fn create_white_black_horiz_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
 
     let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
 
@@ -336,3 +135,61 @@ pub fn create_white_black_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
 
     result_window
 }
+
+// ******************************************************************* 
+// ******************************************************************* 
+/// Creates data for a single column of two tiles
+/// both tiles are white
+/// 200 by 100 UnknownUnits size
+pub fn create_white_vert_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+
+    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+
+    // ****************************
+    // Start the first pane
+    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+
+    // top tile white
+    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
+    let _ = &pane_grid.push((tile_box, rgb));
+    
+    // bottom tile white
+    // (Box2D((0, 100), (100, 200)), RGB(255, 255, 255)),
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 100), (100, 200), (255, 255, 255));
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // save the pane to the result window
+    let _ = &result_window.push(pane_grid);
+
+    result_window
+}
+// ******************************************************************* 
+// ******************************************************************* 
+/// Creates data for a single column of two tiles
+/// top tile is white, bottom tile is black
+/// 200 by 100 UnknownUnits size
+pub fn create_white_black_vert_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+
+    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+
+    // ****************************
+    // Start the first pane
+    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+
+    // top tile white
+    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
+    let _ = &pane_grid.push((tile_box, rgb));
+    
+    // bottom tile black
+    // (Box2D((0, 100), (100, 200)), RGB(0, 0, 0)),
+    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 100), (100, 200), (0, 0, 0));
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // save the pane to the result window
+    let _ = &result_window.push(pane_grid);
+
+    result_window
+}
+
