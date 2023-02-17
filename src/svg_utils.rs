@@ -274,9 +274,16 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
     
                     // open West tiles cannot be first tile in results so no need for absolute 'move_to'.
                     // just continue to draw from last point
+
+                    if curr_end_point != corner[TOP_LEFT]{
+                        line_data = line_data.move_to(corner[TOP_LEFT]);
+                    }
+                    
                     line_data = line_data.line_to(corner[TOP_RIGHT])
                     .line_to(corner[BOT_RIGHT])
                     .line_to(corner[BOT_LEFT]);
+
+                    curr_end_point = corner[BOT_LEFT];
 
                     println!("line data {:?}\n ---------- " , &line_data);
 
@@ -331,10 +338,15 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
                     // continue to draw from last point
                     // above assumption is wrong
                     //  FFTF -> TTFF requires a moveto as last point of FFTF is not start of TTFF  
+                    if curr_end_point != corner[BOT_RIGHT]{
+                        line_data = line_data.move_to(corner[BOT_RIGHT]);
+                    }
                     line_data = line_data.line_to(corner[BOT_LEFT])
                     .line_to(corner[TOP_LEFT]);
 
-                    println!("line data {:?}\n ---------- " , &line_data);
+                    curr_end_point = corner[TOP_LEFT];
+
+                    println!("line data {:?}\n curr_end_point = {:?}---------- " , &line_data, & curr_end_point);
 
                 }, // TTFF
                 // **********************************    
@@ -342,6 +354,13 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
                     println!("match -> false false true false - south open");
                     print!(" NORTH/WEST/EAST (top/left/right) Closed - SOUTH (bottom) side open tile\n");
     
+                    if first_tile {
+                        println!("We have the first tile!") ;
+                        first_tile = false;
+                        // update the endpoint to last point of this shape
+                        curr_end_point = corner[BOT_RIGHT];
+
+                    } 
                     // west closed so may be a move too here if no  'move_to'.
                     // continue to draw from last point
                     // if not first tile then don't do absolute 'move_to'.  TODO CHECK THIS 
