@@ -6,3 +6,5 @@ my_mod.rs
 src/compareNeighbours_NDArray.rs
 .vscode/launch.json
 /svg_output
+src/FuncCalledWithFunctParameter.rs
+src/dfs_arr.rs
