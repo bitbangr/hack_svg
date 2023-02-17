@@ -28,12 +28,19 @@ fn main() {
     // let _ = four_tile_square::svg_1();
     // let _ = four_tile_square::svg_2();
     // let _ = four_tile_square::svg_3();
-
     // let _ = four_tile_square::svg_4();
+    // let _ = four_tile_square::svg_5();   // 2x2 1st row (black, black), 2nd row (white, green)
+    // let _ = four_tile_square::svg_6();   // 2x2 1st row (white, green), 2nd row (black, black) 
+    // let _ = four_tile_square::svg_7();   // 2x2 1st col (white, green), 2nd col (black, black)
+    // let _ = four_tile_square::svg_8();   // 2x2 1st col (black, black), 2nd col (green, white)
+    let _ = four_tile_square::svg_9();   // 2x2 1st col top left green, rest black
+    let _ = four_tile_square::svg_10();   // 2x2 1st col top right green, rest black
+    let _ = four_tile_square::svg_11();   // 2x2 1st col bot left green, rest black
+    let _ = four_tile_square::svg_12();   // 2x2 1st col bot right green, rest black
 
     // let _ = two_tile_horiz::svg_1();
     // let _ = two_tile_horiz::svg_2();
-    let _ = two_tile_horiz::svg_3();
+    // let _ = two_tile_horiz::svg_3();
     // let _ = two_tile_horiz::svg_4();
 
     // test getting Box2D corners 
