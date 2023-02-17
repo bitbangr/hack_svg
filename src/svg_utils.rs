@@ -182,6 +182,10 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
         let mut line_data = Data::new();
         let mut rgb_str: String = String::new();
     
+        // current end location of last line drawn (x,y)
+        // need to check this is the start point of the next line 
+        let mut curr_line_end_point: (usize,usize) = (0,0);
+
         for contig_tile in contig_group{
             
             let row = *&contig_tile.0 as usize;
@@ -328,6 +332,8 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
     
                     // can't be first tile so no need absolute 'move_to'.
                     // continue to draw from last point
+                    // above assumption is wrong
+                    //  FFTF -> TTFF requires a moveto as last point of FFTF is not start of TTFF  
                     line_data = line_data.line_to(corner[BOT_LEFT])
                     .line_to(corner[TOP_LEFT]);
 
