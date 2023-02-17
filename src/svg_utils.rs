@@ -184,7 +184,7 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
     
         // current end location of last line drawn (x,y)
         // need to check this is the start point of the next line 
-        let mut curr_line_end_point: (usize,usize) = (0,0);
+        let mut curr_end_point: (usize,usize) = (0,0);
 
         for contig_tile in contig_group{
             
