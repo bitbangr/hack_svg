@@ -4,7 +4,7 @@ use std::path::Path;
 use std::io::{Read};
 use std::fmt::{self, Formatter, Display};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Copy, Clone, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Copy, Clone, Eq, Hash, Default)]
 pub struct RGB(pub u8,pub u8,pub u8);
 
 impl Display for RGB {
