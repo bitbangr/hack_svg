@@ -7,6 +7,7 @@ use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
 use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
+use euclid::Point2D;
 use euclid::default::Box2D;
 use ndarray::{Array2, ArrayBase, OwnedRepr, Dim, s, Axis, ViewRepr, Array1};
 use svg::node::element::path::Data;
@@ -112,7 +113,7 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
     // let pane_edge_bool_arr_tuple :[(ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>, // pane_nd_arr
     // ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>)] = get_pane_edge_bool_arr(&pane_nd_arr, &edge_booleans);
 
-    let p_b_tuple = get_pane_edge_bool_tuple(&pane_nd_arr, &edge_booleans);
+    // let p_b_tuple = get_pane_edge_bool_tuple(&pane_nd_arr, &edge_booleans);
 
 
     println!("edge_booleans = {:?}" , &edge_booleans);
@@ -152,24 +153,81 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
 } // create_svg
 
 
+/// General helper function for used for testing
+/// 
+/// Arguments
+/// op_svg_file_name
+/// svg_width
+/// svg_height
+/// pane_rows - how many rows of panes are in whole mosaic 
+/// pane_cols - how many columns of panes in whole mosaic 
+/// tiles_per_pane_height: usize, <- this is redundant
+/// tiles_per_pane_width: usize,  <- this is redundant
+pub(crate) fn test_create_svg(op_svg_file_name: &str, 
+    svg_width: i32, 
+    svg_height: i32, 
+    pane_rows: usize, 
+    pane_cols: usize, 
+    tiles_per_pane_height: usize,  // = number of rows
+    tiles_per_pane_width: usize,   // = number of cols
+    create_mosaic_data_fn: fn() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>>) 
+{
+    println!("svg_utils::create_svg");
+
+    // lets call the create data function 
+    let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_mosaic_data_fn(); 
+    println!(" create_mosaic_data_fn {:?}", &mosaic_vec);
+
+    // grab the ND Array for the first mosiac pane
+    // which is the first element of the mosaic vec
+    // TODO In future need to iterate over all panes 
+    let pane_nd_arr = pane_vec_to_ndarray(&mosaic_vec[0],tiles_per_pane_height , tiles_per_pane_width ); // rows, cols
+    println!("\n\npane nd array {:?} ", &pane_nd_arr);
+
+    // convert the pane_ds_arr back to a 2D vector so we can use it for the Depth First Search Algorithm
+    let pane_2d_vec: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = pane_to_2d_vec(&pane_nd_arr, tiles_per_pane_height, tiles_per_pane_width);
+    println!("\n\n2D Pane Vec -> {:?}", pane_2d_vec);
+
+    // get the test boolean array to build our svg path with
+    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
+
+    println!("edge_booleans = {:?}" , &edge_booleans);
+
+    // get Vec of Vec of contigous tiles
+    let contiguous_tiles = dfs_tiles::get_contiguous_tiles_mod(&pane_2d_vec);
+    println!("fn get_contiguous_tiles_mod search results -> {:?}", &contiguous_tiles);
+
+    // testing the travel contigous tiles function
+    let _ = travel_contig_svg(pane_nd_arr, 
+                        edge_booleans, 
+                        contiguous_tiles, 
+                        op_svg_file_name ,
+                        svg_width as usize,
+                        svg_height as usize);
+
+    
+} // test_create_svg
+
+
+
 // what does the function -> [(Array2< (Box2D<i32>, RGB, Array1<[bool;4]>)] return
 // The function returns a tuple containing a single 2-dimensional array 
 // of type Array2<(Box2D<i32>, RGB, Array1<[bool; 4]>)>. 
 
 // Each element of the array is a tuple of (Box2D<i32>, RGB, Array1<[bool; 4]>).
 
-fn get_pane_edge_bool_tuple(
-      pane_nd_arr: &Array2<(Box2D<i32>, modtile::RGB)>,
-    edge_booleans: &Array2<Array1<[bool;4]>> ) -> [Array2<(Box2D<i32>, RGB, Array1<[bool;4]>)>; 4] 
-{
-    let mut pane_edge_bool_arr_tuple = [Array2::default(); 4];
+// fn get_pane_edge_bool_tuple(
+//       pane_nd_arr: &Array2<(Box2D<i32>, modtile::RGB)>,
+//     edge_booleans: &Array2<Array1<[bool;4]>> ) -> [Array2<(Box2D<i32>, RGB, Array1<[bool;4]>)>; 4] 
+// {
+//     let mut pane_edge_bool_arr_tuple = [Array2::default(); 4];
 
-    for (index, (pane, edge_bool)) in pane_nd_arr.iter().zip(edge_booleans.iter()).enumerate() {
-        let pane_edge_bool = Array2::from_elem((pane.0, pane.1, edge_bool.to_owned()), [4, 4]);
-        pane_edge_bool_arr_tuple[index] = pane_edge_bool;
-    }
-    pane_edge_bool_arr_tuple
-}
+//     for (index, (pane, edge_bool)) in pane_nd_arr.iter().zip(edge_booleans.iter()).enumerate() {
+//         let pane_edge_bool = Array2::from_elem((pane.0, pane.1, edge_bool.to_owned()), [4, 4]);
+//         pane_edge_bool_arr_tuple[index] = pane_edge_bool;
+//     }
+//     pane_edge_bool_arr_tuple
+// }
 
 
 
@@ -376,6 +434,7 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
         let mut curr_end_point: (usize,usize) = (0,0);
         let mut first_tile : bool = true;
 
+
         // instead of iterating through each tile in conf lets
         // grab the first tile and draw it
         //    if not yet arrived at start point 
@@ -383,14 +442,23 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
         // first tile
         // 
         // grab the first tile
-        // let tart_tile = contig_group[0];
-        // let more_tiles: bool = true; 
+        // let start_tile = contig_group[0];
+        // let row = *&contig_tile.0 as usize;
+        // let col = *&contig_tile.1 as usize;
+
+        // let mut more_tiles: bool = true; 
         // while (more_tiles) {
         //     // keep drawing 
-        //     line_date = lindata + draw(start_tile, )
+        //     if first_tile {
+
+        //         // move to first tile (starting point based on tile shape (tile boolean)
+        //         //
+        //         // line_data = draw_startingtile, (line_data, start_tile,row,col);
+        //     }
+            
 
 
-        // }
+        // } // while (more_tiles)
 
         for contig_tile in contig_group{
             
@@ -635,6 +703,287 @@ pub fn write_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32
 
 } // write_svg
 
+
+
+/// given set of contiguous tiles find the ntext tile and print it out
+/// 
+pub fn travel_contig_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(Box2D<i32>, RGB)>,ndarray::Dim<[usize; 2]>>,
+                 edge_booleans: ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>>, 
+              contiguous_tiles: Vec<Vec<(isize, isize)>>,
+             svg_file_name_str: &str,
+                 viewbox_width: usize,
+                viewbox_height: usize ) -> Result<(), std::io::Error> 
+{
+
+
+    // TODO dfs_mod returns a vect of matching entries to the position in the Vec
+    //         This does not match the array index position to the NDarray
+    //         So need to modify DFS_MOD to return array index and not Vec position
+    // see dfs_tiles.rs for implimentaion
+
+    // fn dfs_mod search results -> [[(0, 0), (0, 1), (0, 2), (0, 3)]]
+    // fn write_svg - Vector of contigous tiles -> [[(0, 0), (0, 1), (0, 2), (0, 3)]]
+
+    //***********
+    // **********
+    println!("\n***********\nfn travel_contig_svg");
+    println!("\nVector of contigous tiles -> {:?}", contiguous_tiles);
+
+    // Grab a collection of contigous tiles
+    for contig_group in &contiguous_tiles{
+
+        let mut rgb_str: String = String::new();
+    
+        // current end location of last line drawn (x,y)
+        // need to check this is the start point of the next line 
+        let mut curr_end_point: (usize,usize) = (0,0);
+        let mut is_first_tile : bool = true;
+
+        // grab the first tile
+        let start_tile_idx = contig_group[0];
+        let row = *&start_tile_idx.0 as usize;
+        let col = *&start_tile_idx.1 as usize;
+
+        println!("\nStart tile index from contiguous tiles -> {:?}" , &start_tile_idx);
+
+        let mut more_tiles: bool = true; 
+        while (more_tiles) {
+
+            println!("\n while more_tiles start_tile_idx -> {:?}" , &start_tile_idx);
+
+            more_tiles = false;
+
+            let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
+            println!("\n(row: {} col: {})\n\tCur Tile Info {:?} ",row, col, &cur_tile);
+            println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
+        
+            // let next_tile: (usize,usize) = get_next_tile( ) 
+
+            let n = edge_booleans[[row,col]][NORTH];
+            let e = edge_booleans[[row,col]][EAST];
+            let s = edge_booleans[[row,col]][SOUTH];
+            let w = edge_booleans[[row,col]][WEST];
+        
+            let tile_box = &cur_tile.0;
+            let corner:[(usize,usize);4] = box_corners(*tile_box);
+            
+            println!("\nCorner Co-ords {:?}", corner);
+            println!("\ntop left corner {:?}", corner[TOP_LEFT]);
+            println!("top right corner {:?}", corner[TOP_RIGHT]);
+            println!("bottom right corner {:?}", corner[BOT_RIGHT]);
+            println!("bottom left corner {:?}", corner[BOT_LEFT]);
+
+            let mut cur_tile_start_point: Point2D<i32,i32> = Point2D::new(0,0);
+            let mut cur_tile_end_point:Point2D<i32,i32> = Point2D::new(10,10);
+
+            // let mut line_data = Data::new();
+            match (n, e, s, w) { //FTFF
+
+                // *******************************************
+                // Fully closed tiles are by definition the only element in the contigous tile collection
+                (false, false, false, false) => {
+                    println!("match -> false false false false - single tile");
+                    print!(" NORTH EAST SOUTH WEST fully closed single tile\n");
+
+                    cur_tile_start_point = get_point2D(corner[TOP_LEFT]);
+                      cur_tile_end_point = get_point2D(corner[TOP_LEFT]);
+
+                    println!{"start point TOP_LEFT-> {:?} ", corner[TOP_LEFT]}; 
+                    println!{"end point TOP_LEFT-> {:?} ", corner[TOP_LEFT]}; 
+                    }, // FFFF
+                    // **********************************
+                (false, true, false, false) => {
+                    println!("match -> false true false false - east open");
+                    print!(" NORTH SOUTH WEST Closed - East Open tile\n");
+    
+                    cur_tile_start_point = get_point2D(corner[BOT_LEFT]);
+                      cur_tile_end_point = get_point2D(corner[TOP_LEFT]);
+
+                    println!{"start point BOT_LEFT-> {:?} ", corner[BOT_LEFT]}; 
+                    println!{"end point TOP_LEFT-> {:?} ", corner[TOP_LEFT]}; 
+    
+                    }, // FTFF
+                    // **********************************    
+                (false, false, false, true) => { //FFFT
+                        println!("match -> false false false true - west open");
+                        print!(" NORTH EAST SOUTH Closed - West/left side Open tile\n");
+
+                        cur_tile_start_point = get_point2D(corner[TOP_LEFT]);
+                        cur_tile_end_point = get_point2D(corner[BOT_LEFT]);
+      
+                        println!{"start point TOP_LEFT-> {:?} ", corner[TOP_LEFT]}; 
+                        println!{"end point BOT_LEFT-> {:?} ", corner[BOT_LEFT]};     
+    
+                    }, // FFFT
+                    // **********************************    
+                (false, true, true, false) => { //FTTF
+                        println!("match -> false true true false - east/south open");
+                        print!(" NORTH/WEST (top/left) Closed - EAST/South (right/bottom) side open tile\n");
+
+                        cur_tile_start_point = get_point2D(corner[BOT_LEFT]);
+                        cur_tile_end_point = get_point2D(corner[TOP_RIGHT]);
+
+                        println!{"start point BOT_LEFT-> {:?} ", corner[BOT_LEFT]}; 
+                        println!{"end point TOP_RIGHT-> {:?} ", corner[TOP_RIGHT]};     
+    
+                    }, // FTTF
+                    // **********************************    
+                (false, false, true, true) => { //FFTT
+                        println!("match -> false false true true - south/west open");
+                        print!(" NORTH/EAST (top/right) Closed - SOUTH/WEST (bottom/left) side open tile\n");
+
+                        cur_tile_start_point = get_point2D(corner[TOP_LEFT]);
+                        cur_tile_end_point = get_point2D(corner[BOT_RIGHT]);
+
+                        println!{"start point TOP_LEFT-> {:?} ", corner[TOP_LEFT]}; 
+                        println!{"end point BOT_RIGHT-> {:?} ", corner[BOT_RIGHT]};     
+    
+                    }, // FFTT
+                    // **********************************    
+                    (true, false, false, true) => { //TFFT
+                        println!("match -> true false false true - north/east open");
+                        print!(" SOUTH/EAST (bottom/right) Closed - NORTH/WEST (top/left) side open tile\n");
+        
+                        cur_tile_start_point = get_point2D(corner[TOP_RIGHT]);
+                        cur_tile_end_point = get_point2D(corner[BOT_LEFT]);
+
+                        println!{"start point TOP_RIGHT-> {:?} ", corner[TOP_RIGHT]}; 
+                        println!{"end point BOT_LEFT-> {:?} ", corner[BOT_LEFT]};     
+    
+                    }, // TFFT
+                    // **********************************    
+                    (true, true, false, false) => { //TTFF
+                        println!("match -> true true false false - north/west open");
+                        print!(" SOUTH/WEST (bottom/left) Closed - NORTH/EAST (top/right) side open tile\n");
+        
+                        cur_tile_start_point = get_point2D(corner[BOT_RIGHT]);
+                        cur_tile_end_point = get_point2D(corner[TOP_LEFT]);
+
+                        println!{"start point BOT_RIGHT-> {:?} ", corner[BOT_RIGHT]}; 
+                        println!{"end point TOP_LEFT-> {:?} ", corner[TOP_LEFT]};     
+
+                    }, // TTFF
+                    // **********************************    
+                    (false, false, true, false) => { //FFTF
+                        println!("match -> false false true false - south open");
+                        print!(" NORTH/WEST/EAST (top/left/right) Closed - SOUTH (bottom) side open tile\n");
+
+                        cur_tile_start_point = get_point2D(corner[BOT_LEFT]);
+                        cur_tile_end_point = get_point2D(corner[BOT_RIGHT]);
+
+                        println!{"start point BOT_LEFT-> {:?} ", corner[BOT_LEFT]}; 
+                        println!{"end point BOT_RIGHT-> {:?} ", corner[BOT_RIGHT]};     
+                    }, // FFTF
+                    // **********************************    
+                    (true, false, false, false) => { //TFFF
+                        println!("match -> true false false false - north open");
+                        print!(" SOUTH/EAST/WEST (bottom/right/left) Closed - NORTH (top) side open tile\n");
+
+                        cur_tile_start_point = get_point2D(corner[TOP_RIGHT]);
+                        cur_tile_end_point = get_point2D(corner[TOP_LEFT]);
+
+                        println!{"start point TOP_RIGHT-> {:?} ", corner[TOP_RIGHT]}; 
+                        println!{"end point TOP_LEFT-> {:?} ", corner[TOP_LEFT]};     
+    
+                    }, // TFFF
+    
+                    // **********************************
+                    _ => {
+                        println!("The EDGE Boolean does not match any of the options\n");  
+                    },
+    
+                } // match
+                
+                println!("cur_tile_start_point {:?}", cur_tile_start_point);
+                println!("cur_tile_end_point {:?}", cur_tile_end_point);
+
+        }
+
+
+        // instead of iterating through each tile in conf lets
+        // grab the first tile and draw it
+        //    if not yet arrived at start point 
+        //      then find next_tile = get_next_tile(cur_end_point).  ie get the tile that starts with the end point of this tile
+        // first tile
+        // 
+        // grab the first tile
+        // let start_tile = contig_group[0];
+        // let row = *&contig_tile.0 as usize;
+        // let col = *&contig_tile.1 as usize;
+
+        // let mut more_tiles: bool = true; 
+        // while (more_tiles) {
+        //     // keep drawing 
+        //     if first_tile {
+
+        //         // move to first tile (starting point based on tile shape (tile boolean)
+        //         //
+        //         // line_data = draw_startingtile, (line_data, start_tile,row,col);
+        //     }
+            
+
+
+        // } // while (more_tiles)
+
+        for contig_tile in contig_group{
+            
+            let row = *&contig_tile.0 as usize;
+            let col = *&contig_tile.1 as usize;
+        
+            println!("*** contigous tile {:?}", &contig_tile);
+            println!("*** contig_tile row {}", &row);
+            println!("*** contig_tile col {}", &col);
+            // println!("\n\tfirst_tile {}", &first_tile);
+            println!("\n\tcurrent endpoint {:?}", &curr_end_point);
+
+            // println!("mosaic_nd_arr [x][y] -> {:?} ",mosaic_nd_arr[[row,col]] );
+
+            let cur_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]];
+            println!("\n(row: {} col: {})\n\tCur Tile Info {:?} ",row, col, &cur_tile);
+            println!("\tTile Edge Booleans -> {:?} " , edge_booleans[[row,col]]);
+        
+            let n = edge_booleans[[row,col]][NORTH];
+            let e = edge_booleans[[row,col]][EAST];
+            let s = edge_booleans[[row,col]][SOUTH];
+            let w = edge_booleans[[row,col]][WEST];
+        
+            let tile_box = &cur_tile.0;
+            let corner:[(usize,usize);4] = box_corners(*tile_box);
+            
+            println!("\nCorner Co-ords {:?}", corner);
+            println!("\ntop left corner {:?}", corner[TOP_LEFT]);
+            println!("top right corner {:?}", corner[TOP_RIGHT]);
+            println!("bottom right corner {:?}", corner[BOT_RIGHT]);
+            println!("bottom left corner {:?}", corner[BOT_LEFT]);
+
+            // println!("\nNorth West corner {:?}", corner[NW_CORNER]);
+            // println!("North East corner {:?}", corner[NE_CORNER]);
+            // println!("South East corner {:?}", corner[SE_CORNER]);
+            // println!("South West corner {:?}", corner[SW_CORNER]);
+
+            let atile_rgb = &cur_tile.1;
+            let atile_rgb_str = &atile_rgb.to_string().replace(" ", "");
+            rgb_str = atile_rgb_str.to_string(); 
+            println!("\nrgb string  {} ", rgb_str);        
+            // TODO Feb 12 - See notes 
+    
+            }
+        }
+
+
+    let mut document = Document::new().set("viewBox", (0, 0, viewbox_width, viewbox_height));
+    svg::save(svg_file_name_str, &document)   
+}
+
+/// helper function to generate a Point2D from a usize array (x,y)
+/// 
+fn get_point2D( usize_arr : (usize, usize)) -> Point2D<i32, i32> {
+    
+    let start_x:i32 = usize_arr.0.try_into().unwrap();
+    let start_y:i32 = usize_arr.1.try_into().unwrap();
+
+    Point2D::new(start_x,start_y)
+}
 
 
 

@@ -1,6 +1,6 @@
 use euclid::default::Box2D;
 use crate::create_tile;
-use crate::svg_utils::create_svg;
+use crate::svg_utils::{create_svg, test_create_svg};
 use crate::{modtile::{RGB, self}};
 
 // This file holds functions to create various configurations for
@@ -237,6 +237,26 @@ pub(crate) fn svg_12(){
         create_bot_right_grn_rest_blk_tile_data);
 } // svg12
 
+// used to call random stuff for testing
+pub(crate) fn svg_99(){
+    let op_svg_file_name = "./svg_output/twoXtwo/output99.svg";
+    let rows: usize = 2;
+    let cols: usize = 2;
+    let tiles_per_pane_height: usize = 2; 
+    let tiles_per_pane_width: usize = 2; 
+    let svg_width = 200;
+    let svg_height = 200;
+
+    // calling test_create_svg to instead of create_svg() 
+    let _ = test_create_svg(op_svg_file_name,
+        svg_width,
+        svg_height, 
+        rows, 
+        cols, 
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        create_top_right_grn_rest_blk_tile_data);
+} // svg99
 
 
 
