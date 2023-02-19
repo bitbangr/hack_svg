@@ -4,6 +4,9 @@ mod svg_utils;
 mod constants;
 
 mod reshape;
+mod pv_eb_hack;
+
+// mod create_contig_path; // to test out svg_contiguous path code
 
 mod single_tile;
 mod two_tile_horiz;
@@ -17,6 +20,7 @@ use ndarray::{Array, Array2};
 use modtile::RGB;
 use constants::{NORTH,EAST,SOUTH,WEST};
 
+type BoxRgbArr2 = Array2<(Box2D<i32>, modtile::RGB)>;
 
 /// This application will create an SVG files from a various window pane/tile configurations
 /// 
