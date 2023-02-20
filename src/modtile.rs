@@ -4,18 +4,20 @@ use std::path::Path;
 use std::io::{Read};
 use std::fmt::{self, Formatter, Display};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Copy, Clone, Eq, Hash, Default)]
-pub struct RGB(pub u8,pub u8,pub u8);
+use crate::mosaic_tile::RGB;
 
-impl Display for RGB {
-    // `f` is a buffer, and this method must write the formatted string into it
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+// #[derive(Serialize, Deserialize, Debug, PartialEq, Copy, Clone, Eq, Hash, Default)]
+// pub struct RGB(pub u8,pub u8,pub u8);
 
-        // `write!` is like `format!`, but it will write the formatted string
-        // into a buffer (the first argument)
-        write!(f, "rgb ({}, {}, {})", self.0, self.1, self.2)
-    }
-}
+// impl Display for RGB {
+//     // `f` is a buffer, and this method must write the formatted string into it
+//     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+
+//         // `write!` is like `format!`, but it will write the formatted string
+//         // into a buffer (the first argument)
+//         write!(f, "rgb ({}, {}, {})", self.0, self.1, self.2)
+//     }
+// }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct TileColor {

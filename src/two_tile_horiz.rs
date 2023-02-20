@@ -1,7 +1,8 @@
 use euclid::default::Box2D;
 use crate::create_tile;
+use crate::mosaic_tile::RGB;
 use crate::svg_utils::create_svg;
-use crate::{modtile::{RGB, self}};
+// use crate::{modtile::{RGB, self}};
 
 // For a two tile mosiac the dimension are 1 row by 2 col or 2 rows by 1 col
 // For each orientation there are two options - both tiles same colour, or each tile a different colour
@@ -87,20 +88,20 @@ pub(crate) fn svg_4(){
 // ******************************************************************* 
 /// Creates data for a single row of two white tiles
 /// of 100 by 200 UnknownUnits size
-pub fn create_double_white_horiz_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+pub fn create_double_white_horiz_tile_data() -> Vec<Vec<(Box2D<i32>, RGB)>> {
 
-    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
 
     // ****************************
     // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
 
     // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
     
     // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((100, 0), (200, 100), (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile((100, 0), (200, 100), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window
@@ -114,20 +115,20 @@ pub fn create_double_white_horiz_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RG
 /// Creates data for a single row of two tiles
 /// left tile is white, right tile is black
 /// 100 by 200 UnknownUnits size
-pub fn create_white_black_horiz_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+pub fn create_white_black_horiz_tile_data() -> Vec<Vec<(Box2D<i32>, RGB)>> {
 
-    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
 
     // ****************************
     // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
 
     // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
     
     // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((100, 0), (200, 100), (0, 0, 0));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile((100, 0), (200, 100), (0, 0, 0));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window
@@ -141,22 +142,22 @@ pub fn create_white_black_horiz_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB
 /// Creates data for a single column of two tiles
 /// both tiles are white
 /// 200 by 100 UnknownUnits size
-pub fn create_white_vert_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+pub fn create_white_vert_tile_data() -> Vec<Vec<(Box2D<i32>, RGB)>> {
 
-    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
 
     // ****************************
     // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
 
     // top tile white
     // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
     
     // bottom tile white
     // (Box2D((0, 100), (100, 200)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 100), (100, 200), (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile((0, 100), (100, 200), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window
@@ -169,22 +170,22 @@ pub fn create_white_vert_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
 /// Creates data for a single column of two tiles
 /// top tile is white, bottom tile is black
 /// 200 by 100 UnknownUnits size
-pub fn create_white_black_vert_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
+pub fn create_white_black_vert_tile_data() -> Vec<Vec<(Box2D<i32>, RGB)>> {
 
-    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
 
     // ****************************
     // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
 
     // top tile white
     // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile((0, 0), (100, 100), (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
     
     // bottom tile black
     // (Box2D((0, 100), (100, 200)), RGB(0, 0, 0)),
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 100), (100, 200), (0, 0, 0));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile((0, 100), (100, 200), (0, 0, 0));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window

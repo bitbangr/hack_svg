@@ -4,6 +4,8 @@ mod svg_utils;
 mod constants;
 
 mod reshape;
+mod mosaic_tile;
+
 // mod pv_eb_hack;
 
 // mod create_contig_path; // to test out svg_contiguous path code
@@ -17,10 +19,10 @@ use euclid::default::Point2D;
 use ndarray::Axis;
 use ndarray::{Array, Array2};
 
-use modtile::RGB;
+use mosaic_tile::RGB;
 use constants::{NORTH,EAST,SOUTH,WEST};
 
-type BoxRgbArr2 = Array2<(Box2D<i32>, modtile::RGB)>;
+type BoxRgbArr2 = Array2<(Box2D<i32>, RGB)>;
 
 /// This application will create an SVG files from a various window pane/tile configurations
 /// 
@@ -114,7 +116,7 @@ fn get_bool_arr(row_dim:usize, col_dim:usize) -> Array2<Vec<bool>> {
 /// # Panics
 ///
 /// Panics if .
-fn pane_vec_to_ndarray(vec: &Vec<(Box2D<i32>, modtile::RGB)>, row_dim:usize, col_dim:usize) -> Array2<(Box2D<i32>, modtile::RGB)> {
+fn pane_vec_to_ndarray(vec: &Vec<(Box2D<i32>, RGB)>, row_dim:usize, col_dim:usize) -> Array2<(Box2D<i32>, RGB)> {
     let data = vec.as_slice();
        Array::from_shape_vec((row_dim, col_dim), data.to_vec()).unwrap()
 }
@@ -203,20 +205,20 @@ fn box_corners(box2d: Box2D<i32>) -> [(usize, usize); 4] {
 /// # Return
 ///
 /// returns 
-///  ('Box2D<i32>', modtile::RGB)
+///  ('Box2D<i32>', RGB)
 ///  
 pub fn create_tile(
     top_left: (i32, i32),
     bot_right: (i32, i32),
     rgb_val: (u8, u8, u8),
-) -> (Box2D<i32>, modtile::RGB) {
+) -> (Box2D<i32>, RGB) {
     let p_start: Point2D<i32> = Point2D::new(top_left.0, top_left.1);
     let p_end: Point2D<i32> = Point2D::new(bot_right.0, bot_right.1);
     let tile_box: Box2D<i32> = Box2D {
         min: p_start,
         max: p_end,
     };
-    let rgb: modtile::RGB = modtile::RGB(rgb_val.0, rgb_val.1, rgb_val.2);
+    let rgb: RGB = RGB(rgb_val.0, rgb_val.1, rgb_val.2);
 
     (tile_box, rgb)
 }
@@ -272,7 +274,7 @@ pub fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euc
 }
 
 
-fn pane_to_2d_vec(pane_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>, ndarray::Dim<[usize; 2]>>, tiles_per_pane_height: usize, tiles_per_pane_width: usize) -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>> {
+fn pane_to_2d_vec(pane_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>, tiles_per_pane_height: usize, tiles_per_pane_width: usize) -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
     
     // Convert the ndarray into a Vec<Vec>
     let v: Vec<Vec<_>> = pane_nd_arr

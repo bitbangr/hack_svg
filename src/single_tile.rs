@@ -7,6 +7,7 @@ use svg::node::element::path::Data;
 
 use crate::dfs_tiles::get_contiguous_tiles_mod;
 use crate::get_edge_bools;
+use crate::mosaic_tile::RGB;
 use crate::{pane_vec_to_ndarray, get_bool_arr};
 
 use crate::constants::{NORTH,EAST,SOUTH,WEST,};
@@ -14,7 +15,7 @@ use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
 use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
-use crate::modtile::{RGB, self};
+// use crate::modtile::{RGB, self};
 use crate::svg_utils::write_svg;
 use crate::create_tile;
 
@@ -157,7 +158,7 @@ pub(crate) fn create_svg(){
 
 ///
 /// Get the Array2 ND array for the tile 
-fn get_single_tile_ndarray (vec: &Vec<(Box2D<i32>, modtile::RGB)>) -> Array2<(Box2D<i32>, modtile::RGB)> {
+fn get_single_tile_ndarray (vec: &Vec<(Box2D<i32>, RGB)>) -> Array2<(Box2D<i32>, RGB)> {
 
    let pane_nd_array =  pane_vec_to_ndarray(&vec, TILES_PER_PANE_HEIGHT, TILES_PER_PANE_WIDTH );
    
@@ -167,16 +168,16 @@ fn get_single_tile_ndarray (vec: &Vec<(Box2D<i32>, modtile::RGB)>) -> Array2<(Bo
 
 ///  This function creates the simplest possible mosaic which consists of one window of one pane with a single tile
 /// 100 by 100 UnknownUnits size
-pub fn create_single_tile_data() -> Vec<Vec<( Box2D<i32>, modtile::RGB)>> {
+pub fn create_single_tile_data() -> Vec<Vec<( Box2D<i32>, RGB)>> {
 
-    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
 
     // ****************************
     // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
 
     // [(Box2D((0, 0), (100, 100)), RGB(45, 54, 147)),]
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile((0, 0), (100, 100),(255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile((0, 0), (100, 100),(255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window

@@ -1,6 +1,8 @@
 use euclid::{Box2D, UnknownUnit};
 
-use crate::modtile::RGB;
+use crate::mosaic_tile::RGB;
+
+// use crate::mosiac_tilemodtile::RGB;
 
 fn dfs_mod(pane_vec: &Vec<Vec<(Box2D<i32, UnknownUnit>, RGB)>>, row: isize, col: isize, color: &RGB, visited: &mut Vec<Vec<bool>>, rows: isize, cols: isize) -> Vec<(isize, isize)> {    
 

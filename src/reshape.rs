@@ -4,7 +4,7 @@ use ndarray::Array1;
 use ndarray::Axis;
 use euclid::default::Box2D;
 use crate::modtile;
-// use crate::modtile::RGB;
+// use crate::RGB;
 
 use crate::create_tile;
 
@@ -17,6 +17,7 @@ use crate::dfs_tiles::get_contiguous_tiles_mod;
 
 use crate::get_edge_bools;
 
+use crate::mosaic_tile::RGB;
 use crate::svg_utils;
 use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
 
@@ -37,7 +38,7 @@ pub fn reshape_min() {
 
     // Create a simple 2x2 mosaic
     // Note there is only one pane of 4 tiles in 2 rows and 2 cols
-    let mosaic_vec: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = create_2x2_white_tile_data(); 
+    let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_2x2_white_tile_data(); 
     println!("2x2 4 white tiles mosaic vec {:?}", &mosaic_vec);
 
     // grab the ND Array for this mosiac pane
@@ -46,7 +47,7 @@ pub fn reshape_min() {
     println!("\n\npane nd array {:?} ", &pane_nd_arr);
 
     // convert the pane_ds_arr back to a 2D vector so we can use it for the Depth First Search Algorithm
-    let pane_2d_vec: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = pane_to_2d_vec(&pane_nd_arr, tiles_per_pane_height, tiles_per_pane_width);
+    let pane_2d_vec: Vec<Vec<(Box2D<i32>, RGB)>> = pane_to_2d_vec(&pane_nd_arr, tiles_per_pane_height, tiles_per_pane_width);
     
     println!("\n\n2D Pane Vec -> {:?}", pane_2d_vec);
 
@@ -62,7 +63,7 @@ pub fn reshape_min() {
 
 }
 
-fn pane_to_2d_vec(pane_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>, ndarray::Dim<[usize; 2]>>, tiles_per_pane_height: usize, tiles_per_pane_width: usize) -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, modtile::RGB)>> {
+fn pane_to_2d_vec(pane_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>, tiles_per_pane_height: usize, tiles_per_pane_width: usize) -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
     
        // Convert the ndarray into a Vec<Vec>
        let v: Vec<Vec<_>> = pane_nd_arr
@@ -118,35 +119,35 @@ fn reshape_vec_axis_iter() {
 
 /// Make a 2x2 mosaic of a single pane of all white tiles
 /// 
-fn create_2x2_white_tile_data() -> Vec<Vec<(Box2D<i32>, modtile::RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, modtile::RGB)>> = Vec::new();
+fn create_2x2_white_tile_data() -> Vec<Vec<(Box2D<i32>, RGB)>> {
+    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
 
     // ****************************
     // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, modtile::RGB)> = Vec::new();
+    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
 
     // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
     let top_left :(i32,i32) = (0,0);
     let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
     
     // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
     let top_left :(i32,i32) = (100,0);
     let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // (Box2D((0,100), (100, 200)), RGB(255, 255, 255)),
     let top_left :(i32,i32) = (0,100);
     let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // (Box2D((100,100), (200, 200)), RGB(255, 255, 255)),
     let top_left :(i32,i32) = (100,100);
     let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, modtile::RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , (255, 255, 255));
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window
