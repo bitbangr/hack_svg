@@ -36,6 +36,55 @@ impl Display for RGB {
 
 // (Box2D<i32>, modtile::RGB)
 
+#[derive(PartialEq, Debug, Clone, Hash)]
+pub struct MosaicTile {
+    tile: Tile,
+    edge_bool: Vec<bool>,
+}
+
+impl MosaicTile {
+    pub fn new(tile: Tile, edge_bool: Vec<bool>) -> MosaicTile {
+        MosaicTile { tile, edge_bool }
+    }
+}
+
+
+
+use num_traits::Zero;
+
+impl Zero for MosaicTile {
+    fn zero() -> Self {
+        MosaicTile {
+            tile: Tile {
+                coords: Box2D::new(Point2D::new(0,0),Point2D::new(0,0)),
+                rgb: RGB(0, 0, 0),
+            },
+            edge_bool: Vec::new(),
+        }
+    }
+
+    fn is_zero(&self) -> bool {
+        self.tile.coords.min == Point2D::new(0,0) && self.tile.coords.max == Point2D::new(0,0) && self.tile.rgb == RGB(0, 0, 0) && self.edge_bool.is_empty()
+    }
+}
+
+use std::ops::Add;
+
+impl Add for MosaicTile {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        MosaicTile {
+            // tile: self.tile + other.tile,
+            // edge_bool: self.edge_bool + other.edge_bool,
+            tile:self.tile,
+            edge_bool: self.edge_bool,
+            
+        }
+    }
+}
+
+
 #[derive(PartialEq, Debug, Copy, Clone, Hash)]
 pub struct Tile {
     pub coords: Box2D<i32>,

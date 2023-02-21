@@ -18,4 +18,4 @@ itertools = "*"
 regex = "*"
 ndarray = "*"
 svg = "*"
-
+num-traits = "*"

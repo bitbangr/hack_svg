@@ -1,6 +1,6 @@
 use std::iter::Zip;
 
-use crate::mosaic_tile::{Tile, RGB};
+use crate::mosaic_tile::{Tile, RGB, MosaicTile};
 use crate::{box_corners, dfs_tiles};
 // use crate::modtile::{RGB, self};
 use crate::constants::{NORTH,EAST,SOUTH,WEST,};
@@ -189,6 +189,7 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
     let pane_2d_vec: Vec<Vec<(Box2D<i32>, RGB)>> = pane_to_2d_vec(&pane_nd_arr, tiles_per_pane_height, tiles_per_pane_width);
     println!("\n\n2D Pane Vec -> {:?}", pane_2d_vec);
 
+
     // get the test boolean array to build our svg path with
     let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
 
@@ -197,6 +198,10 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
     // get Vec of Vec of contigous tiles
     let contiguous_tiles = dfs_tiles::get_contiguous_tiles_mod(&pane_2d_vec);
     println!("fn get_contiguous_tiles_mod search results -> {:?}", &contiguous_tiles);
+
+    let mosaic_pane_edge_nd_arr:  Array2<(MosaicTile)> = combine_pane_edges(&pane_nd_arr, &edge_booleans);
+
+    println! ("*********\nmosaic_pane_edge_nd_arr\n\n{:?}", &mosaic_pane_edge_nd_arr);
 
     // testing the travel contigous tiles function
     let _ = travel_contig_svg(pane_nd_arr, 
@@ -207,7 +212,31 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
                         svg_height as usize);
 
     
-} // test_create_svg
+}
+
+
+fn combine_pane_edges( pane_nd_arr: &ArrayBase<OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, Dim<[usize; 2]>>,
+                     edge_booleans: &ArrayBase<OwnedRepr<Vec<bool>>, Dim<[usize; 2]>> ) -> ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>> 
+                     {
+    
+    let mut result = Array2::<MosaicTile>::zeros((pane_nd_arr.shape()[0], pane_nd_arr.shape()[1]));
+
+    // for ((row, col), ((coords, rgb), edge_bool)) in pane_nd_arr.indexed_iter().zip(edge_booleans.indexed_iter()) 
+    // for ( row_col , ((box_min,box_max), rgb),(bool_arr_loc, edge_bool) ) in pane_nd_arr.indexed_iter().zip(edge_booleans.indexed_iter()) 
+    // for ( row_col , pane_arr, edge_bool)  in pane_nd_arr.indexed_iter().zip(edge_booleans.indexed_iter()) 
+    for (((row, col), (box2d, rgb)), ((row1, col1), edge_bool)) in pane_nd_arr.indexed_iter().zip(edge_booleans.indexed_iter()) 
+    {
+        println!("[{:?},{:?}]", row, col);
+        // (((0, 0), (Box2D((0, 0), (100, 100)), RGB(0, 0, 0))), ((0, 0), [false, false, true, false]))
+        let tile = Tile::new(Box2D::new(box2d.min, box2d.max), *rgb);
+        let mosaic_tile = MosaicTile::new(tile, edge_bool.to_vec());
+        result[[row, col]] = mosaic_tile;
+
+    }
+
+    result
+}
+
 
 
 
@@ -744,6 +773,20 @@ pub fn travel_contig_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(B
         let row = *&start_tile_idx.0 as usize;
         let col = *&start_tile_idx.1 as usize;
 
+        // grab the first tile
+        let start_tile: (Box2D<i32>, RGB) = mosaic_nd_arr[[row,col]]; 
+        let edge_bool:Vec<bool> = edge_booleans[[row,col]].clone(); 
+
+
+        // let tile = Tile { coords: Box2D::new(0, 0), rgb: RGB::new(255, 255, 255) };
+        // let edge_bool = vec![true, false, true, false];
+        let first_mosaic_tile = MosaicTile::new(Tile::new(start_tile.0,start_tile.1), edge_bool);
+
+        println!("first_mosaic_tile -> {:?}", &first_mosaic_tile);
+        // let group_line_start_point.
+
+
+
         println!("\nStart tile index from contiguous tiles -> {:?}" , &start_tile_idx);
 
         let mut more_tiles: bool = true; 
@@ -913,7 +956,7 @@ pub fn travel_contig_svg(mosaic_nd_arr: ndarray::ArrayBase<ndarray::OwnedRepr<(B
                 println!("cur_tile_start_point {:?}", cur_tile_start_point);
                 println!("cur_tile_end_point {:?}", cur_tile_end_point);
 
-        }
+        } // while moretiles
 
 
         // instead of iterating through each tile in conf lets
@@ -1029,11 +1072,17 @@ fn find_next_tile(
    let tile_edge_bool = &edge_booleans[[row+1,col]];
    let result1 :bool =match_edge_boolean_pattern(match_this, &tile_edge_bool);
 
+   if result1 == true {
+
+
+   }
+
+
    let match_this = [Some(false), None, None, Some(true)];
    let tile_edge_bool = &edge_booleans[[row+1,col+1]];
    let result2 :bool =match_edge_boolean_pattern(match_this, &tile_edge_bool);
 
-    
+    // set up the new tile according to whichever match this came back true
    Tile::new(coords, rgb)
 }
 
