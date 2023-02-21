@@ -75,6 +75,14 @@ impl Add for MosaicTile {
 
     fn add(self, other: Self) -> Self {
         MosaicTile {
+
+            // WARNING WARNING WARNING
+            // 
+            // THIS ADD FUNCTION IS BORKED.  
+            //
+            // JUST RETURNS THE FIRST ELEMENT
+            // This is here so that code compiles
+            //
             // tile: self.tile + other.tile,
             // edge_bool: self.edge_bool + other.edge_bool,
             tile:self.tile,
