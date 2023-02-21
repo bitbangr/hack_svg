@@ -159,36 +159,36 @@ pub fn box2d_to_points(box2d: Box2D<i32>) -> Vec<Point2D<i32>> {
     vec![top_left, top_right, bottom_right, bottom_left]
 }
 
-/// This function takes a Box2D and returns a four element array of (usize,usize) 
-/// with each pair containing the coordinates of each corner in the following order
-///  [top_left, top_right, bottom_right, bottom_left]
-///
-/// # Arguments
-///
-/// `box2d` - This is the Box2D to get the corner coordinates for
-///
-/// # Return
-///
-/// returns a array of (usize,usize) containing the coordinates of each corner in the following order
-///  [top_left, top_right, bottom_right, bottom_left]
-///
-/// # Examples
-///
-/// ```
-/// let p_start: Point2D<i32> = Point2D::new(0, 0);
-/// let p_end: Point2D<i32> = Point2D::new(10,10);
-/// let box2d:Box2D<i32> = Box2D { min: p_start, max: p_end,};
-/// 
-/// // convert Box2d to an array of Point2D one for each corner points
-/// let corner_coords:[(usize,usize);4] = box_corners(box2d);
-/// println!("Box2D corner coordinates {:?}", corner_coords);
-/// 
-/// let eq_ans = [(0 as usize,0 as usize),
-///                                    (10 as usize,0 as usize), 
-///                                    (10 as usize,10 as usize), 
-///                                    (0 as usize,10 as usize), ];
-/// assert_eq!(corner_coords, eq_ans);
-/// ```
+// /// This function takes a Box2D and returns a four element array of (usize,usize) 
+// /// with each pair containing the coordinates of each corner in the following order
+// ///  [top_left, top_right, bottom_right, bottom_left]
+// ///
+// /// # Arguments
+// ///
+// /// `box2d` - This is the Box2D to get the corner coordinates for
+// ///
+// /// # Return
+// ///
+// /// returns a array of (usize,usize) containing the coordinates of each corner in the following order
+// ///  [top_left, top_right, bottom_right, bottom_left]
+// ///
+// /// # Examples
+// ///
+// /// ```
+// /// let p_start: Point2D<i32> = Point2D::new(0, 0);
+// /// let p_end: Point2D<i32> = Point2D::new(10,10);
+// /// let box2d:Box2D<i32> = Box2D { min: p_start, max: p_end,};
+// /// 
+// /// // convert Box2d to an array of Point2D one for each corner points
+// /// let corner_coords:[(usize,usize);4] = box_corners(box2d);
+// /// println!("Box2D corner coordinates {:?}", corner_coords);
+// /// 
+// /// let eq_ans = [(0 as usize,0 as usize),
+// ///                                    (10 as usize,0 as usize), 
+// ///                                    (10 as usize,10 as usize), 
+// ///                                    (0 as usize,10 as usize), ];
+// /// assert_eq!(corner_coords, eq_ans);
+// /// ```
 fn box_corners(box2d: Box2D<i32>) -> [(usize, usize); 4] {
 
     let top_left:(usize,usize)  = (box2d.min.x as usize, box2d.min.y as usize);

@@ -3,11 +3,11 @@ use euclid::default::{Box2D, Point2D};
 
 
 use serde::{Deserialize, Serialize};
+use svg::node::element::tag::Use;
 use std::fs::File;
 use std::path::Path;
 use std::io::{Read};
 use std::fmt::{self, Formatter, Display};
-
 
 
 pub const    TOP: usize = 0;
@@ -38,16 +38,46 @@ impl Display for RGB {
 
 #[derive(PartialEq, Debug, Clone, Hash)]
 pub struct MosaicTile {
-    tile: Tile,
-    edge_bool: Vec<bool>,
+    pub tile: Tile,
+    pub edge_bool: Vec<bool>,
+    pub start_point: Point2D<i32>,
+    pub end_point: Point2D<i32>,
 }
 
 impl MosaicTile {
     pub fn new(tile: Tile, edge_bool: Vec<bool>) -> MosaicTile {
-        MosaicTile { tile, edge_bool }
+        let start_point: Point2D<i32> = Point2D::new(0,0);
+        let end_point: Point2D<i32> = Point2D::new(0,0);
+        MosaicTile { tile, edge_bool, start_point, end_point}
     }
 }
 
+impl MosaicTile {
+
+    // fn set_hp(&mut self, hp: &i32) {
+    //     self.hp = *hp;
+    // }
+
+    pub fn set_start_point(&mut self, start_point: &Point2D<i32>) {
+        self.start_point = *start_point;
+    }
+
+    pub fn set_end_point(&mut self, end_point: &Point2D<i32>) {
+        self.end_point = *end_point;
+    }
+
+    pub fn set_start_end_point(&mut self, start_point: &Point2D<i32>, end_point: &Point2D<i32>) {
+        self.start_point = *start_point;
+        self.end_point = *end_point;
+    }
+
+    pub fn set_start_end_points_to_zero(&mut self)
+    {        
+        self.start_point = Point2D::new(0,0);
+        self.end_point = Point2D::new(0,0);
+    }
+
+}
 
 
 use num_traits::Zero;
@@ -57,14 +87,21 @@ impl Zero for MosaicTile {
         MosaicTile {
             tile: Tile {
                 coords: Box2D::new(Point2D::new(0,0),Point2D::new(0,0)),
-                rgb: RGB(0, 0, 0),
+                rgb: RGB(0, 0, 0),    
             },
             edge_bool: Vec::new(),
+            start_point:Point2D::new(0,0), 
+            end_point:Point2D::new(0,0), 
         }
     }
 
     fn is_zero(&self) -> bool {
-        self.tile.coords.min == Point2D::new(0,0) && self.tile.coords.max == Point2D::new(0,0) && self.tile.rgb == RGB(0, 0, 0) && self.edge_bool.is_empty()
+        self.tile.coords.min == Point2D::new(0,0) 
+     && self.tile.coords.max == Point2D::new(0,0) 
+     && self.tile.rgb == RGB(0, 0, 0) 
+     && self.start_point == Point2D::new(0,0) 
+     && self.end_point == Point2D::new(0,0) 
+     && self.edge_bool.is_empty()
     }
 }
 
@@ -87,7 +124,9 @@ impl Add for MosaicTile {
             // edge_bool: self.edge_bool + other.edge_bool,
             tile:self.tile,
             edge_bool: self.edge_bool,
-            
+            start_point: self.start_point, 
+            end_point: self.end_point, 
+
         }
     }
 }
