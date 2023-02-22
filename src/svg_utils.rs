@@ -3,7 +3,7 @@ use std::iter::Zip;
 use crate::mosaic_tile::{Tile, RGB, MosaicTile};
 use crate::{box_corners, dfs_tiles};
 // use crate::modtile::{RGB, self};
-use crate::constants::{NORTH,EAST,SOUTH,WEST,};
+use crate::constants::{NORTH,EAST,SOUTH,WEST, FLAGGED,};
 use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
 use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
@@ -19,6 +19,8 @@ use crate::dfs_tiles::get_contiguous_tiles_mod;
 use crate::get_edge_bools;
 use crate::pane_to_2d_vec;
 use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
+
+use crate::mosaic_tile_svg_utils::add_line_data;
 
 ///
 /// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
@@ -285,7 +287,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             let (found_tile_row, found_tile_col) = find_next_tile_simple(row, col, &cur_tile, &contig_group, &pane_edge_nd_arr ); 
             
             // this should never happen. 
-            if found_tile_row == 9999 && found_tile_col == 9999 {
+            if found_tile_row == FLAGGED && found_tile_col == FLAGGED {
                 println!("Did not find next tile.  Panic!");
                 panic!();
             }
@@ -350,9 +352,10 @@ fn find_next_tile_simple(row: usize,
     let mut found:bool = false;
 
     // a bad way to program but if this routine completes and a next tile has not 
-    // been found then return (9999,9999) which will be the signal to panic
+    // been found then return (FLAGGED,FLAGGED) where pub const FLAGGED: usize = 987659; 
+    // which will be the signal to panic
     // Look into returning a Result in the future
-    let mut res = (9999,9999);
+    let mut res = (FLAGGED,FLAGGED);
 
     for contig_tile in contig_group{
             
