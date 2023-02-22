@@ -303,7 +303,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             }
             else {
                 println!("Still looking for more tiles in contigous group");
-                more_tiles = false;
+                more_tiles = true;
             }
 
              // TODO now (fix the find yourself in the the find_next_tile_simple)
