@@ -287,7 +287,7 @@ fn get_start_end_points(edge_bool: &[bool], tile: Tile) -> (Point2D<i32>, Point2
         // Start of zere false edge case
         // **********************************
 
-        (true, true, true, false) => { //TTTT
+        (true, true, true, true) => { //TTTT
             println!("\nmatch -> true true true true - top/right/bottom/left open");
             println!(" NO EDGES - Top-Right-Bottom-Left side open tile\n");
 
