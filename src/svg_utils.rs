@@ -310,7 +310,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
             println!("Next Tile using Tile mosaic_tile::Tile struct {:?} ", &next_tile);
 
-                // TODO now (fix the find yourself in the the find_next_tile_simple)
+             // TODO now (fix the find yourself in the the find_next_tile_simple)
 
         } // while moretiles
 
@@ -391,6 +391,14 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
 }
 
+
+/// Find the next tile based on the end point of one tile is the start point of the next tile
+/// Note tiles must reside in the same contiguous group
+/// 
+/// TODO!!!! need to deal with cases where search returns a link to yourself 
+/// and the start point and end points are the same.  
+/// So somehow remove yourself from the contig array or if congtig_row and contig_col match then skip
+
 fn find_next_tile_simple(row: usize, 
     col: usize, 
     cur_tile: &MosaicTile, 
@@ -417,13 +425,21 @@ fn find_next_tile_simple(row: usize,
             
         contig_row = *&contig_tile.0 as usize;
         contig_col = *&contig_tile.1 as usize;
-    
-        let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
 
-        if check_tile.start_point == cur_tile.end_point {
-            println!("Next Tile has been found");
-            break;
-        }
+        // don't check for ourselves
+        if !((contig_row == row) && (contig_col == col))
+        {
+            let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
+
+            if check_tile.start_point == cur_tile.end_point {
+                println!("Next Tile has been found");
+                break;
+            }
+        } else {
+            println!("We found ourselves");
+            
+        } 
+    
     }
 
     // set up the new tile according to whichever match this came back true
