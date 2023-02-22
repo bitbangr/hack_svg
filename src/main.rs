@@ -5,6 +5,7 @@ mod constants;
 
 mod reshape;
 mod mosaic_tile;
+mod mosaic_tile_svg_utils;
 
 // mod pv_eb_hack;
 
