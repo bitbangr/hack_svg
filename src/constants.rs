@@ -26,4 +26,4 @@ pub const TOP_RIGHT: usize = 1;
 pub const BOT_RIGHT: usize = 2;
 pub const  BOT_LEFT: usize = 3;
 
-
+pub const FLAGGED: usize = 987659; // random value unlikely to be used found in problem domain
