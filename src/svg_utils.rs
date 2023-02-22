@@ -253,14 +253,6 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
         // grab the first tile and keep track of it
         let start_tile:MosaicTile  = pane_edge_nd_arr[[row,col]].clone(); 
-        let start_tile_edge_bool:Vec<bool> = start_tile.edge_bool;
-
-        // let edge_bool:Vec<bool> = edge_booleans[[row,col]].clone(); 
-        // let tile = Tile { coords: Box2D::new(0, 0), rgb: RGB::new(255, 255, 255) };
-        // let edge_bool = vec![true, false, true, false];
-        // let first_mosaic_tile = MosaicTile::new(Tile::new(start_tile.0,start_tile.1), edge_bool);
-        // println!("first_mosaic_tile -> {:?}", &first_mosaic_tile);
-        // let group_line_start_point.
 
         let mut more_tiles: bool = true; 
 
@@ -282,21 +274,17 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             cur_tile_clone.set_start_end_point(&Point2D::new(12,40), &Point2D::new(120,223));
             cur_tile_clone.set_end_point(&Point2D::new(434,400));
 
-            println!("\n(row: {} col: {})\n\tCur Tile Info {:?} ",row, col, &cur_tile);
-            println!("\tCur Tile Edge Booleans -> {:?} " , &edge_bools);
-            println!("\n(row: {} col: {})\n\tCur Tile Clone Info {:?} ",row, col, &cur_tile_clone);
-            // let next_tile: (usize,usize) = get_next_tile( ) 
+            println!("\n(row: {} col: {})\n  Cur Tile Info {:?} ",row, col, &cur_tile);
+            println!("  Cur Tile Edge Booleans -> {:?} " , &edge_bools);
+            println!("\nClone of Cur Tile {:?} " ,&cur_tile_clone);
 
-            let n = edge_bools[NORTH];
-            let e = edge_bools[EAST];
-            let s = edge_bools[SOUTH];
-            let w = edge_bools[WEST];
-        
+            
+
             let tile_box = &cur_tile.tile;
             // let corner:[(usize,usize);4] = box_corners(*tile_box);
             let corner = cur_tile.tile.corners();
             
-            println!("\nCorner Co-ords {:?}", corner);
+            println!("\nBRRAAAP Corner Co-ords {:?}", corner);
             println!("\ntop left corner {:?}", corner[TOP_LEFT]);
             println!("top right corner {:?}", corner[TOP_RIGHT]);
             println!("bottom right corner {:?}", corner[BOT_RIGHT]);
@@ -307,6 +295,22 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
             println!("cur_tile_start_point {:?}", cur_tile_start_point);
             println!("cur_tile_end_point {:?}", cur_tile_end_point);
+
+            // find_next_tile_simple
+            // let next_tile = get_next_tile(cur_tile_end_point, &contig_group) 
+
+            // (row: usize, 
+            //     col: usize, 
+            //     cur_tile: &MosaicTile, 
+            //     contig_group: &[(isize, isize)], 
+            //     pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> MosaicTile 
+            // {
+
+            let next_tile=  find_next_tile_simple(row, col, &cur_tile, &contig_group, &pane_edge_nd_arr ); 
+
+            println!("Next Tile using Tile mosaic_tile::Tile struct {:?} ", &next_tile);
+
+                // TODO now (fix the find yourself in the the find_next_tile_simple)
 
         } // while moretiles
 
@@ -386,6 +390,48 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
     svg::save(op_svg_file_name, &document)   
 
 }
+
+fn find_next_tile_simple(row: usize, 
+    col: usize, 
+    cur_tile: &MosaicTile, 
+    contig_group: &[(isize, isize)], 
+    pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> MosaicTile 
+{
+
+    println!( "find_next_tile(\n\trow {}
+    \n\tcol {}        
+    \n\tcur_tile {:?}
+    \n\tcontig_group {:?}
+    \n\tpane_edge_nd_arr) {:?}\n\n", row, 
+                        col, 
+                        cur_tile,
+                        contig_group,
+                        pane_edge_nd_arr ); 
+
+    let end_point = cur_tile.end_point;
+
+    let mut contig_row = 0 as usize;
+    let mut contig_col = 0 as usize;
+
+    for contig_tile in contig_group{
+            
+        contig_row = *&contig_tile.0 as usize;
+        contig_col = *&contig_tile.1 as usize;
+    
+        let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
+
+        if check_tile.start_point == cur_tile.end_point {
+            println!("Next Tile has been found");
+            break;
+        }
+    }
+
+    // set up the new tile according to whichever match this came back true
+    pane_edge_nd_arr[[contig_row,contig_col]].clone()
+
+
+} // find_next_tile_simple
+
 
 fn find_next_tile_refact(row: usize, 
                         col: usize, 
