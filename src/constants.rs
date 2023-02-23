@@ -29,4 +29,6 @@ pub const  BOT_LEFT: usize = 3;
 pub const FLAGGED: usize = 987659; // random value unlikely to be used found in problem domain
 pub const RGB_BLACK: (u8,u8,u8) = (0,0,0);
 pub const RGB_WHITE: (u8,u8,u8) = (255,255,255);
+pub const RGB_RED: (u8,u8,u8) = (255,0,0);
 pub const RGB_GREEN: (u8,u8,u8) = (0,255,0);
+pub const RGB_BLUE: (u8,u8,u8) = (0,0,255);
