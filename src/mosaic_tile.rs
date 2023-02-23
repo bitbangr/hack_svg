@@ -50,6 +50,13 @@ impl MosaicTile {
         let (sp,ep) =  get_start_end_points(&edge_bool, tile);
         MosaicTile { tile, edge_bool, start_point: sp, end_point: ep }
     }
+
+    pub fn get_start_point_as_i32(&self) -> (i32,i32) {
+        let x:i32 = self.start_point.x.try_into().unwrap();
+        let y:i32 = self.start_point.y.try_into().unwrap();
+        (x, y)
+    }
+    
 }
 
 /// helper function to generate a Point2D from a usize array (x,y)
