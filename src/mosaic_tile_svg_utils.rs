@@ -13,7 +13,20 @@ use svg::node::element::Path;
 use svg::Document;
 
 
-/// This will construct an SVG Absolute line to data element
+
+pub fn combineData (data1:&Data, data2:&Data) -> Data {
+    
+    let commands: Vec<_> = data1.iter().chain(data2.iter()).cloned().collect();
+    let concatenated_data = Data::from(commands);
+
+    println!("Combined data {:?} ", &concatenated_data);
+    concatenated_data
+}
+
+// concatenated_data now contains the commands from both data1 and data2
+
+
+/// This will construct an SVG absolute line to data element
 /// 
 /// - it is assumed that the caller is already at the start point of this tile so
 /// there is no move to start_point of the tile and the first line to will be 
@@ -22,10 +35,10 @@ use svg::Document;
 /// It is up to the caller to add the returned line data to the existing line data in order
 /// to complete a path
 /// 
-pub fn add_line_data(m_tile:MosaicTile ) -> Data {
+pub fn get_tile_svg_line_data(m_tile:&MosaicTile ) -> Data {
 
     let mut line_data = Data::new();
-    let edge_bool = m_tile.edge_bool;
+    let edge_bool = m_tile.edge_bool.clone();
 
     let top = edge_bool[TOP];
     let right = edge_bool[RIGHT];
