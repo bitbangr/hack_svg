@@ -20,7 +20,7 @@ use crate::get_edge_bools;
 use crate::pane_to_2d_vec;
 use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
 
-use crate::mosaic_tile_svg_utils::add_line_data;
+use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combineData};
 
 ///
 /// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
@@ -236,10 +236,12 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
     println!("\n***********\nfn travel_contig_svg_refact\n***********");
     println!("\nVector of contigous tiles -> {:?}", contiguous_tiles);
 
+    let mut document = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+
     // Grab a collection of contigous tiles
     for contig_group in &contiguous_tiles{
 
-        let mut rgb_str: String = String::new();
+        
     
         // current end location of last line drawn (x,y)
         // need to check this is the start point of the next line 
@@ -255,19 +257,24 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
         // grab the first tile and keep track of it
         let start_tile:MosaicTile  = pane_edge_nd_arr[[row,col]].clone(); 
+        
+        let start_tile_rgb_str = &start_tile.tile.rgb.to_string().replace(" ", "");
+        let rgb_str = start_tile_rgb_str.to_string(); 
 
         let mut more_tiles: bool = true; 
+
+        // Create new SVG line data and move to the start point of the first tile
+        let mut line_data = Data::new();
+        let start_xy = start_tile.get_start_point_as_i32();
+        line_data = line_data.move_to(start_xy);
 
         while (more_tiles) {
 
             println!("\n while more_tiles start_tile_idx -> {:?}" , &start_tile_idx);
     
             let cur_tile  = &pane_edge_nd_arr[[row,col]]; 
-            let edge_bools = &cur_tile.edge_bool;
             println!("\n(row: {} col: {})\n  Cur Tile Info {:?} ",row, col, &cur_tile);
-            // println!("  Cur Tile Edge Booleans -> {:?} " , &edge_bools);
 
-            // let corner:[(usize,usize);4] = box_corners(*tile_box);
             let corner = cur_tile.tile.corners();
             let mut cur_tile_start_point = cur_tile.start_point;
             let mut cur_tile_end_point = cur_tile.end_point;
@@ -278,6 +285,12 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             println!("bottom left corner {:?}", corner[BOT_LEFT]);
             println!("cur_tile_start_point: {:?}", cur_tile_start_point);
             println!("cur_tile_end_point: {:?}\n\n", cur_tile_end_point);
+
+            // add the current tile data to the line data
+            let cur_tile_svg_line_data = get_tile_svg_line_data(&cur_tile);
+            // line_data = line_data.extend (cur_tile_svg_line_data);
+
+            line_data = combineData(&line_data,&cur_tile_svg_line_data );
 
             if contig_group.len() == 1 {
                 println!("length of contig_group is 1 so there are no more tiles to process");
@@ -301,6 +314,13 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
             if next_tile_clone.end_point == start_tile.start_point {
                 println!("Completed traversal of all tiles in contigous group");
+
+                // add the last tile data to the data 
+                let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone);
+                // line_data = line_data.extend (cur_tile_svg_line_data);
+    
+                line_data = combineData(&line_data,&next_tile_svg_line_data );
+    
                 more_tiles = false;
             }
             else {
@@ -320,9 +340,25 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
         //         //
         //         // line_data = draw_startingtile, (line_data, start_tile,row,col);
         //     }
+
+        let stroke_colour =  "purple";
+        let stroke_width =  0.25; 
+    
+                // create a path and add it to the svg document
+                let tile_path = Path::new()
+                .set("fill", rgb_str.to_owned()) // ie -> .set("fill", "rgb(255, 0, 0)")
+                .set("stroke", stroke_colour)
+                .set("stroke-width", stroke_width)
+                .set("d", line_data);
+        
+                // add the tile path to the document
+                document = document.add(tile_path);        
         }
 
-    let mut document = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+
+    
+
+    
     svg::save(op_svg_file_name, &document)   
 
 }
