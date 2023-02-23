@@ -118,11 +118,11 @@ fn get_start_end_points(edge_bool: &[bool], tile: Tile) -> (Point2D<i32>, Point2
             println!("\nmatch -> false true false false - right open");
             println!(" TOP BOTTOM LEFT Closed - Right side open tile\n");
 
-            start_point = get_point2D(corners[BOT_LEFT]);
-                end_point = get_point2D(corners[TOP_LEFT]);
+            start_point = get_point2D(corners[BOT_RIGHT]);
+                end_point = get_point2D(corners[TOP_RIGHT]);
 
-            println!{"start point BOT_LEFT-> {:?} ", &start_point}; 
-            println!{"end point TOP_LEFT-> {:?} ", &end_point}; 
+            println!{"start point BOT_RIGHT-> {:?} ", &start_point}; 
+            println!{"end point TOP_RIGHT-> {:?} ", &end_point}; 
 
             }, // FTFF
             // **********************************    
