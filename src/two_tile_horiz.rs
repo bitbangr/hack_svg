@@ -1,7 +1,7 @@
 use euclid::default::Box2D;
 use crate::create_tile;
 use crate::mosaic_tile::RGB;
-use crate::svg_utils::create_svg;
+use crate::svg_utils::test_create_svg;
 // use crate::{modtile::{RGB, self}};
 
 // For a two tile mosiac the dimension are 1 row by 2 col or 2 rows by 1 col
@@ -17,7 +17,7 @@ pub(crate) fn svg_1(){
     let svg_width = 200;
     let svg_height = 100;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -36,7 +36,7 @@ pub(crate) fn svg_2(){
     let svg_width = 200;
     let svg_height = 100;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -55,7 +55,7 @@ pub(crate) fn svg_3(){
     let svg_width = 100;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -74,7 +74,7 @@ pub(crate) fn svg_4(){
     let svg_width = 100;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 

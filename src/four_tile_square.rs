@@ -1,7 +1,7 @@
 use euclid::default::Box2D;
 use crate::create_tile;
 use crate::mosaic_tile::RGB;
-use crate::svg_utils::{create_svg, test_create_svg};
+use crate::svg_utils::test_create_svg;
 // use crate::{modtile::{RGB, self}};
 
 // This file holds functions to create various configurations for
@@ -17,7 +17,7 @@ pub fn svg_1(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -36,7 +36,7 @@ pub(crate) fn svg_2(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -55,7 +55,7 @@ pub(crate) fn svg_3(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -76,7 +76,7 @@ pub(crate) fn svg_4(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -95,7 +95,7 @@ pub(crate) fn svg_5(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -114,7 +114,7 @@ pub(crate) fn svg_6(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -133,7 +133,7 @@ pub(crate) fn svg_7(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -152,7 +152,7 @@ pub(crate) fn svg_8(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -171,7 +171,7 @@ pub(crate) fn svg_9(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -190,7 +190,7 @@ pub(crate) fn svg_10(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -209,7 +209,7 @@ pub(crate) fn svg_11(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -228,7 +228,7 @@ pub(crate) fn svg_12(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = create_svg(op_svg_file_name,
+    let _ = test_create_svg(op_svg_file_name,
         svg_width,
         svg_height, 
         rows, 
@@ -237,6 +237,30 @@ pub(crate) fn svg_12(){
         tiles_per_pane_width,
         create_bot_right_grn_rest_blk_tile_data);
 } // svg12
+
+// used to call random stuff for testing
+pub(crate) fn svg_98(){
+    let op_svg_file_name = "./svg_output/twoXtwo/output98.svg";
+    let rows: usize = 2;
+    let cols: usize = 2;
+    let tiles_per_pane_height: usize = 2; 
+    let tiles_per_pane_width: usize = 2; 
+    let svg_width = 200;
+    let svg_height = 200;
+
+    // calling test_create_svg to instead of create_svg() 
+    let _ = test_create_svg(op_svg_file_name,
+        svg_width,
+        svg_height, 
+        rows, 
+        cols, 
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        create_wht_grn_col_blk_blk_col_tile_data);
+} // svg98
+
+
+
 
 // used to call random stuff for testing
 pub(crate) fn svg_99(){

@@ -32,6 +32,9 @@ fn main() {
 
     println!("Hack SVG");
     
+    // Below are the basic tests.
+    // Run these everytime major changes are made to the code base
+
     // let _ = four_tile_square::svg_1();
     // let _ = four_tile_square::svg_2();
     // let _ = four_tile_square::svg_3();
@@ -42,7 +45,6 @@ fn main() {
     // let _ = four_tile_square::svg_8();   // 2x2 1st col (black, black), 2nd col (green, white)
     // let _ = four_tile_square::svg_9();   // 2x2 1st col top left green, rest black
     // let _ = four_tile_square::svg_10();   // 2x2 1st col top right green, rest black
-    let _ = four_tile_square::svg_99();   // 2x2 1st col top right green, rest black
     // let _ = four_tile_square::svg_11();   // 2x2 1st col bot left green, rest black
     // let _ = four_tile_square::svg_12();   // 2x2 1st col bot right green, rest black
 
@@ -51,56 +53,16 @@ fn main() {
     // let _ = two_tile_horiz::svg_3();
     // let _ = two_tile_horiz::svg_4();
 
-    // test getting Box2D corners 
-    // let _ = test_corner();
+    // let _ = single_tile::svg_1();   // 1x1 green tile
 
-    // create a single tile mosaic and draw the corresponding SVG doc    
-    // let _ = single_tile::create_svg();
-
-    // create a double tile horizontal mosaic of two white tiles and draw the corresponding SVG doc    
-    // let _ = two_tile_horiz::create_white_white_svg();
+    // some functions to test refactored code - now execute same as above really
+    // let _ = four_tile_square::svg_98();   // 2x2 1st col (white, green), 2nd col (black, black)
+    // let _ = four_tile_square::svg_99();   // 2x2 1st col top right green, rest black
     
-    // create a double tile horizontal mosaic of one white and one black tile and create svg file
-    // let _ = two_tile_horiz::create_white_black_svg();
-
-    // let _ = four_tile_square::create_2x2_white_svg();
-
-    // let _ = four_tile_square::create_white_row_black_row_svg();
-
-    // let _ = four_tile_square::test_2x2_dfs_arr();
-
-    // let _ = reshape::reshape_vec_1();
-
-    // let _ = reshape::reshape_min();
-    
-    // let _ = reshape::reshape_vec_axis_iter();
-    
-    // let _ = four_tile_square::test_2x2_dfs_arr();
-
-
 } // main
 
-/// Function test the box_corners() call.
-/// Create a box2d and check that the corner coordinates from box_corners match
-fn test_corner() {
- let p_start: Point2D<i32> = Point2D::new(0, 0);
- let p_end: Point2D<i32> = Point2D::new(10,10);
- let box2d:Box2D<i32> = Box2D { min: p_start, max: p_end,};
-
- // convert Box2d to an array of Point2D one for each corner points
- let corner_coords:[(usize,usize);4] = box_corners(box2d);
- println!("Box2D corner coordinates {:?}", corner_coords);
-
- let eq_ans = [(0 as usize,0 as usize),
-                                    (10 as usize,0 as usize), 
-                                    (10 as usize,10 as usize), 
-                                    (0 as usize,10 as usize), ];
- assert_eq!(corner_coords, eq_ans);
-}
-
-
 /// Initialize an Array2D size row_dim by col_dim of a vector of [false,false,false,false]
-/// each boolean represents the [North, East, South, West] edges of a tile.  If the tile
+/// each boolean represents the [Top, Right, Bottom, Left] edges of a tile.  If the tile
 /// matches the colour of an adjacent tile then the corresponding boolean is set to true.
 /// otherwise the value is false.
 /// This value will be used to construct the lines around contiguous colours
@@ -109,7 +71,6 @@ fn get_bool_arr(row_dim:usize, col_dim:usize) -> Array2<Vec<bool>> {
     let bool_bucket = Array::from_shape_vec((row_dim,col_dim), init_bool.to_vec()).unwrap();    
     bool_bucket
 }
-
 
 /// Given a vector of (Box2D,RGB) values representing a single pane construct a 2 dimensional NDArray
 /// that matches the Tiles Per Pane Width (cols) and Tiles Per Pane Height (rows) Dimensions
@@ -121,8 +82,6 @@ fn pane_vec_to_ndarray(vec: &Vec<(Box2D<i32>, RGB)>, row_dim:usize, col_dim:usiz
     let data = vec.as_slice();
        Array::from_shape_vec((row_dim, col_dim), data.to_vec()).unwrap()
 }
-
-
 
 /// This function takes a Box2D and returns a vector of Point2D containing
 /// the coordinates of each corner in the following order
