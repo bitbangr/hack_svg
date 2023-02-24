@@ -65,6 +65,24 @@ pub fn svg_3(){
         create_svg3_data);
 } // svg3
 
+pub fn svg_4(){
+    let op_svg_file_name = "./svg_output/threeXthree/output_3.svg";
+    let rows: usize = 3;
+    let cols: usize = 3;
+    let tiles_per_pane_height: usize = 3; 
+    let tiles_per_pane_width: usize = 3; 
+    let svg_width = 300;
+    let svg_height = 300;
+
+    let _ = test_create_svg(op_svg_file_name,
+        svg_width,
+        svg_height, 
+        rows, 
+        cols, 
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        create_svg4_data_center_black);
+} // svg4
 
 
 
@@ -500,6 +518,89 @@ fn create_svg3_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>
 
 } //create_svg3_data
 
+// ******************************************************
+// ******************************************************
+/// Make a 3x3 mosaic of 9 tiles 
+///  Red   Red   Red
+///  Red  Black  Red
+///  Red   Red   Red
+
+fn create_svg4_data_center_black() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
+    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
+
+    // ****************************
+    // Start the first pane
+    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
+
+    // first row first col (rrb)
+    // [(Box2D((0, 0), (100, 100)), RGB()),
+    let top_left :(i32,i32) = (0,0);
+    let bot_right:(i32,i32) = (100,100);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_RED);
+    let _ = &pane_grid.push((tile_box, rgb));
+    
+    // first row second col (rrb)
+    // (Box2D((100, 0), (200, 100)), RGB(u8,u8,u8)),
+    let top_left :(i32,i32) = (100,0);
+    let bot_right:(i32,i32) = (200,100);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_RED);
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // first row third col (rrb)
+    // (Box2D((200, 0), (300, 100)), RGB(u8,u8,u8)),
+    let top_left :(i32,i32) = (200,0);
+    let bot_right:(i32,i32) = (300,100);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_RED);
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // second row first col brr
+    // (Box2D((0,100), (100, 200)), RGB(u8,u8,u8)),
+    let top_left :(i32,i32) = (0,100);
+    let bot_right:(i32,i32) = (100,200);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_RED);
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // second row second col brr
+    // (Box2D((100,100), (200, 200)), RGB(u8,u8,u8)),
+    let top_left :(i32,i32) = (100,100);
+    let bot_right:(i32,i32) = (200,200);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // second row third col brr
+    // (Box2D((100,100), (200, 200)), RGB(u8,u8,u8)),
+    let top_left :(i32,i32) = (200,100);
+    let bot_right:(i32,i32) = (300,200);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_RED);
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // third row first col BBR 
+    // (Box2D((0,100), (100, 200)), RGB(u8,u8,u8)),
+    let top_left :(i32,i32) = (0,200);
+    let bot_right:(i32,i32) = (100,300);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_RED);
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // third row second col BBR 
+    // (Box2D((100,100), (200, 200)), RGB(u8,u8,u8)),
+    let top_left :(i32,i32) = (100,200);
+    let bot_right:(i32,i32) = (200,300);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_RED);
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // third row third col BBR 
+    // (Box2D((100,100), (200, 200)), RGB(u8,u8,u8)),
+    let top_left :(i32,i32) = (200,200);
+    let bot_right:(i32,i32) = (300,300);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_RED);
+    let _ = &pane_grid.push((tile_box, rgb));
+
+    // save the pane to the result window
+    let _ = &result_window.push(pane_grid);
+
+    result_window
+
+} //create_svg4_data
 
 
 

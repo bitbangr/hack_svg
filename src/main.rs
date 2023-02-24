@@ -36,10 +36,10 @@ fn main() {
     // Below are the basic tests.
     // Run these everytime major changes are made to the code base
 
-    let _ = nine_tile_square::svg_1(); // create_3x3_rgb_checker_tile_data
-    let _ = nine_tile_square::svg_2(); // create_black_center_cross_tile_data
-    let _ = nine_tile_square::svg_3(); // create_black_center_cross_tile_data
-
+    // let _ = nine_tile_square::svg_1(); // create_3x3_rgb_checker_tile_data
+    // let _ = nine_tile_square::svg_2(); // create_black_center_cross_tile_data
+    // let _ = nine_tile_square::svg_3(); // create_black_center_cross_tile_data
+    let _ = nine_tile_square::svg_4();//create_svg4_data_center_black
     // let _ = four_tile_square::svg_1();
     // let _ = four_tile_square::svg_2();
     // let _ = four_tile_square::svg_3();
