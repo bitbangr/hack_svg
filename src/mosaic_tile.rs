@@ -1,14 +1,6 @@
-
 use euclid::default::{Box2D, Point2D};
-
-
 use serde::{Deserialize, Serialize};
-use svg::node::element::tag::Use;
-use std::fs::File;
-use std::path::Path;
-use std::io::{Read};
 use std::fmt::{self, Formatter, Display};
-
 
 pub const    TOP: usize = 0;
 pub const  RIGHT: usize = 1;
@@ -34,21 +26,26 @@ impl Display for RGB {
     }
 }
 
-// (Box2D<i32>, modtile::RGB)
-
 #[derive(PartialEq, Debug, Clone, Hash)]
 pub struct MosaicTile {
     pub tile: Tile,
     pub edge_bool: Vec<bool>,
     pub start_point: Point2D<i32>,
     pub end_point: Point2D<i32>,
+    pub start_point_two: Point2D<i32>,
+    pub end_point_two: Point2D<i32>,
+
 }
 
 
 impl MosaicTile {
     pub fn new(tile: Tile, edge_bool: Vec<bool>) -> MosaicTile {
-        let (sp,ep) =  get_start_end_points(&edge_bool, tile);
-        MosaicTile { tile, edge_bool, start_point: sp, end_point: ep }
+        let (sp,ep,sp2,ep2) =  get_start_end_points(&edge_bool, tile);
+        MosaicTile { tile, edge_bool, 
+                        start_point: sp, 
+                        end_point: ep , 
+                        start_point_two: sp2 ,
+                        end_point_two: ep2}
     }
 
     pub fn get_start_point_as_i32(&self) -> (i32,i32) {
@@ -68,7 +65,7 @@ fn get_point2D( usize_arr : (usize, usize)) -> Point2D<i32> {
     Point2D::new(start_x,start_y)
 }
 
-fn get_start_end_points(edge_bool: &[bool], tile: Tile) -> (Point2D<i32>, Point2D<i32>) {
+fn get_start_end_points(edge_bool: &[bool], tile: Tile) -> (Point2D<i32>, Point2D<i32> , Point2D<i32>, Point2D<i32>) {
     
     let top = edge_bool[TOP];
     let right = edge_bool[RIGHT];
@@ -77,6 +74,11 @@ fn get_start_end_points(edge_bool: &[bool], tile: Tile) -> (Point2D<i32>, Point2
 
     let mut start_point: Point2D<i32> = Point2D::new(0,0);
     let mut end_point:Point2D<i32> = Point2D::new(0,0);
+
+    // Second start end points default to Point2D (FLAGGED, FLAGGED) 
+    // and remain so unless set otherwise in the FTFT and TFTF cases below
+    let mut start_point_two: Point2D<i32> = get_point2D((FLAGGED,FLAGGED));
+    let mut end_point_two:Point2D<i32> = get_point2D((FLAGGED,FLAGGED));
 
     let corners = &tile.corners();
 
@@ -95,7 +97,7 @@ fn get_start_end_points(edge_bool: &[bool], tile: Tile) -> (Point2D<i32>, Point2
 
             start_point = get_point2D(corners[TOP_LEFT]);
               end_point = get_point2D(corners[TOP_LEFT]);
-
+    
             println!{"start point TOP_LEFT-> {:?} ", corners[TOP_LEFT]}; 
             println!{"end point TOP_LEFT-> {:?} ", corners[TOP_LEFT]}; 
             }, // FFFF
@@ -212,13 +214,15 @@ fn get_start_end_points(edge_bool: &[bool], tile: Tile) -> (Point2D<i32>, Point2
 
             start_point = get_point2D(corners[TOP_LEFT]);
             end_point = get_point2D(corners[TOP_RIGHT]);
+            start_point_two = get_point2D(corners[BOT_RIGHT]);
+            end_point_two = get_point2D(corners[BOT_LEFT]);
 
             println!{"1st line - start point TOP_LEFT-> {:?} ", &start_point}; 
             println!{"1st line - end point TOP_RIGHT-> {:?} ", &end_point};  
             println!{"2nd line - start point corners[BOT_RIGHT]-> {:?} ", corners[BOT_RIGHT]}; 
             println!{"2nd line - end point corners[BOT_LEFT]-> {:?} ", corners[BOT_LEFT]};  
 
-            panic!();   
+            // panic!();   
 
         }, // FTFT
         // **********************************    
@@ -229,13 +233,15 @@ fn get_start_end_points(edge_bool: &[bool], tile: Tile) -> (Point2D<i32>, Point2
 
             start_point = get_point2D(corners[BOT_LEFT]);
             end_point = get_point2D(corners[TOP_LEFT]);
+            start_point_two = get_point2D(corners[TOP_RIGHT]);
+            end_point_two = get_point2D(corners[BOT_RIGHT]);
 
             println!{"1st line - start point BOT_LEFT-> {:?} ", &start_point}; 
             println!{"1st line - end point TOP_LEFT-> {:?} ", &end_point};  
             println!{"2nd line - start point corners[TOP_RIGHT]-> {:?} ", corners[TOP_RIGHT]}; 
             println!{"2nd line - end point corners[BOT_RIGHT]-> {:?} ", corners[BOT_RIGHT]};  
 
-            panic!();   
+            // panic!();   
 
         }, // TFTF
         // **********************************  
@@ -313,9 +319,9 @@ fn get_start_end_points(edge_bool: &[bool], tile: Tile) -> (Point2D<i32>, Point2
 
         } // match
     
-    (start_point,end_point)
+    (start_point,end_point, start_point_two, end_point_two)
 
-} // fuck_da_end_point
+} // get_start_end_points
 
 impl MosaicTile {
 
@@ -357,6 +363,9 @@ impl Zero for MosaicTile {
             edge_bool: Vec::new(),
             start_point:Point2D::new(0,0), 
             end_point:Point2D::new(0,0), 
+            start_point_two:Point2D::new(0,0), 
+            end_point_two:Point2D::new(0,0), 
+
         }
     }
 
@@ -372,7 +381,7 @@ impl Zero for MosaicTile {
 
 use std::ops::Add;
 
-use crate::constants::{NORTH, EAST, SOUTH, WEST};
+use crate::constants::{NORTH, EAST, SOUTH, WEST, FLAGGED};
 
 impl Add for MosaicTile {
     type Output = Self;
@@ -393,18 +402,18 @@ impl Add for MosaicTile {
             edge_bool: self.edge_bool,
             start_point: self.start_point, 
             end_point: self.end_point, 
+            start_point_two: self.start_point, 
+            end_point_two: self.end_point, 
 
         }
     }
 }
-
 
 #[derive(PartialEq, Debug, Copy, Clone, Hash)]
 pub struct Tile {
     pub coords: Box2D<i32>,
     pub rgb: RGB,
 }
-
 
 impl Tile {
     pub fn new(coords: Box2D<i32>, rgb: RGB) -> Tile {

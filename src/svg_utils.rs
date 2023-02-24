@@ -8,9 +8,10 @@ use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
 use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
-use euclid::Point2D;
-use euclid::default::Box2D;
+
+use euclid::default::{Box2D, Point2D};
 use ndarray::{Array2, ArrayBase, OwnedRepr, Dim, s, Axis, ViewRepr, Array1};
+use printpdf::Point;
 use svg::node::element::path::Data;
 use svg::node::element::Path;
 use svg::Document;
@@ -21,6 +22,7 @@ use crate::pane_to_2d_vec;
 use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
 
 use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combineData};
+
 
 ///
 /// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
@@ -157,7 +159,8 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
         // current end location of last line drawn (x,y)
         // need to check this is the start point of the next line 
-        let mut curr_svg_line_end_point: (usize,usize) = (0,0);
+        // let mut curr_svg_line_end_point: (usize,usize) = (0,0);
+        let mut curr_svg_line_end_point: Point2D<i32> = Point2D::new(0,0);
         let mut is_first_tile : bool = true;
 
         // grab the first tile
@@ -180,6 +183,9 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
         let start_xy = start_tile.get_start_point_as_i32();
         line_data = line_data.move_to(start_xy);
 
+        // Update the first end point as the first tile end_point
+        curr_svg_line_end_point = start_tile.end_point;
+
         while (more_tiles) {
 
             println!("\n while more_tiles start_tile_idx -> {:?}" , &start_tile_idx);
@@ -190,16 +196,22 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             let corner = cur_tile.tile.corners();
             let mut cur_tile_start_point = cur_tile.start_point;
             let mut cur_tile_end_point = cur_tile.end_point;
+            let mut cur_tile_start_point_two = cur_tile.start_point_two;
+            let mut cur_tile_end_point_two = cur_tile.end_point_two;
 
             println!("\ntop left corner {:?}", corner[TOP_LEFT]);
             println!("top right corner {:?}", corner[TOP_RIGHT]);
             println!("bottom right corner {:?}", corner[BOT_RIGHT]);
             println!("bottom left corner {:?}", corner[BOT_LEFT]);
             println!("cur_tile_start_point: {:?}", cur_tile_start_point);
-            println!("cur_tile_end_point: {:?}\n\n", cur_tile_end_point);
+            println!("cur_tile_end_point: {:?}\n", cur_tile_end_point);
+            println!("cur_tile_start_point_two: {:?}", cur_tile_start_point_two);
+            println!("cur_tile_end_point_two: {:?}\n\n", cur_tile_end_point_two);
 
             // add the current tile data to the line data
-            let cur_tile_svg_line_data = get_tile_svg_line_data(&cur_tile);
+            // need to pass the curr_svg_line_end_point so that we can check TFTF and FTFT which lines to draw.
+            let cur_tile_svg_line_data = get_tile_svg_line_data(&cur_tile,&curr_svg_line_end_point);
+
             // line_data = line_data.extend (cur_tile_svg_line_data);
 
             line_data = combineData(&line_data,&cur_tile_svg_line_data );
@@ -228,7 +240,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
                 println!("Completed traversal of all tiles in contigous group");
 
                 // add the last tile data to the data 
-                let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone);
+                let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point );
                 // line_data = line_data.extend (cur_tile_svg_line_data);
     
                 line_data = combineData(&line_data,&next_tile_svg_line_data );
@@ -261,6 +273,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
     svg::save(op_svg_file_name, &document)   
 
 }
+
 
 
 /// Find the next tile based on the end point of one tile is the start point of the next tile
@@ -304,6 +317,10 @@ fn find_next_tile(row: usize,
 
             if check_tile.start_point == cur_tile.end_point {
                 println!("Next Tile has been found");
+                if check_tile.start_point_two.x as usize != FLAGGED {
+                     println!("This is double line tile FTFT or TFTF {:?}", &check_tile);
+                }
+
                 found == true;
                 res = (contig_row,contig_col);
                 break;

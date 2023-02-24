@@ -6,7 +6,7 @@ use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
 use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
-use euclid::Point2D;
+use euclid::default::Point2D;
 use euclid::default::Box2D;
 use svg::node::element::path::Data;
 use svg::node::element::Path;
@@ -35,8 +35,9 @@ pub fn combineData (data1:&Data, data2:&Data) -> Data {
 /// It is up to the caller to add the returned line data to the existing line data in order
 /// to complete a path
 /// 
-pub fn get_tile_svg_line_data(m_tile:&MosaicTile ) -> Data {
 
+// pub fn get_tile_svg_line_data_orig(m_tile:&MosaicTile ) -> Data {
+pub fn get_tile_svg_line_data(m_tile: &MosaicTile, curr_svg_line_end_point: &Point2D<i32>) -> Data {
     let mut line_data = Data::new();
     let edge_bool = m_tile.edge_bool.clone();
 
@@ -184,12 +185,24 @@ pub fn get_tile_svg_line_data(m_tile:&MosaicTile ) -> Data {
             println!(" TOP BOTTOM Closed - Left-Right side open tile\n");
             println!(" !!!!! Need to Deal with this!!!!!\n");
 
+            // top
+            if *curr_svg_line_end_point == m_tile.start_point 
+            {
+                line_data = line_data.line_to(corner[TOP_RIGHT]);
+            } //bottom
+            else if *curr_svg_line_end_point == m_tile.start_point_two
+            {
+                line_data = line_data.line_to(corner[BOT_LEFT]);
+            }
+            else {
+                println!("We should never get here!!!");
+                panic!();                
+            }
+
             println!{"1st line - start point TOP_LEFT-> {:?} ", &start_point}; 
             println!{"1st line - end point TOP_RIGHT-> {:?} ", &end_point};  
             println!{"2nd line - start point corners[BOT_RIGHT]-> {:?} ", corner[BOT_RIGHT]}; 
             println!{"2nd line - end point corners[BOT_LEFT]-> {:?} ", corner[BOT_LEFT]};  
-
-            panic!();   
 
         }, // FTFT
         // **********************************    
