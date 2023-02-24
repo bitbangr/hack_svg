@@ -8,3 +8,14 @@ src/compareNeighbours_NDArray.rs
 /svg_output
 src/FuncCalledWithFunctParameter.rs
 src/dfs_arr.rs
+BrewUpgradeFontForgeCommandLineToolsMsg.txt
+PstoEdit_Output.txt
+PstoEdit_SVG-DXF_ChatGPT.txt
+src/create_contig_path.rs
+src/fn combine_pane_edges.rs
+src/get_matching_row_indices.rs
+src/get_rows_with_pattern_v2.rs
+src/get_rows_with_pattern_v2_option_match_this.rs
+src/pv_eb_hack.rs
+src/tile_builder_pattern.rs
+svg_output Feb24/
