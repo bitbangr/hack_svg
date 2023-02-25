@@ -15,7 +15,7 @@ mod single_tile;
 mod two_tile_horiz;
 mod four_tile_square;
 mod nine_tile_square;
-mod two_op_lines_tile_panels;
+mod two_op_line_tiles;
 
 use euclid::default::Box2D;
 use euclid::default::Point2D;
@@ -37,7 +37,7 @@ fn main() {
     // Below are the basic tests.
     // Run these everytime major changes are made to the code base
 
-    let _ = two_op_lines_tile_panels::svg_1();
+    let _ = two_op_line_tiles::svg_1();
 
     // let _ = nine_tile_square::svg_1(); // create_3x3_rgb_checker_tile_data
     // let _ = nine_tile_square::svg_2(); // create_black_center_cross_tile_data
