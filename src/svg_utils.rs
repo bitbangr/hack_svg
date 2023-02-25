@@ -72,6 +72,7 @@ use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combineData};
 /// 
 /// The above is a good start for documentation of meth travel_contig_svg_refact()
 
+
 /// General helper function for used for testing
 /// 
 /// Arguments
@@ -139,6 +140,80 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
 
     
 }
+
+
+// ************************************
+// ************************************
+
+/// General helper function for used for testing
+/// 
+/// Arguments
+/// op_svg_file_name
+/// svg_width
+/// svg_height
+/// pane_rows - how many rows of panes are in whole mosaic 
+/// pane_cols - how many columns of panes in whole mosaic 
+/// tiles_per_pane_height: usize, <- this is redundant
+/// tiles_per_pane_width: usize,  <- this is redundant
+pub(crate) fn create_svg(op_svg_file_name: &str, 
+    svg_width: i32, 
+    svg_height: i32, 
+    pane_rows: usize, 
+    pane_cols: usize, 
+    tiles_per_pane_height: usize,  // = number of rows
+    tiles_per_pane_width: usize,   // = number of cols
+    mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> ) 
+{
+    println!("svg_utils::create_svg");
+
+    // lets call the create data function 
+    // let mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> = create_mosaic_data_fn(); 
+    println!(" create_mosaic_data_fn {:?}", &mosaic_vec);
+
+    // grab the ND Array for the first mosiac pane
+    // which is the first element of the mosaic vec
+    // TODO In future need to iterate over all panes 
+    let pane_nd_arr = pane_vec_to_ndarray(&mosaic_vec[0],tiles_per_pane_height , tiles_per_pane_width ); // rows, cols
+    println!("\n\npane nd array {:?} ", &pane_nd_arr);
+
+    // convert the pane_ds_arr back to a 2D vector so we can use it for the Depth First Search Algorithm
+    let pane_2d_vec: Vec<Vec<(Box2D<i32>, RGB)>> = pane_to_2d_vec(&pane_nd_arr, tiles_per_pane_height, tiles_per_pane_width);
+    println!("\n\n2D Pane Vec -> {:?}", pane_2d_vec);
+
+
+    // get the test boolean array to build our svg path with
+    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
+
+    println!("edge_booleans = {:?}" , &edge_booleans);
+
+    // get Vec of Vec of contigous tiles
+    let contiguous_tiles = dfs_tiles::get_contiguous_tiles_mod(&pane_2d_vec);
+    println!("fn get_contiguous_tiles_mod search results -> {:?}", &contiguous_tiles);
+
+    // combine pane_nd_arr and edge_booleans into Array of MosaicTiles.  
+    // Each tile holds its own boolean edge values as well as Box2D and RGB values
+    let pane_edge_nd_arr:  Array2<MosaicTile> = combine_pane_edges(&pane_nd_arr, &edge_booleans);
+
+    println! ("*********\nmosaic_pane_edge_nd_arr\n\n{:?}", &pane_edge_nd_arr);
+
+    // testing the travel contigous tiles function
+    // let _ = travel_contig_svg(pane_nd_arr, 
+    //                     edge_booleans, 
+    //                     contiguous_tiles, 
+    //                     op_svg_file_name ,
+   //                      svg_width as usize,
+    //                     svg_height as usize);
+    // testing the travel contigous tiles function
+    let _ = travel_contig_svg_refact(pane_edge_nd_arr, 
+                        contiguous_tiles, 
+                        op_svg_file_name ,
+                        svg_width as usize,
+                        svg_height as usize);
+
+    
+}
+
+
 
 //****************************** */
 //****************************** */
