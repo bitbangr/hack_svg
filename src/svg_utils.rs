@@ -331,6 +331,9 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
         } // while more_tiles == true
 
+        // finally close the path
+        line_data = line_data.close();
+
         let stroke_colour =  "purple";
         let stroke_width =  0.25; 
     
