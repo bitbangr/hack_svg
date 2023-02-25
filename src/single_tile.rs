@@ -1,4 +1,5 @@
 use euclid::default::Box2D;
+use crate::constants::RGB_GREEN;
 use crate::mosaic_tile::RGB;
 use crate::svg_utils::test_create_svg;
 use crate::create_tile;
@@ -46,7 +47,7 @@ pub(crate) fn create_single_green_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euc
     // [(Box2D((0, 0), (100, 100)), RGB_VAL (#,#,#)),
     let top_left :(i32,i32) = (0,0);
     let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , green);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_GREEN);
     let _ = &pane_grid.push((tile_box, rgb));
     
     // save the pane to the result window

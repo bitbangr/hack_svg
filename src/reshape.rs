@@ -3,6 +3,7 @@ use ndarray::Array2;
 use ndarray::Array1;
 use ndarray::Axis;
 use euclid::default::Box2D;
+use crate::constants::RGB_WHITE;
 use crate::modtile;
 // use crate::RGB;
 
@@ -126,28 +127,28 @@ fn create_2x2_white_tile_data() -> Vec<Vec<(Box2D<i32>, RGB)>> {
     // Start the first pane
     let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
 
-    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
+    // [(Box2D((0, 0), (100, 100)), rgb_val),
     let top_left :(i32,i32) = (0,0);
     let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
     let _ = &pane_grid.push((tile_box, rgb));
     
-    // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
+    // (Box2D((100, 0), (200, 100)), rgb_val),
     let top_left :(i32,i32) = (100,0);
     let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
     let _ = &pane_grid.push((tile_box, rgb));
 
-    // (Box2D((0,100), (100, 200)), RGB(255, 255, 255)),
+    // (Box2D((0,100), (100, 200)), rgb_val),
     let top_left :(i32,i32) = (0,100);
     let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
     let _ = &pane_grid.push((tile_box, rgb));
 
-    // (Box2D((100,100), (200, 200)), RGB(255, 255, 255)),
+    // (Box2D((100,100), (200, 200)), rgb_val),
     let top_left :(i32,i32) = (100,100);
     let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , (255, 255, 255));
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
     let _ = &pane_grid.push((tile_box, rgb));
 
     // save the pane to the result window

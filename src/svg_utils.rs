@@ -119,7 +119,7 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
 
     // combine pane_nd_arr and edge_booleans into Array of MosaicTiles.  
     // Each tile holds its own boolean edge values as well as Box2D and RGB values
-    let pane_edge_nd_arr:  Array2<(MosaicTile)> = combine_pane_edges(&pane_nd_arr, &edge_booleans);
+    let pane_edge_nd_arr:  Array2<MosaicTile> = combine_pane_edges(&pane_nd_arr, &edge_booleans);
 
     println! ("*********\nmosaic_pane_edge_nd_arr\n\n{:?}", &pane_edge_nd_arr);
 
@@ -128,7 +128,7 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
     //                     edge_booleans, 
     //                     contiguous_tiles, 
     //                     op_svg_file_name ,
-    //                     svg_width as usize,
+   //                      svg_width as usize,
     //                     svg_height as usize);
     // testing the travel contigous tiles function
     let _ = travel_contig_svg_refact(pane_edge_nd_arr, 
@@ -186,7 +186,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
         // Update the first end point as the first tile end_point
         curr_svg_line_end_point = start_tile.end_point;
 
-        while (more_tiles) {
+        while more_tiles {
 
             println!("\n while more_tiles start_tile_idx -> {:?}" , &start_tile_idx);
     

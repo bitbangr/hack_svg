@@ -26,6 +26,32 @@ impl Display for RGB {
     }
 }
 
+impl Zero for RGB {
+    fn zero() -> Self {
+        RGB(0, 0, 0)
+    }
+
+    fn is_zero(&self) -> bool {
+        self.0 == 0 && self.1 == 0 && self.2 == 0
+    }
+
+}
+
+impl Add for RGB {
+    type Output = RGB;
+
+    fn add(self, other: RGB) -> RGB {
+        RGB(self.0.saturating_add(other.0), self.1.saturating_add(other.1), self.2.saturating_add(other.2))
+    }
+}
+
+
+impl RGB {
+    pub fn new_with_u8(in_rgb: (u8,u8,u8)) -> RGB {
+        RGB(in_rgb.0, in_rgb.1, in_rgb.2)
+    }
+}
+
 #[derive(PartialEq, Debug, Clone, Hash)]
 pub struct MosaicTile {
     pub tile: Tile,

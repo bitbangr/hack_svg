@@ -181,7 +181,7 @@ fn box_corners(box2d: Box2D<i32>) -> [(usize, usize); 4] {
 pub fn create_tile(
     top_left: (i32, i32),
     bot_right: (i32, i32),
-    rgb_val: (u8, u8, u8),
+    rgb_val: RGB,
 ) -> (Box2D<i32>, RGB) {
     let p_start: Point2D<i32> = Point2D::new(top_left.0, top_left.1);
     let p_end: Point2D<i32> = Point2D::new(bot_right.0, bot_right.1);
@@ -189,7 +189,8 @@ pub fn create_tile(
         min: p_start,
         max: p_end,
     };
-    let rgb: RGB = RGB(rgb_val.0, rgb_val.1, rgb_val.2);
+    // let rgb: RGB = RGB(rgb_val.0, rgb_val.1, rgb_val.2);
+    let rgb: RGB = rgb_val;
 
     (tile_box, rgb)
 }
