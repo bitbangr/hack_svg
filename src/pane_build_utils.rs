@@ -1,10 +1,7 @@
-use crate::constants::{RGB_BLACK, RGB_BLUE, RGB_GREEN, RGB_RED, RGB_WHITE};
 use crate::create_tile;
-use crate::mosaic_tile::{RGB, rgb_vec_to_array};
-use crate::svg_utils::create_svg;
+use crate::mosaic_tile::RGB;
 use euclid::default::Box2D;
 use ndarray::Array2;
-
 
 /// This returns panes and tiles as there is only ever one pane
 /// for testing the result window will have 1 main vec

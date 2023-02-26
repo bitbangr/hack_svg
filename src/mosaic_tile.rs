@@ -3,15 +3,8 @@ use ndarray::Array2;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Formatter};
 
-pub const TOP: usize = 0;
-pub const RIGHT: usize = 1;
-pub const BOTTOM: usize = 2;
-pub const LEFT: usize = 3;
-
-pub const TOP_LEFT: usize = 0;
-pub const TOP_RIGHT: usize = 1;
-pub const BOT_RIGHT: usize = 2;
-pub const BOT_LEFT: usize = 3;
+use crate::constants::{TOP, RIGHT,BOTTOM,LEFT,FLAGGED};
+use crate::constants::{TOP_LEFT, TOP_RIGHT,BOT_LEFT, BOT_RIGHT};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Copy, Clone, Eq, Hash, Default)]
 // #[derive(Debug, PartialEq, Copy, Clone, Eq, Hash, Default)]
@@ -434,7 +427,9 @@ impl Zero for MosaicTile {
 
 use std::ops::Add;
 
-use crate::constants::{EAST, FLAGGED, NORTH, SOUTH, WEST};
+
+
+// use crate::constants::{EAST, FLAGGED, NORTH, SOUTH, WEST};
 
 impl Add for MosaicTile {
     type Output = Self;

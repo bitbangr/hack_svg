@@ -1,18 +1,10 @@
-use crate::mosaic_tile::{Tile, RGB, MosaicTile};
+use crate::mosaic_tile::MosaicTile;
 
-// use crate::modtile::{RGB, self};
-use crate::constants::FLAGGED;
-use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
 use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
 use euclid::default::Point2D;
-use euclid::default::Box2D;
 use svg::node::element::path::Data;
-use svg::node::element::Path;
-use svg::Document;
-
-
 
 pub fn combine_data (data1:&Data, data2:&Data) -> Data {
     
