@@ -8,6 +8,9 @@ pub const TOP_RIGHT: usize = 1;
 pub const BOT_RIGHT: usize = 2;
 pub const  BOT_LEFT: usize = 3;
 
+pub const NOT_VISITED: usize = 0;
+pub const     VISITED: usize = 1;
+
 pub const FLAGGED: usize = 987659; // random value unlikely to be used found in problem domain
 use crate::mosaic_tile::RGB;
 pub const RGB_BLACK: RGB = RGB(0,0,0);
