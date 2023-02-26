@@ -18,13 +18,15 @@ mod four_tile_square;
 mod nine_tile_square;
 mod two_op_line_tiles;
 
+use std::os::fd::AsFd;
+
 use euclid::default::Box2D;
 use euclid::default::Point2D;
 use ndarray::Axis;
 use ndarray::{Array, Array2};
 
 use mosaic_tile::RGB;
-use constants::{NORTH,EAST,SOUTH,WEST};
+use constants::{TOP,RIGHT,BOTTOM,LEFT};
 
 type BoxRgbArr2 = Array2<(Box2D<i32>, RGB)>;
 
@@ -223,17 +225,17 @@ pub fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euc
     for i in 0..rows {
         for j in 0..cols {
             let curtile_rgb = mosaic_nd_arr[(i, j)].1;
-            let north_tile_bool: bool = { if i > 0 {curtile_rgb == mosaic_nd_arr[(i - 1, j)].1 } else { false } };
-            let south_tile_bool: bool = { if i < rows - 1 { curtile_rgb == mosaic_nd_arr[(i + 1, j)].1 } else { false } };
-            let  west_tile_bool: bool = { if j > 0 { curtile_rgb == mosaic_nd_arr[(i, j - 1)].1 } else { false } };
-            let  east_tile_bool: bool = { if j < cols - 1 { curtile_rgb == mosaic_nd_arr[(i, j + 1)].1 } else { false } };
+            let top_tile_bool: bool = { if i > 0 {curtile_rgb == mosaic_nd_arr[(i - 1, j)].1 } else { false } };
+            let bottom_tile_bool: bool = { if i < rows - 1 { curtile_rgb == mosaic_nd_arr[(i + 1, j)].1 } else { false } };
+            let  left_tile_bool: bool = { if j > 0 { curtile_rgb == mosaic_nd_arr[(i, j - 1)].1 } else { false } };
+            let  right_tile_bool: bool = { if j < cols - 1 { curtile_rgb == mosaic_nd_arr[(i, j + 1)].1 } else { false } };
 
-            println!("get_edge_bools() ({},{}) \n\tNorth {}\n\tEast {}\n\tSouth {}\n\tWest {}", i,j, north_tile_bool, east_tile_bool, south_tile_bool, west_tile_bool);
+            println!("get_edge_bools() ({},{}) \n\tTop {}\n\tRight {}\n\tBottom {}\n\tLeft {}", i,j, top_tile_bool, right_tile_bool, bottom_tile_bool, left_tile_bool);
 
-            edges[[i,j]][NORTH] = north_tile_bool;
-            edges[[i,j]][EAST] = east_tile_bool;
-            edges[[i,j]][SOUTH] = south_tile_bool;
-            edges[[i,j]][WEST] = west_tile_bool;
+            edges[[i,j]][TOP] = top_tile_bool;
+            edges[[i,j]][RIGHT] = right_tile_bool;
+            edges[[i,j]][BOTTOM] = bottom_tile_bool;
+            edges[[i,j]][LEFT] = left_tile_bool; 
         
             // if curtile_rgb == north_tile_rgb {println!("north tile same colour");}
             // if curtile_rgb == east_tile_rgb {println!("east tile same colour");}
