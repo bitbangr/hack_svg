@@ -1,25 +1,17 @@
-use std::iter::Zip;
-
 use crate::mosaic_tile::{Tile, RGB, MosaicTile};
-use crate::{box_corners, dfs_tiles};
-// use crate::modtile::{RGB, self};
-use crate::constants::{NORTH,EAST,SOUTH,WEST, FLAGGED,};
-use crate::constants::{SE_CORNER,SW_CORNER,NW_CORNER,NE_CORNER};
-use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
+use crate::dfs_tiles;
+use crate::constants::FLAGGED;
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
-
 use euclid::default::{Box2D, Point2D};
-use ndarray::{Array2, ArrayBase, OwnedRepr, Dim, s, Axis, ViewRepr, Array1};
-use printpdf::Point;
+use ndarray::{Array2, ArrayBase, OwnedRepr, Dim};
 use svg::node::element::path::Data;
 use svg::node::element::Path;
 use svg::Document;
 
-use crate::dfs_tiles::get_contiguous_tiles_mod;
 use crate::get_edge_bools;
 use crate::pane_to_2d_vec;
-use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
+use crate::pane_vec_to_ndarray;
 
 use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combine_data};
 
@@ -86,8 +78,8 @@ use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combine_data};
 pub(crate) fn test_create_svg(op_svg_file_name: &str, 
     svg_width: i32, 
     svg_height: i32, 
-    pane_rows: usize, 
-    pane_cols: usize, 
+    _pane_rows: usize, 
+    _pane_cols: usize, 
     tiles_per_pane_height: usize,  // = number of rows
     tiles_per_pane_width: usize,   // = number of cols
     create_mosaic_data_fn: fn() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>>) 
@@ -110,7 +102,7 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
 
 
     // get the test boolean array to build our svg path with
-    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
+    let edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
 
     println!("edge_booleans = {:?}" , &edge_booleans);
 
@@ -158,8 +150,8 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
 pub(crate) fn create_svg(op_svg_file_name: &str, 
     svg_width: i32, 
     svg_height: i32, 
-    pane_rows: usize, 
-    pane_cols: usize, 
+    _pane_rows: usize, 
+    _pane_cols: usize, 
     tiles_per_pane_height: usize,  // = number of rows
     tiles_per_pane_width: usize,   // = number of cols
     mosaic_vec: Vec<Vec<(Box2D<i32>, RGB)>> ) 
@@ -235,8 +227,8 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
         // current end location of last line drawn (x,y)
         // need to check this is the start point of the next line 
         // let mut curr_svg_line_end_point: (usize,usize) = (0,0);
-        let mut curr_svg_line_end_point: Point2D<i32> = Point2D::new(0,0);
-        let mut is_first_tile : bool = true;
+        let mut curr_svg_line_end_point: Point2D<i32>;
+        // let mut is_first_tile : bool = true;
 
         // grab the first tile
         let start_tile_idx = contig_group[0];
@@ -269,10 +261,10 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             println!("\n(row: {} col: {})\n  Cur Tile Info {:?} ",row, col, &cur_tile);
 
             let corner = cur_tile.tile.corners();
-            let mut cur_tile_start_point = cur_tile.start_point;
-            let mut cur_tile_end_point = cur_tile.end_point;
-            let mut cur_tile_start_point_two = cur_tile.start_point_two;
-            let mut cur_tile_end_point_two = cur_tile.end_point_two;
+            let cur_tile_start_point = cur_tile.start_point;
+            let cur_tile_end_point = cur_tile.end_point;
+            let cur_tile_start_point_two = cur_tile.start_point_two;
+            let cur_tile_end_point_two = cur_tile.end_point_two;
 
             println!("\ntop left corner {:?}", corner[TOP_LEFT]);
             println!("top right corner {:?}", corner[TOP_RIGHT]);
@@ -373,8 +365,8 @@ fn find_next_tile(row: usize,
 
     println!( "row {}\ncol {}\ncontig_group {:?}\ncur_tile {:?}\n\n", row, col, contig_group, cur_tile ); 
 
-    let mut contig_row = 0 as usize;
-    let mut contig_col = 0 as usize;
+    let mut contig_row: usize;
+    let mut contig_col: usize;
     let mut found:bool = false;
 
     // a bad way to program but if this routine completes and a next tile has not 
@@ -454,7 +446,7 @@ fn combine_pane_edges( pane_nd_arr: &ArrayBase<OwnedRepr<(euclid::Box2D<i32, euc
     let mut result = Array2::<MosaicTile>::zeros((pane_nd_arr.shape()[0], pane_nd_arr.shape()[1]));
 
     // (((0, 0), (Box2D((0, 0), (100, 100)), RGB(0, 0, 0))), ((0, 0), [false, false, true, false]))
-    for (((row, col), (box2d, rgb)), ((row1, col1), edge_bool)) in pane_nd_arr.indexed_iter().zip(edge_booleans.indexed_iter()) 
+    for (((row, col), (box2d, rgb)), ((_row1, _col1), edge_bool)) in pane_nd_arr.indexed_iter().zip(edge_booleans.indexed_iter()) 
     {
         
         let tile = Tile::new(Box2D::new(box2d.min, box2d.max), *rgb);

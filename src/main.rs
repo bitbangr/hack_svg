@@ -3,7 +3,7 @@ mod dfs_tiles;
 mod svg_utils;
 mod constants;
 
-mod reshape;
+// mod reshape;
 mod mosaic_tile;
 mod mosaic_tile_svg_utils;
 mod pane_build_utils;
@@ -18,17 +18,11 @@ mod four_tile_square;
 mod nine_tile_square;
 mod two_op_line_tiles;
 
-use std::os::fd::AsFd;
-
 use euclid::default::Box2D;
 use euclid::default::Point2D;
-use ndarray::Axis;
-use ndarray::{Array, Array2};
-
+use ndarray::{Axis,Array, Array2};
 use mosaic_tile::RGB;
 use constants::{TOP,RIGHT,BOTTOM,LEFT};
-
-type BoxRgbArr2 = Array2<(Box2D<i32>, RGB)>;
 
 /// This application will create an SVG files from a various window pane/tile configurations
 /// 
@@ -84,7 +78,7 @@ fn main() {
 /// otherwise the value is false.
 /// This value will be used to construct the lines around contiguous colours
 fn get_bool_arr(row_dim:usize, col_dim:usize) -> Array2<Vec<bool>> {
-    let mut init_bool= vec![vec![false ; 4] ; row_dim * col_dim] ;
+    let init_bool= vec![vec![false ; 4] ; row_dim * col_dim] ;
     let bool_bucket = Array::from_shape_vec((row_dim,col_dim), init_bool.to_vec()).unwrap();    
     bool_bucket
 }
@@ -252,7 +246,7 @@ pub fn get_edge_bools(mosaic_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euc
 }
 
 
-fn pane_to_2d_vec(pane_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>, tiles_per_pane_height: usize, tiles_per_pane_width: usize) -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
+fn pane_to_2d_vec(pane_nd_arr: &ndarray::ArrayBase<ndarray::OwnedRepr<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>, ndarray::Dim<[usize; 2]>>, _tiles_per_pane_height: usize, _tiles_per_pane_width: usize) -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
     
     // Convert the ndarray into a Vec<Vec>
     let v: Vec<Vec<_>> = pane_nd_arr
