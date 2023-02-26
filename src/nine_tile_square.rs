@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use euclid::default::Box2D;
 use crate::constants::{RGB_BLACK,RGB_WHITE,RGB_RED,RGB_GREEN,RGB_BLUE};
 use crate::create_tile;
