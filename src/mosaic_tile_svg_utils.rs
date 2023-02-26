@@ -14,7 +14,7 @@ use svg::Document;
 
 
 
-pub fn combineData (data1:&Data, data2:&Data) -> Data {
+pub fn combine_data (data1:&Data, data2:&Data) -> Data {
     
     let commands: Vec<_> = data1.iter().chain(data2.iter()).cloned().collect();
     let concatenated_data = Data::from(commands);

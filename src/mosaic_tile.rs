@@ -104,7 +104,7 @@ impl MosaicTile {
 }
 
 /// helper function to generate a Point2D from a usize array (x,y)
-fn get_point2D(usize_arr: (usize, usize)) -> Point2D<i32> {
+fn get_point_2d(usize_arr: (usize, usize)) -> Point2D<i32> {
     let start_x: i32 = usize_arr.0.try_into().unwrap();
     let start_y: i32 = usize_arr.1.try_into().unwrap();
 
@@ -125,8 +125,8 @@ fn get_start_end_points(
 
     // Second start end points default to Point2D (FLAGGED, FLAGGED)
     // and remain so unless set otherwise in the FTFT and TFTF cases below
-    let mut start_point_two: Point2D<i32> = get_point2D((FLAGGED, FLAGGED));
-    let mut end_point_two: Point2D<i32> = get_point2D((FLAGGED, FLAGGED));
+    let mut start_point_two: Point2D<i32> = get_point_2d((FLAGGED, FLAGGED));
+    let mut end_point_two: Point2D<i32> = get_point_2d((FLAGGED, FLAGGED));
 
     let corners = &tile.corners();
 
@@ -142,8 +142,8 @@ fn get_start_end_points(
             println!("\nmatch -> false false false false - single tile");
             println!(" TOP RIGHT BOTTOM LEFT fully closed single tile\n");
 
-            start_point = get_point2D(corners[TOP_LEFT]);
-            end_point = get_point2D(corners[TOP_LEFT]);
+            start_point = get_point_2d(corners[TOP_LEFT]);
+            end_point = get_point_2d(corners[TOP_LEFT]);
 
             println! {"start point TOP_LEFT-> {:?} ", corners[TOP_LEFT]};
             println! {"end point TOP_LEFT-> {:?} ", corners[TOP_LEFT]};
@@ -156,8 +156,8 @@ fn get_start_end_points(
             println!("\nmatch -> true false false false - top open");
             println!(" BOTTOM LEFT RIGHT Closed - Top side open tile\n");
 
-            start_point = get_point2D(corners[TOP_RIGHT]);
-            end_point = get_point2D(corners[TOP_LEFT]);
+            start_point = get_point_2d(corners[TOP_RIGHT]);
+            end_point = get_point_2d(corners[TOP_LEFT]);
 
             println! {"start point TOP_RIGHT-> {:?} ", &start_point};
             println! {"end point TOP_LEFT-> {:?} ", &end_point};
@@ -168,8 +168,8 @@ fn get_start_end_points(
             println!("\nmatch -> false true false false - right open");
             println!(" TOP BOTTOM LEFT Closed - Right side open tile\n");
 
-            start_point = get_point2D(corners[BOT_RIGHT]);
-            end_point = get_point2D(corners[TOP_RIGHT]);
+            start_point = get_point_2d(corners[BOT_RIGHT]);
+            end_point = get_point_2d(corners[TOP_RIGHT]);
 
             println! {"start point BOT_RIGHT-> {:?} ", &start_point};
             println! {"end point TOP_RIGHT-> {:?} ", &end_point};
@@ -180,8 +180,8 @@ fn get_start_end_points(
             println!("\nmatch -> false false true false - bottom open");
             println!(" TOP/LEFT/RIGHT Closed - bottom side open tile\n");
 
-            start_point = get_point2D(corners[BOT_LEFT]);
-            end_point = get_point2D(corners[BOT_RIGHT]);
+            start_point = get_point_2d(corners[BOT_LEFT]);
+            end_point = get_point_2d(corners[BOT_RIGHT]);
             // update the current tile line end point
 
             println! {"start point BOT_LEFT-> {:?} ", &start_point};
@@ -194,8 +194,8 @@ fn get_start_end_points(
             println!("\nmatch -> false false false true - left open");
             println!(" TOP RIGHT BOTTOM Closed - Left side Open tile\n");
 
-            start_point = get_point2D(corners[TOP_LEFT]);
-            end_point = get_point2D(corners[BOT_LEFT]);
+            start_point = get_point_2d(corners[TOP_LEFT]);
+            end_point = get_point_2d(corners[BOT_LEFT]);
 
             println! {"start point TOP_LEFT-> {:?} ", &start_point};
             println! {"end point BOT_LEFT-> {:?} ", &end_point};
@@ -208,8 +208,8 @@ fn get_start_end_points(
             println!("\nmatch -> false false true true - bottom left open");
             println!(" TOP/RIGHT Closed - Bottom-Left side open tile\n");
 
-            start_point = get_point2D(corners[TOP_LEFT]);
-            end_point = get_point2D(corners[BOT_RIGHT]);
+            start_point = get_point_2d(corners[TOP_LEFT]);
+            end_point = get_point_2d(corners[BOT_RIGHT]);
             // update the current tile line end point
 
             println! {"start point TOP_LEFT-> {:?} ", &start_point};
@@ -221,8 +221,8 @@ fn get_start_end_points(
             println!("\nmatch -> true false false true - top/left open");
             println!(" BOTTOM RIGHT Closed - Top-Left side open tile\n");
 
-            start_point = get_point2D(corners[TOP_RIGHT]);
-            end_point = get_point2D(corners[BOT_LEFT]);
+            start_point = get_point_2d(corners[TOP_RIGHT]);
+            end_point = get_point_2d(corners[BOT_LEFT]);
 
             println! {"start point TOP_RIGHT-> {:?} ", &start_point};
             println! {"end point BOT_LEFT-> {:?} ", &end_point};
@@ -233,8 +233,8 @@ fn get_start_end_points(
             println!("\nmatch -> true true false false - top/right open");
             println!(" BOTTOM LEFT Closed - Top-Right side open tile\n");
 
-            start_point = get_point2D(corners[BOT_RIGHT]);
-            end_point = get_point2D(corners[TOP_LEFT]);
+            start_point = get_point_2d(corners[BOT_RIGHT]);
+            end_point = get_point_2d(corners[TOP_LEFT]);
 
             println! {"start point BOT_RIGHT-> {:?} ", &start_point};
             println! {"end point TOP_LEFT-> {:?} ", &end_point};
@@ -245,8 +245,8 @@ fn get_start_end_points(
             println!("\nmatch -> false true true false - right/bottom open");
             println!(" TOP LEFT Closed - Right-Bottom side open tile\n");
 
-            start_point = get_point2D(corners[BOT_LEFT]);
-            end_point = get_point2D(corners[TOP_RIGHT]);
+            start_point = get_point_2d(corners[BOT_LEFT]);
+            end_point = get_point_2d(corners[TOP_RIGHT]);
 
             println! {"start point BOT_LEFT-> {:?} ", &start_point};
             println! {"end point TOP_RIGHT-> {:?} ", &end_point};
@@ -264,15 +264,20 @@ fn get_start_end_points(
             println!(" TOP BOTTOM Closed - Left-Right side open tile\n");
             println!(" !!!!! Need to Deal with this!!!!!\n");
 
-            start_point = get_point2D(corners[TOP_LEFT]);
-            end_point = get_point2D(corners[TOP_RIGHT]);
-            start_point_two = get_point2D(corners[BOT_RIGHT]);
-            end_point_two = get_point2D(corners[BOT_LEFT]);
+            start_point = get_point_2d(corners[TOP_LEFT]);
+            end_point = get_point_2d(corners[TOP_RIGHT]);
+            // start_point_two = get_point_2d(corners[BOT_RIGHT]);
+            // end_point_two = get_point_2d(corners[BOT_LEFT]);
+            // changing this so the both start points are on left and both end points are on right
+            // Each start end needs to be evaluated on a case by case basis as direction 
+            // of drawn line depends on where in the mosiac this tile is encountered
+            start_point_two = get_point_2d(corners[BOT_LEFT]);
+            end_point_two = get_point_2d(corners[BOT_RIGHT]);
 
             println! {"1st line - start point TOP_LEFT-> {:?} ", &start_point};
             println! {"1st line - end point TOP_RIGHT-> {:?} ", &end_point};
-            println! {"2nd line - start point corners[BOT_RIGHT]-> {:?} ", corners[BOT_RIGHT]};
-            println! {"2nd line - end point corners[BOT_LEFT]-> {:?} ", corners[BOT_LEFT]};
+            println! {"2nd line - start point corners[BOT_LEFT]-> {:?} ", &start_point_two};
+            println! {"2nd line - end point corners[BOT_RIGHT]-> {:?} ", &end_point_two};
 
             // panic!();
         } // FTFT
@@ -283,15 +288,20 @@ fn get_start_end_points(
             println!(" LEFT RIGHT Closed - Left-Right side open tile\n");
             println!(" !!!!! Need to Deal with this!!!!!\n");
 
-            start_point = get_point2D(corners[BOT_LEFT]);
-            end_point = get_point2D(corners[TOP_LEFT]);
-            start_point_two = get_point2D(corners[TOP_RIGHT]);
-            end_point_two = get_point2D(corners[BOT_RIGHT]);
+            start_point = get_point_2d(corners[BOT_LEFT]);
+            end_point = get_point_2d(corners[TOP_LEFT]);
+            // start_point_two = get_point_2d(corners[TOP_RIGHT]);
+            // end_point_two = get_point_2d(corners[BOT_RIGHT]);
+            // changing this so the both start points are on bottom and both end points are on top
+            // Each start end needs to be evaluated on a case by case basis as direction 
+            // of drawn line depends on where in the mosiac this tile is encountered
+            start_point_two = get_point_2d(corners[BOT_RIGHT]);
+            end_point_two = get_point_2d(corners[TOP_RIGHT]);
 
             println! {"1st line - start point BOT_LEFT-> {:?} ", &start_point};
             println! {"1st line - end point TOP_LEFT-> {:?} ", &end_point};
-            println! {"2nd line - start point corners[TOP_RIGHT]-> {:?} ", corners[TOP_RIGHT]};
-            println! {"2nd line - end point corners[BOT_RIGHT]-> {:?} ", corners[BOT_RIGHT]};
+            println! {"2nd line - start point corners[BOT_RIGHT]-> {:?} ", &start_point_two};
+            println! {"2nd line - end point corners[TOP_RIGHT]-> {:?} ", &end_point_two};
 
             // panic!();
         } // TFTF
@@ -304,8 +314,8 @@ fn get_start_end_points(
             println!("\nmatch -> false true true true - right/left/bottom open");
             println!(" TOP Closed - Right-Left-Bottom side open tile\n");
 
-            start_point = get_point2D(corners[TOP_LEFT]);
-            end_point = get_point2D(corners[TOP_RIGHT]);
+            start_point = get_point_2d(corners[TOP_LEFT]);
+            end_point = get_point_2d(corners[TOP_RIGHT]);
 
             println! {"start point TOP_LEFT-> {:?} ", &start_point};
             println! {"end point TOP_RIGHT-> {:?} ", &end_point};
@@ -316,8 +326,8 @@ fn get_start_end_points(
             println!("\nmatch -> true false true true - top/bottom/left open");
             println!(" RIGHT Closed - Top-Bottom-Left side open tile\n");
 
-            start_point = get_point2D(corners[TOP_RIGHT]);
-            end_point = get_point2D(corners[BOT_RIGHT]);
+            start_point = get_point_2d(corners[TOP_RIGHT]);
+            end_point = get_point_2d(corners[BOT_RIGHT]);
 
             println! {"start point TOP_RIGHT-> {:?} ", &start_point};
             println! {"end point BOT_RIGHT-> {:?} ", &end_point};
@@ -328,8 +338,8 @@ fn get_start_end_points(
             println!("\nmatch -> true true false true - top/left/right open");
             println!(" BOTTOM Closed - Top-Left-Right side open tile\n");
 
-            start_point = get_point2D(corners[BOT_RIGHT]);
-            end_point = get_point2D(corners[BOT_LEFT]);
+            start_point = get_point_2d(corners[BOT_RIGHT]);
+            end_point = get_point_2d(corners[BOT_LEFT]);
 
             println! {"start point BOT_RIGHT-> {:?} ", &start_point};
             println! {"end point BOT_LEFT-> {:?} ", &end_point};
@@ -340,8 +350,8 @@ fn get_start_end_points(
             println!("\nmatch -> true true true false - top/right/bottom open");
             println!(" LEFT Closed - Top-Right-Bottom side open tile\n");
 
-            start_point = get_point2D(corners[BOT_LEFT]);
-            end_point = get_point2D(corners[TOP_LEFT]);
+            start_point = get_point_2d(corners[BOT_LEFT]);
+            end_point = get_point_2d(corners[TOP_LEFT]);
 
             println! {"start point BOT_LEFT-> {:?} ", &start_point};
             println! {"end point TOP_LEFT-> {:?} ", &end_point};
@@ -356,8 +366,8 @@ fn get_start_end_points(
             println!(" NO EDGES - Top-Right-Bottom-Left side open tile\n");
 
             // start and points don't matter as there are no edges so just setting to top right for defaul
-            start_point = get_point2D(corners[TOP_RIGHT]);
-            end_point = get_point2D(corners[TOP_RIGHT]);
+            start_point = get_point_2d(corners[TOP_RIGHT]);
+            end_point = get_point_2d(corners[TOP_RIGHT]);
 
             println! {"start point TOP_RIGHT-> {:?} ", &start_point};
             println! {"end point TOP_RIGHT-> {:?} ", &end_point};
