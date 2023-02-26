@@ -21,7 +21,7 @@ use crate::get_edge_bools;
 use crate::pane_to_2d_vec;
 use crate::{pane_vec_to_ndarray, get_bool_arr, box2d_to_points};
 
-use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combineData};
+use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combine_data};
 
 
 ///
@@ -289,7 +289,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
             // line_data = line_data.extend (cur_tile_svg_line_data);
 
-            line_data = combineData(&line_data,&cur_tile_svg_line_data );
+            line_data = combine_data(&line_data,&cur_tile_svg_line_data );
 
             if contig_group.len() == 1 {
                 println!("length of contig_group is 1 so there are no more tiles to process");
@@ -318,7 +318,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
                 let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point );
                 // line_data = line_data.extend (cur_tile_svg_line_data);
     
-                line_data = combineData(&line_data,&next_tile_svg_line_data );
+                line_data = combine_data(&line_data,&next_tile_svg_line_data );
     
                 more_tiles = false;
             }
@@ -393,13 +393,30 @@ fn find_next_tile(row: usize,
         {
             let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
 
+            // find the true match and set the new tile accordingly
+            let match_this_tftf = [Some(true), Some(false), Some(true), Some(false)];
+            let match_this_ftft = [Some(false), Some(true), Some(false), Some(true)];
+
+            let cur_tile_edge_bool = cur_tile.edge_bool.clone();
+            let tile_is_tftf :bool = match_edge_boolean_pattern(match_this_tftf, &cur_tile_edge_bool);
+            let tile_is_ftft :bool = match_edge_boolean_pattern(match_this_ftft, &cur_tile_edge_bool);
+
+            // this is where we need to add logic to handle finding next tile for
+            // FTFT and TFTF tiles
+            if tile_is_tftf == true {
+                println!("\nnext tile found is TFTF {:?}", &cur_tile);
+            } else if tile_is_ftft == true {
+                println!("\nnext tile found is FTFT {:?}", &cur_tile);
+            }
+
+
             if check_tile.start_point == cur_tile.end_point {
                 println!("Next Tile has been found");
                 if check_tile.start_point_two.x as usize != FLAGGED {
                      println!("This is double line tile FTFT or TFTF {:?}", &check_tile);
                 }
 
-                found == true;
+                found = true;
                 res = (contig_row,contig_col);
                 break;
             }
