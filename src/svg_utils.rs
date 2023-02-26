@@ -1,6 +1,6 @@
 use crate::mosaic_tile::{Tile, RGB, MosaicTile};
 use crate::dfs_tiles;
-use crate::constants::FLAGGED;
+use crate::constants::{FLAGGED, TOP, BOTTOM, LEFT, RIGHT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
 use euclid::default::{Box2D, Point2D};
@@ -14,6 +14,50 @@ use crate::pane_to_2d_vec;
 use crate::pane_vec_to_ndarray;
 
 use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combine_data};
+
+use num_traits::Zero;
+
+#[derive(PartialEq, Debug, Clone, Hash)]
+pub struct TileVisited{
+    pub edge_visited: Vec<bool>
+} 
+
+impl TileVisited {
+    pub fn new(edge_visited: Vec<bool>) -> TileVisited {
+        TileVisited { edge_visited }
+    }
+}
+
+impl Zero for TileVisited {
+    fn zero() -> Self {
+        TileVisited {
+            edge_visited: Vec::new(),
+        }
+    }
+
+    fn is_zero(&self) -> bool {
+        self.edge_visited.is_empty()
+    }
+}
+
+use std::ops::Add;
+impl Add for TileVisited {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        TileVisited {
+            // WARNING WARNING WARNING
+            //
+            // THIS ADD FUNCTION IS BORKED.
+            //
+            // JUST RETURNS THE FIRST ELEMENT
+            // This is here so that code compiles
+            edge_visited: self.edge_visited,
+        }
+    }
+}
+
+
 
 
 ///
@@ -221,6 +265,18 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
     let mut document = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
 
+    let mut visited_tiles: Array2<TileVisited> = create_visited_bool_arr(&pane_edge_nd_arr);
+
+    visited_tiles[[0,0]] = TileVisited::new(vec![true,true,true,true]);
+    // visited_tiles[[0,1]][0] = true;
+    visited_tiles[[0, 1]].edge_visited[TOP] = true;
+    visited_tiles[[0, 1]].edge_visited[BOTTOM] = true;
+    visited_tiles[[0, 2]].edge_visited[LEFT] = true;
+    visited_tiles[[0, 2]].edge_visited[RIGHT] = true;
+
+    // *visited_tiles.get_mut((0, 1))[0].unwrap() = true; // modify element at row 0, column 1
+    println!("Visited Tiles {:?} ", &visited_tiles);
+
     // Grab a collection of contigous tiles
     for contig_group in &contiguous_tiles{
 
@@ -342,6 +398,21 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
     svg::save(op_svg_file_name, &document)   
 
+}
+
+/// Create visited boolean array with each edge set to false
+fn create_visited_bool_arr(pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>> {
+    
+    let mut result = Array2::<TileVisited>::zeros((pane_edge_nd_arr.shape()[0], pane_edge_nd_arr.shape()[1]));
+        
+    for mut row in result.outer_iter_mut() {
+        for mut tile in row.iter_mut() {
+            *tile = TileVisited::new(vec![false, false, false, false]);
+        }
+    }
+    
+    result
+        
 }
 
 
