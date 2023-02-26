@@ -5,7 +5,6 @@ use crate::mosaic_tile::{RGB, rgb_vec_to_array};
 use crate::pane_build_utils::create_pane_test_data;
 use crate::svg_utils::create_svg;
 
-
 // This file holds functions to create various configurations for
 // a opposing line tiles mosaic made  of tiles in various colour configurations.
 // tile. So tiles with FTFT and TFTF configs
@@ -50,7 +49,7 @@ pub fn svg_1() {
     );
 } // svg1
 
-pub fn svg_98() {
+pub fn _svg_98() {
     let op_svg_file_name = "./svg_output/two_op_lines/output_98.svg";
     let rows: usize = 4;
     let cols: usize = 4;
@@ -89,7 +88,7 @@ pub fn svg_98() {
 
 
 
-pub fn svg_99() {
+pub fn _svg_99() {
     let op_svg_file_name = "./svg_output/two_op_lines/output_99.svg";
     let rows: usize = 3;
     let cols: usize = 3;

@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use euclid::default::Box2D;
 use crate::constants::RGB_GREEN;
 use crate::mosaic_tile::RGB;
