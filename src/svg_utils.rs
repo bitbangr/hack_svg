@@ -77,11 +77,11 @@ impl Add for TileVisited {
 ///   8) each tile has an associated array (T,R,B,L) that holds (T/F,T/F,T/F,T/F) corresponding to whether the adjacent tile is the same colour or not
 ///         a border is drawn for False Edges, A border is not dranw for True edges
 ///   9) Tiles are never rotated. Top edge cannot become Right edge etc.
-///  10) Tile borders are always drawn in clockwise fashion in the output SVG
+///  10.0) Interior Tile borders are always drawn in counter clockwise fzashion in the output SVG
 ///  11) SVG Lines(borders) are drawn for tile edges that are marked False. 
 ///  12) There are 16 possible configurations of borders (tile edges which have been marked false) for a Topbound(Northbound) tile ranging from none to all 4 edges being a border
 ///  13) A vector containing collections of contigous tiles has been returned by a Depth First Search Algorithm
-///  14) All completely interior tiles (i.e tiles with zero borders, all edges marked true) are to be removed from search collection as there are no lines to be drawn
+///  14) All completely interior tiles (i.e tiles with zero borders, all edges marked true) will be ignored. i.e. no drawing will take place for these
 /// 
 /// Drawing Process is
 /// 1. Pick a tile from a result from the DFS collection. 
@@ -106,7 +106,7 @@ impl Add for TileVisited {
 /// 4. Repeat steps 2 and 3 for all the results returned from depth first search.
 ///     4. once complete write the SVG document out to a file
 /// 
-/// The above is a good start for documentation of meth travel_contig_svg_refact()
+/// The above is a good start for documentation of function travel_contig_svg_refact()
 
 
 /// General helper function for used for testing
@@ -385,28 +385,28 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
         // as we don't know which point is the end of the path
         // modify this to check for FTFT || TFTF tiles -> if any visited edge end point (sp or ep) matches then we've completed travel
 
-            // // ----------------------------------------
-            // // ----------------------------------------
-            // if next_tile_clone.start_point_two.x as usize != FLAGGED {
-            //     println!("\n\t FTFT or TFTF -- check all corners to see if end match");
+            // ----------------------------------------
+            // ----------------------------------------
+            if next_tile_clone.start_point_two.x as usize != FLAGGED {
+                println!("\n\t FTFT or TFTF -- check all corners to see if end match");
 
-            //     // check to see if any of check_tile corners match start_tile.start_point;
-            //     let corners: [euclid::Point2D<i32, euclid::UnknownUnit>; 4] = next_tile_clone.tile.get_tile_corners();
-            //     let start_tile_start_point: &euclid::Point2D<i32, euclid::UnknownUnit> = &start_tile.start_point;
+                // check to see if any of check_tile corners match start_tile.start_point;
+                let corners: [euclid::Point2D<i32, euclid::UnknownUnit>; 4] = next_tile_clone.tile.get_tile_corners();
+                let start_tile_start_point: &euclid::Point2D<i32, euclid::UnknownUnit> = &start_tile.start_point;
                 
-            //     // find out if curtile endpoint is in corners 
-            //     // and which which corner it is [top_left, top_right, bottom_right, bottom_left] 
-            //     if let Some(idx) = corners.iter().position(|&corner| corner == *start_tile_start_point) {
-            //         println!("Found {:?} at index {}", start_tile_start_point, idx);
+                // find out if curtile endpoint is in corners 
+                // and which which corner it is [top_left, top_right, bottom_right, bottom_left] 
+                if let Some(idx) = corners.iter().position(|&corner| corner == *start_tile_start_point) {
+                    println!("Found {:?} at index {}", start_tile_start_point, idx);
                     
-            //         println!("FTFT TFTF -> Completed contigous tile group traversal");
-            //         println!("need to get_tile_svg_line_data with correct info here ");
-            //         more_tiles = false;
-            //     } else {
-            //         println!("{:?} Cur_tile_end_point not found in check_tile corners array", cur_tile_end_point);
-            //     }
+                    println!("FTFT TFTF -> Completed contigous tile group traversal");
+                    println!("need to get_tile_svg_line_data with correct info here ");
+                    more_tiles = false;
+                } else {
+                    println!("{:?} Cur_tile_end_point not found in check_tile corners array", cur_tile_end_point);
+                }
 
-            // } else 
+            } else 
             
             if next_tile_clone.end_point == start_tile.start_point { 
                 println!("Completed traversal of all tiles in contigous group");
