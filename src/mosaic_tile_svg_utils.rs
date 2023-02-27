@@ -2,8 +2,10 @@ use crate::mosaic_tile::MosaicTile;
 
 use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
+use crate::svg_utils::TileVisited;
 
 use euclid::default::Point2D;
+use ndarray::{ArrayBase, OwnedRepr};
 use svg::node::element::path::Data;
 
 pub fn combine_data (data1:&Data, data2:&Data) -> Data {
@@ -11,7 +13,7 @@ pub fn combine_data (data1:&Data, data2:&Data) -> Data {
     let commands: Vec<_> = data1.iter().chain(data2.iter()).cloned().collect();
     let concatenated_data = Data::from(commands);
 
-    println!("Combined data {:?} ", &concatenated_data);
+    println!("\nCombined data: \n\t{:?} ", &concatenated_data);
     concatenated_data
 }
 
@@ -28,8 +30,11 @@ pub fn combine_data (data1:&Data, data2:&Data) -> Data {
 /// to complete a path
 /// 
 
-// pub fn get_tile_svg_line_data_orig(m_tile:&MosaicTile ) -> Data {
-pub fn get_tile_svg_line_data(m_tile: &MosaicTile, curr_svg_line_end_point: &Point2D<i32>) -> Data {
+
+// pub fn get_tile_svg_line_data(m_tile: &MosaicTile, curr_svg_line_end_point: &Point2D<i32>) -> Data {
+pub fn get_tile_svg_line_data(m_tile: &MosaicTile, 
+                                curr_svg_line_end_point: &Point2D<i32>, 
+                                visited_tiles: &ArrayBase<OwnedRepr<TileVisited>, ndarray::Dim<[usize; 2]>>) -> Data {
     let mut line_data = Data::new();
     let edge_bool = m_tile.edge_bool.clone();
 
@@ -42,6 +47,9 @@ pub fn get_tile_svg_line_data(m_tile: &MosaicTile, curr_svg_line_end_point: &Poi
     let end_point = m_tile.end_point;
 
     let corner = &m_tile.tile.corners();
+
+    println!("\t*************************");
+    println!("\tfn get_tile_svg_line_data");
 
     match (top, right, bottom, left) {
 
@@ -88,8 +96,8 @@ pub fn get_tile_svg_line_data(m_tile: &MosaicTile, curr_svg_line_end_point: &Poi
                                  .line_to(corner[TOP_LEFT])
                                  .line_to(corner[TOP_RIGHT]);
 
-            println!{"start point BOT_LEFT-> {:?} ", &start_point}; 
-            println!{"end point TOP_LEFT-> {:?} ", &end_point}; 
+            println!{"start point BOT_RIGHT-> {:?} ", &start_point}; 
+            println!{"end point TOP_RIGHT-> {:?} ", &end_point}; 
 
             }, // FTFF
             // **********************************    
@@ -280,11 +288,6 @@ pub fn get_tile_svg_line_data(m_tile: &MosaicTile, curr_svg_line_end_point: &Poi
             },
 
         } // match
-
-
-
-
-
 
     line_data
 
