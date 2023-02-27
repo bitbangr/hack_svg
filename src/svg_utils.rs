@@ -259,23 +259,39 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
                             svg_width: usize, 
                             svg_height: usize) -> Result<(), std::io::Error> 
 {
-
     println!("\n***********\nfn travel_contig_svg_refact\n***********");
     println!("\nVector of contigous tiles -> {:?}", contiguous_tiles);
 
     let mut document = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
 
-    let mut visited_tiles: Array2<TileVisited> = create_visited_bool_arr(&pane_edge_nd_arr);
+    let shape = pane_edge_nd_arr.shape();
+    let mut visited_tiles: Array2<TileVisited> = create_visited_bool_arr(shape);
 
-    visited_tiles[[0,0]] = TileVisited::new(vec![true,true,true,true]);
-    // visited_tiles[[0,1]][0] = true;
-    visited_tiles[[0, 1]].edge_visited[TOP] = true;
-    visited_tiles[[0, 1]].edge_visited[BOTTOM] = true;
-    visited_tiles[[0, 2]].edge_visited[LEFT] = true;
-    visited_tiles[[0, 2]].edge_visited[RIGHT] = true;
+    // visited_tiles[[0,0]] = TileVisited::new(vec![true,true,true,true]);
+    // // visited_tiles[[0,1]][0] = true;
+    // visited_tiles[[0, 1]].edge_visited[TOP] = true;
+    // visited_tiles[[0, 1]].edge_visited[BOTTOM] = true;
+    // visited_tiles[[0, 2]].edge_visited[LEFT] = true;
+    // visited_tiles[[0, 2]].edge_visited[RIGHT] = true;
 
-    // *visited_tiles.get_mut((0, 1))[0].unwrap() = true; // modify element at row 0, column 1
-    println!("Visited Tiles {:?} ", &visited_tiles);
+    // // *visited_tiles.get_mut((0, 1))[0].unwrap() = true; // modify element at row 0, column 1
+    // println!("Visited Tiles {:?} ", &visited_tiles);
+
+    // let match_this_tttt = [Some(true), Some(true), Some(true), Some(true)];
+    // let match_this_ftft = [Some(false), Some(true), Some(false), Some(true)];
+
+    // let visited_tile_bool = visited_tiles[[0,0]].edge_visited.clone();
+    // let visited_tile_is_tttt :bool = match_edge_boolean_pattern(match_this_tttt, &visited_tile_bool);
+    // let visited_tile_is_ftft :bool = match_edge_boolean_pattern(match_this_ftft, &visited_tile_bool);
+
+    // // this is where we need to add logic to handle finding next tile for
+    // // FTFT and TFTF tiles
+    // if visited_tile_is_tttt == true {
+    //     println!("\nvisited_tile_edges are {:?}", &visited_tile_bool);
+    // }
+    // // } else if tile_is_ftft == true {
+    // //     println!("\nnext tile found is FTFT {:?}", &cur_tile);
+    // // }
 
     // Grab a collection of contigous tiles
     for contig_group in &contiguous_tiles{
@@ -311,10 +327,13 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
         while more_tiles {
 
-            println!("\n while more_tiles start_tile_idx -> {:?}" , &start_tile_idx);
-    
             let cur_tile  = &pane_edge_nd_arr[[row,col]]; 
-            println!("\n(row: {} col: {})\n  Cur Tile Info {:?} ",row, col, &cur_tile);
+            
+            println!("\n\n********** cur_tile INFO **********");
+            println!("(row: {} col: {})",row, col);
+            println!("\tbox co-ords {:?}", &cur_tile.tile.coords);
+            println!("\trgb {:?}", &cur_tile.tile.coords);
+            println!("\tedge_bool {:?}", &cur_tile.edge_bool);
 
             let corner = cur_tile.tile.corners();
             let cur_tile_start_point = cur_tile.start_point;
@@ -322,18 +341,21 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             let cur_tile_start_point_two = cur_tile.start_point_two;
             let cur_tile_end_point_two = cur_tile.end_point_two;
 
-            println!("\ntop left corner {:?}", corner[TOP_LEFT]);
-            println!("top right corner {:?}", corner[TOP_RIGHT]);
-            println!("bottom right corner {:?}", corner[BOT_RIGHT]);
-            println!("bottom left corner {:?}", corner[BOT_LEFT]);
-            println!("cur_tile_start_point: {:?}", cur_tile_start_point);
-            println!("cur_tile_end_point: {:?}\n", cur_tile_end_point);
-            println!("cur_tile_start_point_two: {:?}", cur_tile_start_point_two);
-            println!("cur_tile_end_point_two: {:?}\n\n", cur_tile_end_point_two);
+            println!("\n\ttop left corner {:?}", corner[TOP_LEFT]);
+            println!("\ttop right corner {:?}", corner[TOP_RIGHT]);
+            println!("\tbottom right corner {:?}", corner[BOT_RIGHT]);
+            println!("\tbottom left corner {:?}", corner[BOT_LEFT]);
+            println!("\tcur_tile_start_point: {:?}", cur_tile_start_point);
+            println!("\tcur_tile_end_point: {:?}\n", cur_tile_end_point);
+            println!("\tcur_tile_start_point_two: {:?}", cur_tile_start_point_two);
+            println!("\tcur_tile_end_point_two: {:?}\n\n", cur_tile_end_point_two);
 
             // add the current tile data to the line data
             // need to pass the curr_svg_line_end_point so that we can check TFTF and FTFT which lines to draw.
-            let cur_tile_svg_line_data = get_tile_svg_line_data(&cur_tile,&curr_svg_line_end_point);
+            // let cur_tile_svg_line_data = get_tile_svg_line_data(&cur_tile,&curr_svg_line_end_point);
+            let cur_tile_svg_line_data = get_tile_svg_line_data(&cur_tile,&curr_svg_line_end_point,&visited_tiles);
+
+            // visited_tiles[[row,col]] = TileVisited::new(vec![true,true,true,true]);
 
             // line_data = line_data.extend (cur_tile_svg_line_data);
 
@@ -359,11 +381,39 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             let next_tile_clone = pane_edge_nd_arr[[found_tile_row,found_tile_col]].clone(); 
             println!("Next Tile using Tile mosaic_tile::Tile struct {:?} ", &next_tile_clone);
 
-            if next_tile_clone.end_point == start_tile.start_point {
+        // TODO the below if ep = sp check does not work for FTFT or TFTF next_tile_clone tiles
+        // as we don't know which point is the end of the path
+        // modify this to check for FTFT || TFTF tiles -> if any visited edge end point (sp or ep) matches then we've completed travel
+
+            // // ----------------------------------------
+            // // ----------------------------------------
+            // if next_tile_clone.start_point_two.x as usize != FLAGGED {
+            //     println!("\n\t FTFT or TFTF -- check all corners to see if end match");
+
+            //     // check to see if any of check_tile corners match start_tile.start_point;
+            //     let corners: [euclid::Point2D<i32, euclid::UnknownUnit>; 4] = next_tile_clone.tile.get_tile_corners();
+            //     let start_tile_start_point: &euclid::Point2D<i32, euclid::UnknownUnit> = &start_tile.start_point;
+                
+            //     // find out if curtile endpoint is in corners 
+            //     // and which which corner it is [top_left, top_right, bottom_right, bottom_left] 
+            //     if let Some(idx) = corners.iter().position(|&corner| corner == *start_tile_start_point) {
+            //         println!("Found {:?} at index {}", start_tile_start_point, idx);
+                    
+            //         println!("FTFT TFTF -> Completed contigous tile group traversal");
+            //         println!("need to get_tile_svg_line_data with correct info here ");
+            //         more_tiles = false;
+            //     } else {
+            //         println!("{:?} Cur_tile_end_point not found in check_tile corners array", cur_tile_end_point);
+            //     }
+
+            // } else 
+            
+            if next_tile_clone.end_point == start_tile.start_point { 
                 println!("Completed traversal of all tiles in contigous group");
 
                 // add the last tile data to the data 
-                let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point );
+                // let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point );
+                let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &visited_tiles );
                 // line_data = line_data.extend (cur_tile_svg_line_data);
     
                 line_data = combine_data(&line_data,&next_tile_svg_line_data );
@@ -371,11 +421,11 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
                 more_tiles = false;
             }
             else {
-                println!("Still looking for more tiles in contigous group");
+                println!("next_tile end_point != start_tile start_point\n Continue processing contigous group tiles");
                 more_tiles = true;
             }
 
-             // TODO now (fix the find yourself in the the find_next_tile_simple)
+             // TODO now (fix the find yourself in the the find_next_tile)
 
         } // while more_tiles == true
 
@@ -400,10 +450,12 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
 
 }
 
-/// Create visited boolean array with each edge set to false
-fn create_visited_bool_arr(pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>> {
+/// Create visited boolean array with each edge set to false 
+/// shape[0] is rows
+/// shape[1] is cols
+fn create_visited_bool_arr(shape: &[usize]) -> ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>> {
     
-    let mut result = Array2::<TileVisited>::zeros((pane_edge_nd_arr.shape()[0], pane_edge_nd_arr.shape()[1]));
+    let mut result = Array2::<TileVisited>::zeros((shape[0], shape[1]));
         
     for mut row in result.outer_iter_mut() {
         for mut tile in row.iter_mut() {
@@ -412,7 +464,6 @@ fn create_visited_bool_arr(pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, D
     }
     
     result
-        
 }
 
 
@@ -432,9 +483,10 @@ fn find_next_tile(row: usize,
     // pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> MosaicTile 
 {
 
-    println!("\n***********\nfn find_next_tile_simple\n***********");
-
-    println!( "row {}\ncol {}\ncontig_group {:?}\ncur_tile {:?}\n\n", row, col, contig_group, cur_tile ); 
+    println!("\n******************\nfn find_next_tile\n******************");
+    println!( "row {}\ncol {}\ncontig_group {:?}\ncur_tile {:?}", row, col, contig_group, cur_tile ); 
+    println!("******************************************");
+    println!("******************************************\n");
 
     let mut contig_row: usize;
     let mut contig_col: usize;
@@ -454,6 +506,7 @@ fn find_next_tile(row: usize,
         // don't check for ourselves
         if !((contig_row == row) && (contig_col == col))
         {
+
             let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
 
             // find the true match and set the new tile accordingly
@@ -467,35 +520,67 @@ fn find_next_tile(row: usize,
             // this is where we need to add logic to handle finding next tile for
             // FTFT and TFTF tiles
             if tile_is_tftf == true {
-                println!("\nnext tile found is TFTF {:?}", &cur_tile);
+                println!("\nCurrent tile is TFTF\n\n {:?}\n", &cur_tile);
             } else if tile_is_ftft == true {
-                println!("\nnext tile found is FTFT {:?}", &cur_tile);
+                println!("\nCurrent tile is FTFT\n\n {:?}\n", &cur_tile);
             }
 
-
             if check_tile.start_point == cur_tile.end_point {
-                println!("Next Tile has been found");
+                println!("Next Tile Found\ncheck_tile.start_point == cur_tile.end_point");
+
+                println!("Next Tile: \n {:?}", &check_tile);
+
                 if check_tile.start_point_two.x as usize != FLAGGED {
-                     println!("This is double line tile FTFT or TFTF {:?}", &check_tile);
+                     println!("\n\tThis is a double line tile FTFT or TFTF");
                 }
 
                 found = true;
                 res = (contig_row,contig_col);
                 break;
+            } else {
+                println!("\n[{},{}]check_tile.start_point Does not match cur_tile.end_point", &contig_row, &contig_col);
+                if check_tile.start_point_two.x as usize != FLAGGED {
+                    println!("\n\tThis is double line tile FTFT or TFTF \n\n{:?} \n", &check_tile);
+
+                    // check to see if any of check_tile corners match cur_tile.end_point 
+                    let corners: [euclid::Point2D<i32, euclid::UnknownUnit>; 4] = check_tile.tile.get_tile_corners();
+                    let cur_tile_end_point: &euclid::Point2D<i32, euclid::UnknownUnit> = &cur_tile.end_point;
+
+                    // if corners.contains(cur_tile_end_point) {
+                    //     println!("cur_tile_end_point is in corners array");
+                    // } else {
+                    //     println!("cur_tile_end_point is not in corners array");
+                    // }
+
+                    // find out if curtile endpoint is in corners 
+                    // and which which corner it is [top_left, top_right, bottom_right, bottom_left] 
+                    if let Some(idx) = corners.iter().position(|&corner| corner == *cur_tile_end_point) {
+                        println!("Found {:?} at index {}", cur_tile_end_point, idx);
+
+                        found = true;
+                        res = (contig_row,contig_col);
+                        break;
+        
+                    } else {
+                        println!("{:?} Cur_tile_end_point not found in check_tile corners array", cur_tile_end_point);
+                    }
+
+               }
+
             }
         } else {
-            println!("We found ourselves");
+            println!("...self...");
         } 
     
     }
 
     // set up the new tile according to whichever match this came back true
     // pane_edge_nd_arr[[contig_row,contig_col]].clone()
-    println!("fn find_next_tile_simple return {:?}", &res);
+    println!("fn find_next_tile return {:?}\n**********\n ", &res);
 
     res
 
-} // find_next_tile_simple
+} // find_next_tile
 
 
 /// This function takes two array arguments, pane_nd_arr and edge_booleans, each of which has a shape of [usize; 2]. 
@@ -572,6 +657,6 @@ fn match_edge_boolean_pattern(match_this: [Option<bool>; 4], tile_edge_bool: &[b
             }
         }
 
-    println!("match_edge_boolean_pattern result {:?}" , &res);        
+    // println!("match_edge_bool: {:?} result: {:?}" ,&match_this, &res);        
     res
 }
