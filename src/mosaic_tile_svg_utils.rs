@@ -302,7 +302,45 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             println!{"2nd line - start point corners[TOP_RIGHT]-> {:?} ", corner[TOP_RIGHT]}; 
             println!{"2nd line - end point corners[BOT_RIGHT]-> {:?} ", corner[BOT_RIGHT]};  
 
-            panic!();   
+                // ***** TODO BELOW 
+            // TODO use bpoints instead of m_tile.start_point m_tile_end_point 
+
+            if *curr_svg_line_end_point == m_tile.start_point 
+            {
+                line_data = line_data.line_to(corner[TOP_LEFT]);
+
+                // set the last point for return
+                svg_end_point = corner[TOP_LEFT];
+
+                // Set TOP BOTTOM and LEFT as VISITED
+                // RIGHT will default to whatever it was so will remain FALSE if first time through
+                visited_tiles[[row, col]].edge_visited[TOP] = true;
+                visited_tiles[[row, col]].edge_visited[LEFT] = true;
+                visited_tiles[[row, col]].edge_visited[BOTTOM] = true;
+
+                println!("curr_svg_line_end_point = m_tile.start_point");
+
+            } //bottom
+            else if *curr_svg_line_end_point == m_tile.start_point_two 
+            {
+                line_data = line_data.line_to(corner[BOT_RIGHT]);
+
+                // set the last point for return
+                svg_end_point = corner[BOT_RIGHT];
+
+                // Set TOP BOTTOM and RIGHT as VISITED
+                // TOP will default to whatever it was so will remain FALSE if first time through
+                visited_tiles[[row, col]].edge_visited[TOP] = true;
+                visited_tiles[[row, col]].edge_visited[RIGHT] = true;
+                visited_tiles[[row, col]].edge_visited[BOTTOM] = true;
+
+                println!("curr_svg_line_end_point = m_tile.start_point_two");
+
+            }
+            else {
+                println!("We should never get here!!!");
+                panic!();                
+            }
 
         }, // TFTF
         // **********************************  
