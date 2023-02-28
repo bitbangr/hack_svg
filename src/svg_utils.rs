@@ -103,7 +103,7 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
 
 
     // get the test boolean array to build our svg path with
-    let mut edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
+    let edge_booleans : ndarray::ArrayBase<ndarray::OwnedRepr<Vec<bool>>, ndarray::Dim<[usize; 2]>> = get_edge_bools(&pane_nd_arr);
 
     println!("edge_booleans = {:?}" , &edge_booleans);
 
@@ -223,6 +223,10 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                                                                     row,
                                                                     col);
 
+            // update the curr_svg_line_end_point to the last svg line position
+            curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32, );
+
+
             // display the visited_tiles.  Each edge should be marked true unless it is FTFT or TFTF tile
             println!(" ->Visited tile [{},{}] {:?} ", &row, &col, &visited_tiles[[row,col]]);
 
@@ -262,7 +266,9 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
             // ----------------------------------------
             // ----------------------------------------
-            let tile_prev_visited = visited_tiles[[row,col]].visited();
+            // may come back to use _tile_prev_visited as part of overall check
+            let _tile_prev_visited = visited_tiles[[row,col]].visited();
+
             if next_tile_clone.is_ftft() 
             {
                 println!("\t is_ftft() true "); 
@@ -291,6 +297,10 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                                                                                      &mut visited_tiles, 
                                                                                      row,
                                                                                      col );
+
+                            // update the curr_svg_line_end_point to the last svg line position
+                            curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32, );
+
                             // call from above 
                             // let cur_tile_svg_line_data = get_ext_tile_svg_line_data(&cur_tile,
                             //                                                         &curr_svg_line_end_point, // CHECK Called with end point
@@ -346,6 +356,10 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                 // let next_tile_svg_line_data = get_ext_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &mut visited_tiles, row, col );
                 
             let (next_tile_svg_line_data, svg_line_end_point) = get_ext_tile_svg_line_data(&next_tile_clone, &curr_svg_line_end_point, &mut visited_tiles, row, col );
+            
+                // update the curr_svg_line_end_point to the last svg line position
+                curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32  );
+
                 line_data = combine_data(&line_data,&next_tile_svg_line_data );
     
                 more_tiles = false;
@@ -408,8 +422,7 @@ fn find_next_tile_ext(curtile_row: usize,
 
     let mut contig_row: usize;
     let mut contig_col: usize;
-    let mut found:bool = false;
-
+    
     // a bad way to program but if this routine completes and a next tile has not 
     // been found then return (FLAGGED,FLAGGED) where pub const FLAGGED: usize = 987659; 
     // which will be the signal to panic
@@ -459,7 +472,6 @@ fn find_next_tile_ext(curtile_row: usize,
                      println!("\n\tThis is a double line tile FTFT or TFTF");
                 }
 
-                found = true;
                 res = (contig_row,contig_col);
                 break;
             } else {
@@ -483,7 +495,6 @@ fn find_next_tile_ext(curtile_row: usize,
                     if let Some(idx) = corners.iter().position(|&corner| corner == *cur_tile_end_point) {
                         println!("Found {:?} at index {}", cur_tile_end_point, idx);
 
-                        found = true;
                         res = (contig_row,contig_col);
                         break;
         
@@ -559,7 +570,7 @@ fn create_visited_bool_arr(shape: &[usize]) -> ArrayBase<OwnedRepr<TileVisited>,
     let mut result = Array2::<TileVisited>::zeros((shape[0], shape[1]));
         
     for mut row in result.outer_iter_mut() {
-        for mut tile in row.iter_mut() {
+        for tile in row.iter_mut() {
             *tile = TileVisited::new(vec![false, false, false, false]);
         }
     }
@@ -677,7 +688,7 @@ use std::ops::Add;
 impl Add for TileVisited {
     type Output = Self;
 
-    fn add(self, other: Self) -> Self {
+    fn add(self, _other: Self) -> Self {
         TileVisited {
             // WARNING WARNING WARNING
             //
@@ -783,7 +794,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
     let shape = pane_edge_nd_arr.shape();
     let mut visited_tiles: Array2<TileVisited> = create_visited_bool_arr(shape);
 
-    // visited_tiles[[0,0]] = TileVisited::new(vec![true,true,true,true]);
+    visited_tiles[[0,0]] = TileVisited::new(vec![true,true,true,true]);
     // // visited_tiles[[0,1]][0] = true;
     // visited_tiles[[0, 1]].edge_visited[TOP] = true;
     // visited_tiles[[0, 1]].edge_visited[BOTTOM] = true;
@@ -988,7 +999,6 @@ fn find_next_tile(row: usize,
 
     let mut contig_row: usize;
     let mut contig_col: usize;
-    let mut found:bool = false;
 
     // a bad way to program but if this routine completes and a next tile has not 
     // been found then return (FLAGGED,FLAGGED) where pub const FLAGGED: usize = 987659; 
@@ -1032,7 +1042,6 @@ fn find_next_tile(row: usize,
                      println!("\n\tThis is a double line tile FTFT or TFTF");
                 }
 
-                found = true;
                 res = (contig_row,contig_col);
                 break;
             } else {
@@ -1055,7 +1064,6 @@ fn find_next_tile(row: usize,
                     if let Some(idx) = corners.iter().position(|&corner| corner == *cur_tile_end_point) {
                         println!("Found {:?} at index {}", cur_tile_end_point, idx);
 
-                        found = true;
                         res = (contig_row,contig_col);
                         break;
         
