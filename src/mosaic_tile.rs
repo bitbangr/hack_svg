@@ -133,8 +133,8 @@ fn get_start_end_points(
     let bottom = edge_bool[BOTTOM];
     let left = edge_bool[LEFT];
 
-    let mut start_point: Point2D<i32> = Point2D::new(0, 0);
-    let mut end_point: Point2D<i32> = Point2D::new(0, 0);
+    let start_point: Point2D<i32>; // = Point2D::new(0, 0);
+    let end_point: Point2D<i32>; // = Point2D::new(0, 0);
 
     // Second start end points default to Point2D (FLAGGED, FLAGGED)
     // and remain so unless set otherwise in the FTFT and TFTF cases below
@@ -384,10 +384,6 @@ fn get_start_end_points(
             println! {"start point TOP_RIGHT-> {:?} ", &start_point};
             println! {"end point TOP_RIGHT-> {:?} ", &end_point};
         } // TTTT
-        _ => {
-            println!("The EDGE Boolean does not match any of the options\n");
-            panic!();
-        }
     } // match
 
     println!("\n----------------------- ");
@@ -412,20 +408,20 @@ impl MosaicTile {
 
     }
 
-    pub fn set_start_point(&mut self, start_point: &Point2D<i32>) {
+    pub fn _set_start_point(&mut self, start_point: &Point2D<i32>) {
         self.start_point = *start_point;
     }
 
-    pub fn set_end_point(&mut self, end_point: &Point2D<i32>) {
+    pub fn _set_end_point(&mut self, end_point: &Point2D<i32>) {
         self.end_point = *end_point;
     }
 
-    pub fn set_start_end_point(&mut self, start_point: &Point2D<i32>, end_point: &Point2D<i32>) {
+    pub fn _set_start_end_point(&mut self, start_point: &Point2D<i32>, end_point: &Point2D<i32>) {
         self.start_point = *start_point;
         self.end_point = *end_point;
     }
 
-    pub fn set_start_end_points_to_zero(&mut self) {
+    pub fn _set_start_end_points_to_zero(&mut self) {
         self.start_point = Point2D::new(0, 0);
         self.end_point = Point2D::new(0, 0);
     }
@@ -468,7 +464,7 @@ use std::ops::Add;
 impl Add for MosaicTile {
     type Output = Self;
 
-    fn add(self, other: Self) -> Self {
+    fn add(self, _other: Self) -> Self {
         MosaicTile {
             // WARNING WARNING WARNING
             //
@@ -501,7 +497,7 @@ impl Tile {
         Tile { coords, rgb }
     }
 
-    pub fn new_withpoints(
+    pub fn _new_withpoints(
         top_left: (i32, i32),
         bot_right: (i32, i32),
         rgb_val: (u8, u8, u8),
@@ -516,7 +512,7 @@ impl Tile {
         Tile { coords, rgb }
     }
 
-    pub fn as_tuple(&self) -> (Box2D<i32>, RGB) {
+    pub fn _as_tuple(&self) -> (Box2D<i32>, RGB) {
         (self.coords, self.rgb)
     }
 
@@ -536,7 +532,7 @@ impl Tile {
         [top_left, top_right, bottom_right, bottom_left]
     }
 
-    pub fn top_left(&self) -> (usize, usize) {
+    pub fn _top_left(&self) -> (usize, usize) {
         let x0 = self.coords.min.x.try_into().unwrap();
         let y0 = self.coords.min.y.try_into().unwrap();
         // let x1 = self.coords.max.x.try_into().unwrap();
@@ -544,7 +540,7 @@ impl Tile {
         (x0, y0)
     }
 
-    pub fn top_right(&self) -> (usize, usize) {
+    pub fn _top_right(&self) -> (usize, usize) {
         // let x0 = self.coords.min.x.try_into().unwrap();
         let y0 = self.coords.min.y.try_into().unwrap();
         let x1 = self.coords.max.x.try_into().unwrap();
@@ -552,7 +548,7 @@ impl Tile {
         (x1, y0)
     }
 
-    pub fn bot_right(&self) -> (usize, usize) {
+    pub fn _bot_right(&self) -> (usize, usize) {
         // let x0 = self.coords.min.x.try_into().unwrap();
         // let y0 = self.coords.min.y.try_into().unwrap();
         let x1 = self.coords.max.x.try_into().unwrap();
@@ -560,7 +556,7 @@ impl Tile {
         (x1, y1)
     }
 
-    pub fn bot_left(&self) -> (usize, usize) {
+    pub fn _bot_left(&self) -> (usize, usize) {
         let x0 = self.coords.min.x.try_into().unwrap();
         // let y0 = self.coords.min.y.try_into().unwrap();
         // let x1 = self.coords.max.x.try_into().unwrap();
