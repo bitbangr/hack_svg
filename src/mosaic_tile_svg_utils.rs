@@ -22,8 +22,10 @@ use svg::node::element::path::Data;
 pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile, 
                                 curr_svg_line_end_point: &Point2D<i32>, 
                                 visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>,
-                                row: usize, col: usize) -> Data {
+                                row: usize, col: usize) -> (Data, (usize,usize)) {
     let mut line_data = Data::new();
+
+    let mut svg_end_point: (usize,usize) = (0,0).try_into().unwrap(); 
     let edge_bool = m_tile.edge_bool.clone();
 
     let top = edge_bool[TOP];
@@ -109,6 +111,8 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             println!{"start point BOT_RIGHT-> {:?} ", &start_point}; 
             println!{"end point TOP_RIGHT-> {:?} ", &end_point};
 
+            // test to see if this is changed in svg utils
+            // curr_svg_line_end_point = end_point.clone();
  
             }, // FTFF
             // **********************************    
@@ -227,8 +231,8 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                 visited_tiles[[row, col]].edge_visited[LEFT] = true;
 
             } //bottom
-            // else if *curr_svg_line_end_point == m_tile.start_point_two // Not sure why this is - REVIEW REVIEW REVIEW
-            else if *curr_svg_line_end_point == m_tile.end_point_two // Not sure why this is - REVIEW REVIEW REVIEW
+            else if *curr_svg_line_end_point == m_tile.start_point_two // Not sure why this is - REVIEW REVIEW REVIEW
+            // else if *curr_svg_line_end_point == m_tile.end_point_two // Not sure why this is - REVIEW REVIEW REVIEW
             {
                 line_data = line_data.line_to(corner[BOT_LEFT]);
 
@@ -253,7 +257,7 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
         // **********************************    
         (true, false, true, false) => { //TFTF
             println!("\nmatch -> true false true false - top/bottom open");
-            println!(" LEFT RIGHT Closed - Left-Right side open tile\n");
+            println!(" LEFT RIGHT Closed - Top-Bottom side open tile\n");
             println!(" !!!!! Need to Deal with this!!!!!\n");
 
             println!{"1st line - start point BOT_LEFT-> {:?} ", &start_point}; 
@@ -349,7 +353,7 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
 
         } // match
 
-    line_data
+    ( line_data, svg_end_point)
 
 } // get_ext_tile_svg_line_data
 
@@ -446,7 +450,6 @@ pub fn get_tile_svg_line_data(m_tile: &MosaicTile,
 
             println!{"start point BOT_RIGHT-> {:?} ", &start_point}; 
             println!{"end point TOP_RIGHT-> {:?} ", &end_point}; 
-
             }, // FTFF
             // **********************************    
         (false, false, true, false) => { //FFTF
@@ -556,7 +559,7 @@ pub fn get_tile_svg_line_data(m_tile: &MosaicTile,
         // **********************************    
         (true, false, true, false) => { //TFTF
             println!("\nmatch -> true false true false - top/bottom open");
-            println!(" LEFT RIGHT Closed - Left-Right side open tile\n");
+            println!(" LEFT RIGHT Closed - Top-Bottom side open tile\n");
             println!(" !!!!! Need to Deal with this!!!!!\n");
 
             println!{"1st line - start point BOT_LEFT-> {:?} ", &start_point}; 
