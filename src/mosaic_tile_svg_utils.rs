@@ -1,6 +1,6 @@
 use crate::mosaic_tile::MosaicTile;
 
-use crate::constants::{TOP,RIGHT,BOTTOM, LEFT};
+use crate::constants::{TOP,RIGHT,BOTTOM, LEFT, FLAGGED};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 use crate::svg_utils::TileVisited;
 
@@ -25,7 +25,7 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                                 row: usize, col: usize) -> (Data, (usize,usize)) {
     let mut line_data = Data::new();
 
-    let mut svg_end_point: (usize,usize) = (0,0).try_into().unwrap(); 
+    let svg_end_point: (usize,usize); 
     let edge_bool = m_tile.edge_bool.clone();
 
     let top = edge_bool[TOP];
@@ -74,6 +74,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                                  .line_to(corner[BOT_LEFT])
                                  .line_to(corner[TOP_LEFT]);
 
+            // set the last point for return
+            svg_end_point = corner[TOP_LEFT];
+
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
 
@@ -89,11 +92,14 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                                  .line_to(corner[BOT_LEFT])
                                  .line_to(corner[TOP_LEFT]);
 
-            println!{"start point TOP_RIGHT-> {:?} ", &start_point}; 
-            println!{"end point TOP_LEFT-> {:?} ", &end_point};     
+            // set the last point for return
+            svg_end_point = corner[TOP_LEFT];
 
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
+
+            println!{"start point TOP_RIGHT-> {:?} ", &start_point}; 
+            println!{"end point TOP_LEFT-> {:?} ", &end_point};     
 
             }, // TFFF
             // **********************************    
@@ -104,6 +110,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             line_data = line_data.line_to(corner[BOT_LEFT])
                                  .line_to(corner[TOP_LEFT])
                                  .line_to(corner[TOP_RIGHT]);
+
+            // set the last point for return
+            svg_end_point = corner[TOP_RIGHT];
 
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
@@ -124,6 +133,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                                   .line_to(corner[TOP_RIGHT])
                                   .line_to(corner[BOT_RIGHT]);
 
+            // set the last point for return
+            svg_end_point = corner[BOT_RIGHT];
+
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
 
@@ -139,6 +151,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             line_data = line_data.line_to(corner[TOP_RIGHT])
             .line_to(corner[BOT_RIGHT])
             .line_to(corner[BOT_LEFT]);
+
+            // set the last point for return
+            svg_end_point = corner[BOT_LEFT];
 
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
@@ -156,6 +171,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             line_data = line_data.line_to(corner[TOP_RIGHT])
                                  .line_to(corner[BOT_RIGHT]);
 
+            // set the last point for return
+            svg_end_point = corner[BOT_RIGHT];
+
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
 
@@ -169,6 +187,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
 
             line_data = line_data.line_to(corner[BOT_RIGHT])
                                  .line_to(corner[BOT_LEFT]);
+
+            // set the last point for return
+            svg_end_point = corner[BOT_LEFT];
 
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
@@ -184,6 +205,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             line_data = line_data.line_to(corner[BOT_LEFT])
                                  .line_to(corner[TOP_LEFT]);
 
+            // set the last point for return
+            svg_end_point = corner[TOP_LEFT];
+
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
 
@@ -198,6 +222,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
 
             line_data = line_data.line_to(corner[TOP_LEFT])
                                  .line_to(corner[TOP_RIGHT]);
+
+            // set the last point for return
+            svg_end_point = corner[TOP_RIGHT];
 
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
@@ -224,6 +251,10 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             if *curr_svg_line_end_point == m_tile.start_point 
             {
                 line_data = line_data.line_to(corner[TOP_RIGHT]);
+
+                // set the last point for return
+                svg_end_point = corner[TOP_RIGHT];
+
                 // Set TOP RIGHT and LEFT as VISITED
                 // BOTTOM will default to whatever it was so will remain FALSE if first time through
                 visited_tiles[[row, col]].edge_visited[TOP] = true;
@@ -235,6 +266,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             // else if *curr_svg_line_end_point == m_tile.end_point_two // Not sure why this is - REVIEW REVIEW REVIEW
             {
                 line_data = line_data.line_to(corner[BOT_LEFT]);
+
+                // set the last point for return
+                svg_end_point = corner[BOT_LEFT];
 
                 // Set BOTTOM RIGHT and LEFT as VISITED
                 // TOP will default to whatever it was so will remain FALSE if first time through
@@ -278,6 +312,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
 
             line_data = line_data.line_to(corner[TOP_RIGHT]);
 
+            // set the last point for return
+            svg_end_point = corner[TOP_RIGHT];
+
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
 
@@ -291,6 +328,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             println!(" RIGHT Closed - Top-Bottom-Left side open tile\n");
 
             line_data = line_data.line_to(corner[BOT_RIGHT]);
+
+            // set the last point for return
+            svg_end_point = corner[BOT_RIGHT];
 
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
@@ -306,6 +346,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
 
             line_data = line_data.line_to(corner[BOT_LEFT]);
 
+            // set the last point for return
+            svg_end_point = corner[BOT_LEFT];
+
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
 
@@ -319,6 +362,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             println!(" LEFT Closed - Top-Right-Bottom side open tile\n");
 
             line_data = line_data.line_to(corner[TOP_LEFT]);
+
+            // set the last point for return
+            svg_end_point = corner[TOP_LEFT];
 
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
@@ -342,14 +388,13 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             println!{"start point TOP_RIGHT-> {:?} ", &start_point}; 
             println!{"end point TOP_RIGHT-> {:?} ", &end_point};     
 
+            // set the last point for return
+            svg_end_point = (FLAGGED, FLAGGED);  // no end point so flag this 
+
             // set all the visited edges to true
             visited_tiles[[row, col]].set_all_visited_edges_true(); 
 
         }, // TTTT
-            _ => {
-                println!("The EDGE Boolean does not match any of the options\n");  
-                panic!();
-            },
 
         } // match
 
@@ -386,7 +431,7 @@ pub fn combine_data (data1:&Data, data2:&Data) -> Data {
 /// 
 pub fn get_tile_svg_line_data(m_tile: &MosaicTile, 
                                 curr_svg_line_end_point: &Point2D<i32>, 
-                                visited_tiles: &ArrayBase<OwnedRepr<TileVisited>, ndarray::Dim<[usize; 2]>>) -> Data {
+                                _visited_tiles: &ArrayBase<OwnedRepr<TileVisited>, ndarray::Dim<[usize; 2]>>) -> Data {
     let mut line_data = Data::new();
     let edge_bool = m_tile.edge_bool.clone();
 
@@ -632,11 +677,7 @@ pub fn get_tile_svg_line_data(m_tile: &MosaicTile,
             println!{"start point TOP_RIGHT-> {:?} ", &start_point}; 
             println!{"end point TOP_RIGHT-> {:?} ", &end_point};     
 
-        }, // TTTT
-            _ => {
-                println!("The EDGE Boolean does not match any of the options\n");  
-                panic!();
-            },
+        },
 
         } // match
 
