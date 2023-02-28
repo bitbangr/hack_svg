@@ -13,13 +13,9 @@ use crate::get_edge_bools;
 use crate::pane_to_2d_vec;
 use crate::pane_vec_to_ndarray;
 
-use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combine_data};
+use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combine_data, get_ext_tile_svg_line_data};
 
 use num_traits::Zero;
-
-
-
-
 
 ///
 /// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
@@ -140,10 +136,8 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
     
 }
 
-
-
-//****************************** */
-//****************************** */
+// ****************************** */
+// ****************************** */
 
 fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>, 
                             contiguous_tiles: Vec<Vec<(isize, isize)>>, 
@@ -244,12 +238,13 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
             // add the current tile data to the line data
             // need to pass the curr_svg_line_end_point so that we can check TFTF and FTFT which lines to draw.
-            // let cur_tile_svg_line_data = get_tile_svg_line_data(&cur_tile,&curr_svg_line_end_point);
-            let cur_tile_svg_line_data = get_tile_svg_line_data(&cur_tile,&curr_svg_line_end_point,&visited_tiles);
+            // let cur_tile_svg_line_data = get_tile_svg_line_data(&cur_tile,&curr_svg_line_end_point,&visited_tiles);
+            
+            // at this point assume we are working on external path so external line date
+            // once we find interior tiles we would need to call get_int_tile_svg_line_data
+            let cur_tile_svg_line_data = get_ext_tile_svg_line_data(&cur_tile,&curr_svg_line_end_point,&visited_tiles);
 
             // visited_tiles[[row,col]] = TileVisited::new(vec![true,true,true,true]);
-
-            // line_data = line_data.extend (cur_tile_svg_line_data);
 
             line_data = combine_data(&line_data,&cur_tile_svg_line_data );
 
@@ -341,27 +336,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     svg::save(op_svg_file_name, &document)   
 
 } // travel_contig_ext_int_svg
-//****************************** */
-//****************************** */
-
-
-/// Create visited boolean array with each edge set to false 
-/// shape[0] is rows
-/// shape[1] is cols
-fn create_visited_bool_arr(shape: &[usize]) -> ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>> {
-    
-    let mut result = Array2::<TileVisited>::zeros((shape[0], shape[1]));
-        
-    for mut row in result.outer_iter_mut() {
-        for mut tile in row.iter_mut() {
-            *tile = TileVisited::new(vec![false, false, false, false]);
-        }
-    }
-    
-    result
-}
-
-
+// ****************************** */
+// ****************************** */
 
 /// Find the next tile based on the end point of one tile is the start point of the next tile
 /// Note tiles must reside in the same contiguous group
@@ -477,6 +453,11 @@ fn find_next_tile_ext(row: usize,
 
 } // find_next_tile
 
+// ****************************** */
+// ****************************** */
+
+
+
 
 /// This function takes two array arguments, pane_nd_arr and edge_booleans, each of which has a shape of [usize; 2]. 
 /// pane_nd_arr is an array of tuples containing a Box2D<i32> instance and an RGB instance, 
@@ -510,6 +491,29 @@ println!("combine_pane_edges Mosaic tile bpoints {:?}", &mosaic_tile.bpoints);
     result
 
 } // combine_pane_edges
+
+// ****************************** */
+// ****************************** */
+
+
+/// Create visited boolean array with each edge set to false 
+/// shape[0] is rows
+/// shape[1] is cols
+fn create_visited_bool_arr(shape: &[usize]) -> ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>> {
+    
+    let mut result = Array2::<TileVisited>::zeros((shape[0], shape[1]));
+        
+    for mut row in result.outer_iter_mut() {
+        for mut tile in row.iter_mut() {
+            *tile = TileVisited::new(vec![false, false, false, false]);
+        }
+    }
+    
+    result
+}
+
+// ****************************** */
+// ****************************** */
 
 
 /// Function to compare passed Option to the tile edge boolean 
@@ -570,8 +574,8 @@ fn match_edge_boolean_pattern(match_this: [Option<bool>; 4], tile_edge_bool: &[b
     res
 }
 
-//****************************** */
-//****************************** */
+// ****************************** */
+// ****************************** */
 #[derive(PartialEq, Debug, Clone, Hash)]
 pub struct TileVisited{
     pub edge_visited: Vec<bool>
@@ -612,11 +616,11 @@ impl Add for TileVisited {
     }
 }
 
-//****************************** */
-//****************************** */
+// ****************************** */
+// ****************************** */
 // DO NOT Touch the code below 
-//****************************** */
-//****************************** */
+// ****************************** */
+// ****************************** */
 
 
 /// General helper function for used for testing
@@ -903,7 +907,7 @@ fn find_next_tile(row: usize,
     // pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> MosaicTile 
 {
 
-    println!("\n******************\nfn find_next_tile\n******************");
+    println!("\n******************\nfn find_ne52xt_tile\n******************");
     println!( "row {}\ncol {}\ncontig_group {:?}\ncur_tile {:?}", row, col, contig_group, cur_tile ); 
     println!("******************************************");
     println!("******************************************\n");
