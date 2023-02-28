@@ -214,14 +214,30 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             println!(" TOP BOTTOM Closed - Left-Right side open tile\n");
             println!(" !!!!! Need to Deal with this!!!!!\n");
 
-            // top
+            // ***** TODO BELOW 
+            // TODO use bpoints instead of m_tile.start_point m_tile_end_point 
+
             if *curr_svg_line_end_point == m_tile.start_point 
             {
                 line_data = line_data.line_to(corner[TOP_RIGHT]);
+                // Set TOP RIGHT and LEFT as VISITED
+                // BOTTOM will default to whatever it was so will remain FALSE if first time through
+                visited_tiles[[row, col]].edge_visited[TOP] = true;
+                visited_tiles[[row, col]].edge_visited[RIGHT] = true;
+                visited_tiles[[row, col]].edge_visited[LEFT] = true;
+
             } //bottom
-            else if *curr_svg_line_end_point == m_tile.start_point_two
+            // else if *curr_svg_line_end_point == m_tile.start_point_two // Not sure why this is - REVIEW REVIEW REVIEW
+            else if *curr_svg_line_end_point == m_tile.end_point_two // Not sure why this is - REVIEW REVIEW REVIEW
             {
                 line_data = line_data.line_to(corner[BOT_LEFT]);
+
+                // Set BOTTOM RIGHT and LEFT as VISITED
+                // TOP will default to whatever it was so will remain FALSE if first time through
+                visited_tiles[[row, col]].edge_visited[RIGHT] = true;
+                visited_tiles[[row, col]].edge_visited[LEFT] = true;
+                visited_tiles[[row, col]].edge_visited[BOTTOM] = true;
+
             }
             else {
                 println!("We should never get here!!!");
