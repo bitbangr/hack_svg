@@ -258,7 +258,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                 break;
             }
 
-            let (found_tile_row, found_tile_col) = find_next_tile(row, col, &cur_tile, &contig_group, &pane_edge_nd_arr ); 
+            let (found_tile_row, found_tile_col) = find_next_tile_ext(row, col, &cur_tile, &contig_group, &pane_edge_nd_arr ); 
             
             // this should never happen. 
             if found_tile_row == FLAGGED && found_tile_col == FLAGGED {
@@ -370,7 +370,7 @@ fn create_visited_bool_arr(shape: &[usize]) -> ArrayBase<OwnedRepr<TileVisited>,
 /// and the start point and end points are the same.  
 /// So somehow remove yourself from the contig array or if congtig_row and contig_col match then skip
 
-fn find_next_tile(row: usize, 
+fn find_next_tile_ext(row: usize, 
     col: usize, 
     cur_tile: &MosaicTile, 
     contig_group: &[(isize, isize)], 
@@ -887,3 +887,117 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
     svg::save(op_svg_file_name, &document)   
 
 }
+
+/// Find the next tile based on the end point of one tile is the start point of the next tile
+/// Note tiles must reside in the same contiguous group
+/// 
+/// TODO!!!! need to deal with cases where search returns a link to yourself 
+/// and the start point and end points are the same.  
+/// So somehow remove yourself from the contig array or if congtig_row and contig_col match then skip
+
+fn find_next_tile(row: usize, 
+    col: usize, 
+    cur_tile: &MosaicTile, 
+    contig_group: &[(isize, isize)], 
+    pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> (usize,usize) 
+    // pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> MosaicTile 
+{
+
+    println!("\n******************\nfn find_next_tile\n******************");
+    println!( "row {}\ncol {}\ncontig_group {:?}\ncur_tile {:?}", row, col, contig_group, cur_tile ); 
+    println!("******************************************");
+    println!("******************************************\n");
+
+    let mut contig_row: usize;
+    let mut contig_col: usize;
+    let mut found:bool = false;
+
+    // a bad way to program but if this routine completes and a next tile has not 
+    // been found then return (FLAGGED,FLAGGED) where pub const FLAGGED: usize = 987659; 
+    // which will be the signal to panic
+    // Look into returning a Result in the future
+    let mut res = (FLAGGED,FLAGGED);
+
+    for contig_tile in contig_group{
+            
+        contig_row = *&contig_tile.0 as usize;
+        contig_col = *&contig_tile.1 as usize;
+
+        // don't check for ourselves
+        if !((contig_row == row) && (contig_col == col))
+        {
+
+            let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
+
+            // find the true match and set the new tile accordingly
+            let match_this_tftf = [Some(true), Some(false), Some(true), Some(false)];
+            let match_this_ftft = [Some(false), Some(true), Some(false), Some(true)];
+
+            let cur_tile_edge_bool = cur_tile.edge_bool.clone();
+            let tile_is_tftf :bool = match_edge_boolean_pattern(match_this_tftf, &cur_tile_edge_bool);
+            let tile_is_ftft :bool = match_edge_boolean_pattern(match_this_ftft, &cur_tile_edge_bool);
+
+            // this is where we need to add logic to handle finding next tile for
+            // FTFT and TFTF tiles
+            if tile_is_tftf == true {
+                println!("\nCurrent tile is TFTF\n\n {:?}\n", &cur_tile);
+            } else if tile_is_ftft == true {
+                println!("\nCurrent tile is FTFT\n\n {:?}\n", &cur_tile);
+            }
+
+            if check_tile.start_point == cur_tile.end_point {
+                println!("Next Tile Found\ncheck_tile.start_point == cur_tile.end_point");
+
+                println!("Next Tile: \n {:?}", &check_tile);
+
+                if check_tile.start_point_two.x as usize != FLAGGED {
+                     println!("\n\tThis is a double line tile FTFT or TFTF");
+                }
+
+                found = true;
+                res = (contig_row,contig_col);
+                break;
+            } else {
+                println!("\n[{},{}]check_tile.start_point Does not match cur_tile.end_point", &contig_row, &contig_col);
+                if check_tile.start_point_two.x as usize != FLAGGED {
+                    println!("\n\tThis is double line tile FTFT or TFTF \n\n{:?} \n", &check_tile);
+
+                    // check to see if any of check_tile corners match cur_tile.end_point 
+                    let corners: [euclid::Point2D<i32, euclid::UnknownUnit>; 4] = check_tile.tile.get_tile_corners();
+                    let cur_tile_end_point: &euclid::Point2D<i32, euclid::UnknownUnit> = &cur_tile.end_point;
+
+                    // if corners.contains(cur_tile_end_point) {
+                    //     println!("cur_tile_end_point is in corners array");
+                    // } else {
+                    //     println!("cur_tile_end_point is not in corners array");
+                    // }
+
+                    // find out if curtile endpoint is in corners 
+                    // and which which corner it is [top_left, top_right, bottom_right, bottom_left] 
+                    if let Some(idx) = corners.iter().position(|&corner| corner == *cur_tile_end_point) {
+                        println!("Found {:?} at index {}", cur_tile_end_point, idx);
+
+                        found = true;
+                        res = (contig_row,contig_col);
+                        break;
+        
+                    } else {
+                        println!("{:?} Cur_tile_end_point not found in check_tile corners array", cur_tile_end_point);
+                    }
+
+               }
+
+            }
+        } else {
+            println!("...self...");
+        } 
+    
+    }
+
+    // set up the new tile according to whichever match this came back true
+    // pane_edge_nd_arr[[contig_row,contig_col]].clone()
+    println!("fn find_next_tile return {:?}\n**********\n ", &res);
+
+    res
+
+} // find_next_tile
