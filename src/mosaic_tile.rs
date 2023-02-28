@@ -2,9 +2,11 @@ use euclid::default::{Box2D, Point2D};
 use ndarray::Array2;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Formatter};
+use svg_utils::match_edge_boolean_pattern;
 
 use crate::constants::{TOP, RIGHT,BOTTOM,LEFT,FLAGGED};
 use crate::constants::{TOP_LEFT, TOP_RIGHT,BOT_LEFT, BOT_RIGHT};
+use crate::svg_utils;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Copy, Clone, Eq, Hash, Default)]
 // #[derive(Debug, PartialEq, Copy, Clone, Eq, Hash, Default)]
@@ -102,6 +104,7 @@ impl MosaicTile {
         let y: i32 = self.start_point.y.try_into().unwrap();
         (x, y)
     }
+    
 }
 
 /// helper function to generate a Point2D from a usize array (x,y)
@@ -111,6 +114,11 @@ fn get_point_2d(usize_arr: (usize, usize)) -> Point2D<i32> {
 
     Point2D::new(start_x, start_y)
 }
+
+
+
+
+
 
 ///
 /// This function calculate the start endpoints for each Tile configuration 
@@ -383,7 +391,7 @@ fn get_start_end_points(
     } // match
 
     println!("\n----------------------- ");
-    
+
     (start_point, end_point, start_point_two, end_point_two)
 } // get_start_end_points
 
@@ -391,6 +399,18 @@ impl MosaicTile {
     // fn set_hp(&mut self, hp: &i32) {
     //     self.hp = *hp;
     // }
+
+    pub fn is_ftft ( &self) -> bool {
+
+        // let match_this_tftf = [Some(true), Some(false), Some(true), Some(false)];
+        // let tile_is_tftf :bool = match_edge_boolean_pattern(match_this_tftf, &cur_tile_edge_bool);
+        // let cur_tile_edge_bool = cur_tile.edge_bool.clone();
+        // let tile_is_ftft :bool = match_edge_boolean_pattern(match_this_ftft, &self);
+
+        let match_this_ftft = [Some(false), Some(true), Some(false), Some(true)];        
+        match_edge_boolean_pattern(match_this_ftft, &self.edge_bool)
+
+    }
 
     pub fn set_start_point(&mut self, start_point: &Point2D<i32>) {
         self.start_point = *start_point;
