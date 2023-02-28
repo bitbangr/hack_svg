@@ -396,16 +396,16 @@ impl MosaicTile {
     //     self.hp = *hp;
     // }
 
+    /// return true if this is a FTFT tile
     pub fn is_ftft ( &self) -> bool {
-
-        // let match_this_tftf = [Some(true), Some(false), Some(true), Some(false)];
-        // let tile_is_tftf :bool = match_edge_boolean_pattern(match_this_tftf, &cur_tile_edge_bool);
-        // let cur_tile_edge_bool = cur_tile.edge_bool.clone();
-        // let tile_is_ftft :bool = match_edge_boolean_pattern(match_this_ftft, &self);
-
         let match_this_ftft = [Some(false), Some(true), Some(false), Some(true)];        
         match_edge_boolean_pattern(match_this_ftft, &self.edge_bool)
+    }
 
+    /// return true if this is a TFTF tile
+    pub fn is_tftf ( &self) -> bool {
+        let match_this_ftft = [Some(true), Some(false), Some(true), Some(false)];        
+        match_edge_boolean_pattern(match_this_ftft, &self.edge_bool)
     }
 
     pub fn _set_start_point(&mut self, start_point: &Point2D<i32>) {
