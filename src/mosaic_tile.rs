@@ -70,6 +70,7 @@ pub fn rgb_vec_to_array(rgb_vec: Vec<Vec<RGB>>) -> Array2<RGB> {
 pub struct MosaicTile {
     pub tile: Tile,
     pub edge_bool: Vec<bool>,
+    pub bpoints: [Box2D<i32>; 2],  // Using Box2D struct to hold Start Point End Point pairs Clockwise And Counter Clockwise
     pub start_point: Point2D<i32>,
     pub end_point: Point2D<i32>,
     pub start_point_two: Point2D<i32>,
@@ -79,9 +80,16 @@ pub struct MosaicTile {
 impl MosaicTile {
     pub fn new(tile: Tile, edge_bool: Vec<bool>) -> MosaicTile {
         let (sp, ep, sp2, ep2) = get_start_end_points(&edge_bool, tile);
+
+        let sp_points = [
+            Box2D::new(sp, ep),    // 
+            Box2D::new(sp2, ep2),  // Set to sp2 ep2 are Point2D(FLAGGED,FLAGGED) unless this is a TFTF or FTFT tile
+        ];
+        
         MosaicTile {
             tile,
             edge_bool,
+            bpoints: sp_points ,
             start_point: sp,
             end_point: ep,
             start_point_two: sp2,
@@ -104,6 +112,10 @@ fn get_point_2d(usize_arr: (usize, usize)) -> Point2D<i32> {
     Point2D::new(start_x, start_y)
 }
 
+///
+/// This function calculate the start endpoints for each Tile configuration 
+/// Values are passed back to MosaicTile Constructor
+
 fn get_start_end_points(
     edge_bool: &[bool],
     tile: Tile,
@@ -122,6 +134,9 @@ fn get_start_end_points(
     let mut end_point_two: Point2D<i32> = get_point_2d((FLAGGED, FLAGGED));
 
     let corners = &tile.corners();
+
+    println!("\n----------------------- ");
+    println!("mosaic_tile Constructor \n\t fn get_start_end_points()");
 
     match (top, right, bottom, left) {
         // *******************************************
@@ -255,22 +270,20 @@ fn get_start_end_points(
             //FTFT
             println!("\nmatch -> false true false true - left/right open");
             println!(" TOP BOTTOM Closed - Left-Right side open tile\n");
-            println!(" !!!!! Need to Deal with this!!!!!\n");
+            println!(" !!!!! CHECK THIS CODE LOGIC !!!!!\n");
 
             start_point = get_point_2d(corners[TOP_LEFT]);
             end_point = get_point_2d(corners[TOP_RIGHT]);
-            // start_point_two = get_point_2d(corners[BOT_RIGHT]);
-            // end_point_two = get_point_2d(corners[BOT_LEFT]);
-            // changing this so the both start points are on left and both end points are on right
+            // pairs of start/end points are opposite direction assuming clockwise direction of travel around tile
             // Each start end needs to be evaluated on a case by case basis as direction 
             // of drawn line depends on where in the mosiac this tile is encountered
-            start_point_two = get_point_2d(corners[BOT_LEFT]);
-            end_point_two = get_point_2d(corners[BOT_RIGHT]);
+            start_point_two = get_point_2d(corners[BOT_RIGHT]);
+            end_point_two = get_point_2d(corners[BOT_LEFT]);
 
             println! {"1st line - start point TOP_LEFT-> {:?} ", &start_point};
             println! {"1st line - end point TOP_RIGHT-> {:?} ", &end_point};
-            println! {"2nd line - start point corners[BOT_LEFT]-> {:?} ", &start_point_two};
-            println! {"2nd line - end point corners[BOT_RIGHT]-> {:?} ", &end_point_two};
+            println! {"2nd line - start point corners[BOT_RIGHT]-> {:?} ", &start_point_two};
+            println! {"2nd line - end point corners[BOT_LEFT]-> {:?} ", &end_point_two};
 
             // panic!();
         } // FTFT
@@ -279,22 +292,20 @@ fn get_start_end_points(
             //TFTF
             println!("\nmatch -> true false true false - top/bottom open");
             println!(" LEFT RIGHT Closed - Left-Right side open tile\n");
-            println!(" !!!!! Need to Deal with this!!!!!\n");
+            println!(" !!!!! CHECK THIS CODE LOGIC !!!!!\n");
 
             start_point = get_point_2d(corners[BOT_LEFT]);
             end_point = get_point_2d(corners[TOP_LEFT]);
-            // start_point_two = get_point_2d(corners[TOP_RIGHT]);
-            // end_point_two = get_point_2d(corners[BOT_RIGHT]);
-            // changing this so the both start points are on bottom and both end points are on top
+            // pairs of start/end points are opposite direction assuming clockwise direction of travel around tile
             // Each start end needs to be evaluated on a case by case basis as direction 
             // of drawn line depends on where in the mosiac this tile is encountered
-            start_point_two = get_point_2d(corners[BOT_RIGHT]);
-            end_point_two = get_point_2d(corners[TOP_RIGHT]);
+            start_point_two = get_point_2d(corners[TOP_RIGHT]);
+            end_point_two = get_point_2d(corners[BOT_RIGHT]);
 
             println! {"1st line - start point BOT_LEFT-> {:?} ", &start_point};
             println! {"1st line - end point TOP_LEFT-> {:?} ", &end_point};
-            println! {"2nd line - start point corners[BOT_RIGHT]-> {:?} ", &start_point_two};
-            println! {"2nd line - end point corners[TOP_RIGHT]-> {:?} ", &end_point_two};
+            println! {"2nd line - start point corners[TOP_RIGHT]-> {:?} ", &start_point_two};
+            println! {"2nd line - end point corners[BOT_RIGHT]-> {:?} ", &end_point_two};
 
             // panic!();
         } // TFTF
@@ -371,6 +382,8 @@ fn get_start_end_points(
         }
     } // match
 
+    println!("\n----------------------- ");
+    
     (start_point, end_point, start_point_two, end_point_two)
 } // get_start_end_points
 
@@ -408,6 +421,7 @@ impl Zero for MosaicTile {
                 rgb: RGB(0, 0, 0),
             },
             edge_bool: Vec::new(),
+            bpoints: [Box2D::new(Point2D::new(0, 0), Point2D::new(0, 0)), Box2D::new(Point2D::new(0, 0), Point2D::new(0, 0))],
             start_point: Point2D::new(0, 0),
             end_point: Point2D::new(0, 0),
             start_point_two: Point2D::new(0, 0),
@@ -447,6 +461,7 @@ impl Add for MosaicTile {
             // edge_bool: self.edge_bool + other.edge_bool,
             tile: self.tile,
             edge_bool: self.edge_bool,
+            bpoints: self.bpoints,
             start_point: self.start_point,
             end_point: self.end_point,
             start_point_two: self.start_point,
