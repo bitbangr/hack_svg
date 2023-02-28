@@ -261,9 +261,10 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                 visited_tiles[[row, col]].edge_visited[RIGHT] = true;
                 visited_tiles[[row, col]].edge_visited[LEFT] = true;
 
+                println!("curr_svg_line_end_point = m_tile.start_point");
+
             } //bottom
-            else if *curr_svg_line_end_point == m_tile.start_point_two // Not sure why this is - REVIEW REVIEW REVIEW
-            // else if *curr_svg_line_end_point == m_tile.end_point_two // Not sure why this is - REVIEW REVIEW REVIEW
+            else if *curr_svg_line_end_point == m_tile.start_point_two 
             {
                 line_data = line_data.line_to(corner[BOT_LEFT]);
 
@@ -275,6 +276,8 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                 visited_tiles[[row, col]].edge_visited[RIGHT] = true;
                 visited_tiles[[row, col]].edge_visited[LEFT] = true;
                 visited_tiles[[row, col]].edge_visited[BOTTOM] = true;
+
+                println!("curr_svg_line_end_point = m_tile.start_point_two");
 
             }
             else {
