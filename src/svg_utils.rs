@@ -160,8 +160,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     // visited_tiles[[0, 2]].edge_visited[LEFT] = true;
     // visited_tiles[[0, 2]].edge_visited[RIGHT] = true;
 
-    // // *visited_tiles.get_mut((0, 1))[0].unwrap() = true; // modify element at row 0, column 1
-    // println!("Visited Tiles {:?} ", &visited_tiles);
+    // *visited_tiles.get_mut((0, 1))[0].unwrap() = true; // modify element at row 0, column 1
+    println!("Visited Tiles {:?} ", &visited_tiles);
 
     // let match_this_tttt = [Some(true), Some(true), Some(true), Some(true)];
     // let match_this_ftft = [Some(false), Some(true), Some(false), Some(true)];
@@ -242,10 +242,15 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
             
             // at this point assume we are working on external path so external line date
             // once we find interior tiles we would need to call get_int_tile_svg_line_data
-            let cur_tile_svg_line_data = get_ext_tile_svg_line_data(&cur_tile,&curr_svg_line_end_point,&visited_tiles);
+            let cur_tile_svg_line_data = get_ext_tile_svg_line_data(&cur_tile,
+                                                                    &curr_svg_line_end_point,
+                                                                    &mut visited_tiles,
+                                                                    row,
+                                                                    col);
+
+            println!(" ->Visited tile [{},{}] {:?} ", &row, &col, &visited_tiles[[row,col]]);
 
             // visited_tiles[[row,col]] = TileVisited::new(vec![true,true,true,true]);
-
             line_data = combine_data(&line_data,&cur_tile_svg_line_data );
 
             if contig_group.len() == 1 {
@@ -336,6 +341,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     svg::save(op_svg_file_name, &document)   
 
 } // travel_contig_ext_int_svg
+
+
 // ****************************** */
 // ****************************** */
 
@@ -584,6 +591,15 @@ pub struct TileVisited{
 impl TileVisited {
     pub fn new(edge_visited: Vec<bool>) -> TileVisited {
         TileVisited { edge_visited }
+    }
+
+    pub(crate) fn set_all_visited_edges_true(&mut self)
+    {
+        self.edge_visited[TOP] = true;
+        self.edge_visited[RIGHT]= true;
+        self.edge_visited[BOTTOM]= true;
+        self.edge_visited[LEFT]= true;
+
     }
 }
 
