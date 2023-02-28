@@ -217,8 +217,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
             
             // at this point assume we are working on external path so external line date
             // once we find interior tiles we would need to call get_int_tile_svg_line_data
-            let cur_tile_svg_line_data = get_ext_tile_svg_line_data(&cur_tile,
-                                                                    &curr_svg_line_end_point,
+            let (cur_tile_svg_line_data, svg_line_end_point) = get_ext_tile_svg_line_data(&cur_tile,
+                                                                    &curr_svg_line_end_point, // CHECK Called with end point
                                                                     &mut visited_tiles,
                                                                     row,
                                                                     col);
@@ -285,12 +285,19 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
                             // let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &visited_tiles );
 
-                            let next_tile_svg_line_data = get_ext_tile_svg_line_data(&next_tile_clone, 
-                                                                                     &start_tile.start_point, 
+                            let (next_tile_svg_line_data, svg_line_end_point)  = get_ext_tile_svg_line_data(&next_tile_clone, 
+                                                                                    //  &start_tile.start_point, // CHECK Called with start tile start point
+                                                                                     &curr_svg_line_end_point, // 
                                                                                      &mut visited_tiles, 
                                                                                      row,
                                                                                      col );
-                
+                            // call from above 
+                            // let cur_tile_svg_line_data = get_ext_tile_svg_line_data(&cur_tile,
+                            //                                                         &curr_svg_line_end_point, // CHECK Called with end point
+                            //                                                         &mut visited_tiles,
+                            //                                                         row,
+                            //                                                         col);
+                    
                                                                                     //  m_tile: &MosaicTile, 
                                                                                     //  curr_svg_line_end_point: &Point2D<i32>, 
                                                                                     //  visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>,
@@ -336,8 +343,9 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                 // let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point );
                 // let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &visited_tiles );
 
-                let next_tile_svg_line_data = get_ext_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &mut visited_tiles, row, col );
-
+                // let next_tile_svg_line_data = get_ext_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &mut visited_tiles, row, col );
+                
+            let (next_tile_svg_line_data, svg_line_end_point) = get_ext_tile_svg_line_data(&next_tile_clone, &curr_svg_line_end_point, &mut visited_tiles, row, col );
                 line_data = combine_data(&line_data,&next_tile_svg_line_data );
     
                 more_tiles = false;
