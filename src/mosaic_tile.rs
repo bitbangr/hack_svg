@@ -299,7 +299,7 @@ fn get_start_end_points(
         (true, false, true, false) => {
             //TFTF
             println!("\nmatch -> true false true false - top/bottom open");
-            println!(" LEFT RIGHT Closed - Left-Right side open tile\n");
+            println!(" LEFT RIGHT Closed - Top-Bottom side open tile\n");
             println!(" !!!!! CHECK THIS CODE LOGIC !!!!!\n");
 
             start_point = get_point_2d(corners[BOT_LEFT]);
