@@ -92,6 +92,53 @@ pub fn svg_2() {
 } // svg2
 
 
+// test one vertical TFTF tile plus one horiz FTFT tile in same file
+pub fn svg_3() {
+    let op_svg_file_name = "./svg_output/two_op_lines/output_3.svg";
+    let rows: usize = 3;
+    let cols: usize = 4;
+    let tiles_per_pane_height: usize = 3;
+    let tiles_per_pane_width: usize = 4;
+    let svg_width = 400;
+    let svg_height = 300;
+
+    //  3x4 array    
+    let rgb_vec: Vec<Vec<RGB>> = vec![
+        vec![RGB_RED, RGB_GREEN, RGB_GREEN, RGB_GREEN],
+        vec![RGB_RED, RGB_BLACK, RGB_BLACK, RGB_BLACK],
+        vec![RGB_RED, RGB_BLACK, RGB_BLACK, RGB_BLACK],
+
+    ];
+
+    // sample 3 rows by 1 col
+    // let rgb_vec: Vec<Vec<RGB>> = vec![
+    //                                 vec![RGB_WHITE],
+    //                                 vec![RGB_WHITE],
+    //                                 vec![RGB_WHITE],
+    //                                 ];
+
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+    println!("rgb_arr {:?}", &rgb_arr);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    println!("svg1 data_results = {:?}", data_results);
+
+    let _ = create_svg(
+        op_svg_file_name,
+        svg_width,
+        svg_height,
+        rows,
+        cols,
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        data_results,
+    );
+} // svg3
+
+
 
 pub fn _svg_98() {
     let op_svg_file_name = "./svg_output/two_op_lines/output_98.svg";
