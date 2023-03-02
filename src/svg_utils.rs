@@ -136,6 +136,9 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
     
 }
 
+
+
+
 // ****************************** */
 // ****************************** */
 
@@ -263,6 +266,9 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
         // TODO the below if ep = sp check does not work for FTFT or TFTF next_tile_clone tiles
         // as we don't know which point is the end of the path
         // modify this to check for FTFT || TFTF tiles -> if any visited edge end point (sp or ep) matches then we've completed travel
+        
+        // we want to check if next_tile_clone end_point or end_point_one matches the cur_tile start_point.
+        // if it does match then we draw the last line segment(s) and set more_tiles to false;
 
             // ----------------------------------------
             // ----------------------------------------
@@ -322,6 +328,60 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                     println!("!top_visited && bot_visited");
                     panic!();
                 }
+            } 
+            else if next_tile_clone.is_tftf() 
+            {
+                println!("\t is_tftf() true "); 
+
+                let left_visited = visited_tiles[[row,col]].edge_visited[LEFT];
+                let right_visited = visited_tiles[[row,col]].edge_visited[RIGHT];
+                
+                println!("\tleft_visited {} \n\tright_visited {}", &left_visited, &right_visited );
+                
+                // use visited to determine which start point end point pair to compare to start tile
+                if right_visited && !left_visited
+                { 
+                        println!("right_visited && !left_visited");
+
+                        if next_tile_clone.end_point == start_tile.start_point { 
+                            println!(" next_tile_clone.end_point == start_tile.start_point  ");
+                            println!("and handle things accordingly ");
+                            // panic!();
+                            println!("TFTF check Completed traversal of all tiles in contigous group");
+
+                            let (next_tile_svg_line_data, svg_line_end_point)  = get_ext_tile_svg_line_data(&next_tile_clone, 
+                                                                                    //  &start_tile.start_point, // CHECK Called with start tile start point
+                                                                                     &curr_svg_line_end_point, // 
+                                                                                     &mut visited_tiles, 
+                                                                                     row,
+                                                                                     col );
+
+                            // update the curr_svg_line_end_point to the last svg line position
+                            curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32, );
+
+                            line_data = combine_data(&line_data,&next_tile_svg_line_data );
+                
+                            more_tiles = false;
+                        }
+
+                } else if !right_visited && left_visited {
+                    println!("!right_visited && left_visited");
+                    panic!();
+                } else if !right_visited && !left_visited {
+                    println!("!right_visited && !left_visited");
+                    println!("First time processing this tile");
+                    
+                    more_tiles = true;
+                    // get the ext tile svg line data
+                    // update curr svg line end point
+                    // combine the data
+                    // more tiles is set to true 
+
+
+                    
+                }
+
+
             } else
 
             // if next_tile_clone.start_point_two.x as usize != FLAGGED {
@@ -431,7 +491,8 @@ fn find_next_tile_ext(curtile_row: usize,
 
     println!("\n Start of -> for contig_tile in contig_group - FindNextTile\n ");
     for contig_tile in contig_group{
-            
+
+        println!{"AAAA"};    
         contig_row = *&contig_tile.0 as usize;
         contig_col = *&contig_tile.1 as usize;
 
@@ -447,77 +508,183 @@ fn find_next_tile_ext(curtile_row: usize,
         {
             let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
 
-            // find the true match and set the new tile accordingly
-            let match_this_tftf = [Some(true), Some(false), Some(true), Some(false)];
-            let match_this_ftft = [Some(false), Some(true), Some(false), Some(true)];
-
-            let cur_tile_edge_bool = cur_tile.edge_bool.clone();
-            let tile_is_tftf :bool = match_edge_boolean_pattern(match_this_tftf, &cur_tile_edge_bool);
-            let tile_is_ftft :bool = match_edge_boolean_pattern(match_this_ftft, &cur_tile_edge_bool);
-
             // this is where we need to add logic to handle finding next tile for
             // FTFT and TFTF tiles
-            if tile_is_tftf == true {
-                println!("\nCurrent tile is TFTF\n\n {:?}\n", &cur_tile);
-            } else if tile_is_ftft == true {
-                println!("\nCurrent tile is FTFT\n\n {:?}\n", &cur_tile);
+
+            let cur_tile_is_tftf :bool = cur_tile.is_tftf();
+            let cur_tile_is_ftft :bool = cur_tile.is_ftft();
+            let check_tile_is_tftf:bool = check_tile.is_tftf();
+            let check_tile_is_ftft:bool = check_tile.is_ftft();
+
+            // if cur_tile is TFTF or FTFT then we need to determine which line endpoint
+            //  has the current svg_line_end_point that we're drawing from.
+            // otherwise just use cur_tile.end_point to match with check_tile
+            if cur_tile.is_tftf() { // TFTF Tile
+                println!("\n\tCurrent tile is TFTF");
+            } else if cur_tile.is_ftft() { //FTFT Tile
+                println!("\n\tCurrent tile is FTFT");
+            } else {
+                println!("\n\tCurrent tile is not TFTF or FTFT");
             }
 
-            if check_tile.start_point == cur_tile.end_point {
-                println!("Next Tile Found\ncheck_tile.start_point == cur_tile.end_point");
+            // if check tile is TFTF or FTFT then we need to determine which line start point
+            // matches the previous line end point and use this to find the next tile
+            if check_tile.is_tftf() { // TFTF Tile
+                println!("\tCheck tile is TFTF\n\n\t{:?}", &check_tile);
+            } else if check_tile.is_ftft() { //FTFT Tile
+                println!("\tCheck tile is FTFT\n\n\t {:?}\n", &check_tile);
+            } else {
+                println!("\tCheck tile is not TFTF or FTFT");
+            }
 
-                println!("Next Tile: \n {:?}", &check_tile);
+// FOLLOWING CODE IS A MESS
+// CLEAN IT UP   // if both tiles are not FTFT or TFTF then just do the simple check for start end points
+            if !cur_tile_is_tftf && !cur_tile_is_ftft && !check_tile_is_tftf && !check_tile_is_ftft
+             {
+                println!(" ----- 99 1 --------- ");
+                if check_tile.start_point == cur_tile.end_point {
+                    println!(" ----- 1a --------- ");
+                    println!("Next Tile Found\ncheck_tile.start_point == cur_tile.end_point");
+                    println!("Next Tile: \n {:?}", &check_tile);
+        
+                    res = (contig_row,contig_col);
+                    break;
+                } 
+            }
+            // if Current Tile is TFTF check tile is not then
+            else if cur_tile_is_tftf && !check_tile_is_tftf
+            {
+                println!(" ----- 2 --------- TFTF ");
+                // check to see if edge not visited
+                // see if end point matches start point of non visited edge
+                // if so next tile found
+                // if not then we've got an error 
+                if cur_tile.end_point == check_tile.start_point
+                {   println!(" ----- 2a --------\n TFTF ");
+                    println!("Next Tile Found\ncur_tile.end_point == check_tile.start_point");
+                    println!("Next Tile: \n {:?}", &check_tile);
+                    res = (contig_row,contig_col);
+                    break;
+                } 
+                else if cur_tile.end_point_two == check_tile.start_point
+                {
+                    println!(" ----- 2b -------- TFTF ");
+                    println!("Next Tile Found\ncur_tile.end_point_two == check_tile.start_point");
+                    println!("Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                    
+                    res = (contig_row,contig_col);
+                    break;
+                } else {
+                    println!(" ----- 2c --------\n TFTF ");
+                    println!(" somethings wrong TFTF ");
+                    panic!();
+                }
+        
+            } 
+// ***************
+            // if Current Tile is TFTF check tile is not then
+            else if !cur_tile_is_tftf && check_tile_is_tftf
+            {
+                println!(" ----- 3 --------- TFTF ");
+                // check to see if edge not visited
+                // see if end point matches start point of non visited edge
+                // if so next tile found
+                // if not then we've got an error 
+                if cur_tile.end_point == check_tile.start_point
+                {   println!(" ----- 3a --------\n TFTF ");
+                    println!("Next Tile Found\ncur_tile.end_point == check_tile.start_point");
+                    println!("Next Tile: \n {:?}", &check_tile);
+                    res = (contig_row,contig_col);
+                    break;
+                } 
+                else if cur_tile.end_point == check_tile.start_point_two
+                {
+                    println!(" ----- 2b -------b TFTF ");
+                    println!("cur_tile.end_point == check_tile.start_point_one");
+                    println!("Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                    
+                    res = (contig_row,contig_col);
+                    break;
+                } else {
+                    println!(" ----- 2c --------\n TFTF ");
+                    println!(" somethings wrong TFTF ");
+                    panic!();
+                }
+        
+            } 
 
-                if check_tile.start_point_two.x as usize != FLAGGED {
-                     println!("\n\tThis is a double line tile FTFT or TFTF");
+// ****************
+
+             else if (!cur_tile_is_tftf || !cur_tile_is_ftft) && check_tile_is_ftft 
+            {
+                println!(" ----- 4 --------- \n FTFT ");
+                // check to see if edge not visited
+                // see if end point matches start point of non visited edge
+                // if so next tile found
+                // if not then we've got an error 
+                panic!()
+            }
+            else {
+                println!(" ----- 5 --------- \n ");
+                println!("{:?} Cur_tile_end_point not found ", cur_tile.end_point);
                 }
 
-                res = (contig_row,contig_col);
-                break;
-            } else {
-                println!("\n[{},{}]check_tile.start_point Does not match cur_tile.end_point", &contig_row, &contig_col);
-                if check_tile.start_point_two.x as usize != FLAGGED {
-                    println!("\n\tThis is double line tile FTFT or TFTF \n\n{:?} \n", &check_tile);
-
-                    // check to see if any of check_tile corners match cur_tile.end_point 
-                    let corners: [euclid::Point2D<i32, euclid::UnknownUnit>; 4] = check_tile.tile.get_tile_corners();
-                    let cur_tile_end_point: &euclid::Point2D<i32, euclid::UnknownUnit> = &cur_tile.end_point;
-
-                    // if corners.contains(cur_tile_end_point) {
-                    //     println!("cur_tile_end_point is in corners array");
-                    // } else {
-                    //     println!("cur_tile_end_point is not in corners array");
-                    // }
-
-                    // find out if curtile endpoint is in corners 
-                    // and which which corner it is [top_left, top_right, bottom_right, bottom_left] 
-                    // THIS DOES NOT WORK AS YES ONE OF THE CORNERS WILL ALWAYS MATCH THE FIRST TILE
-                    if let Some(idx) = corners.iter().position(|&corner| corner == *cur_tile_end_point) {
-                        println!("Found {:?} at index {}", cur_tile_end_point, idx);
-
-                        res = (contig_row,contig_col);
-                        break;
-        
-                    } else {
-                        println!("{:?} Cur_tile_end_point not found in check_tile corners array", cur_tile_end_point);
-                    }
-
-               }
-
             }
-        } else {
+            else {
+            println!(" ----- 7 --------- \n ");
             println!("...self...or already visited tile");
-        } 
-    
+            }     
     }
+
 
     // set up the new tile according to whichever match this came back true
     // pane_edge_nd_arr[[contig_row,contig_col]].clone()
-    println!(" {:?}\n**********\n ", &res);
+    println!(" \n***** {:?} <- find_next_tile_ext result *******\n ", &res);
 
     res
 
 } // find_next_tile
+
+// code below from find_next_tile
+//
+            // if check_tile.start_point == cur_tile.end_point {
+            //     println!("Next Tile Found\ncheck_tile.start_point == cur_tile.end_point");
+
+            //     println!("Next Tile: \n {:?}", &check_tile);
+
+            //     if check_tile.start_point_two.x as usize != FLAGGED {
+            //          println!("\n\tThis is a double line tile FTFT or TFTF");
+            //     }
+
+            //     res = (contig_row,contig_col);
+            //     break;
+            // } 
+            // else {
+            //     println!("\n[{},{}]check_tile.start_point Does not match cur_tile.end_point", &contig_row, &contig_col);
+            //     if check_tile.start_point_two.x as usize != FLAGGED {
+            //         println!("\n\tThis is double line tile FTFT or TFTF \n\n{:?} \n", &check_tile);
+
+            //         // check to see if any of check_tile corners match cur_tile.end_point 
+            //         let corners: [euclid::Point2D<i32, euclid::UnknownUnit>; 4] = check_tile.tile.get_tile_corners();
+            //         let cur_tile_end_point: &euclid::Point2D<i32, euclid::UnknownUnit> = &cur_tile.end_point;
+
+            //         // if corners.contains(cur_tile_end_point) {
+            //         //     println!("cur_tile_end_point is in corners array");
+            //         // } else {
+            //         //     println!("cur_tile_end_point is not in corners array");
+            //         // }
+
+            //         // find out if curtile endpoint is in corners 
+            //         // and which which corner it is [top_left, top_right, bottom_right, bottom_left] 
+            //         // THIS DOES NOT WORK AS YES ONE OF THE CORNERS WILL ALWAYS MATCH THE FIRST TILE
+            //         if let Some(idx) = corners.iter().position(|&corner| corner == *cur_tile_end_point) {
+            //             println!("Found {:?} at index {}", cur_tile_end_point, idx);
+
+            //             res = (contig_row,contig_col);
+            //             break;
+        
+                    // } 
+
 
 // ****************************** */
 // ****************************** */
@@ -666,7 +833,7 @@ impl TileVisited {
         
         let res:bool  = self.edge_visited[TOP] == true && self.edge_visited[RIGHT] == true && self.edge_visited[BOTTOM] == true && self.edge_visited[LEFT] == true;
 
-        println!("Result {}", res);
+        println!("Tile Has Been Visited -> {}", res);
         
         res
     }

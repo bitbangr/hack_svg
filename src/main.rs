@@ -36,7 +36,8 @@ fn main() {
 
     // let _ = two_op_line_tiles::svg_98();
     // let _ = two_op_line_tiles::svg_99();
-    let _ = two_op_line_tiles::svg_1();
+    // let _ = two_op_line_tiles::svg_1();
+    let _ = two_op_line_tiles::svg_2();
     
 
     // let _ = nine_tile_square::svg_1(); // create_3x3_rgb_checker_tile_data
