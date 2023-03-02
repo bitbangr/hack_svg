@@ -516,118 +516,187 @@ fn find_next_tile_ext(curtile_row: usize,
             let check_tile_is_tftf:bool = check_tile.is_tftf();
             let check_tile_is_ftft:bool = check_tile.is_ftft();
 
+            println!("match find_next_tile_ext "); 
+            println!("(cur_tile_is_tftf, cur_tile_is_ftft, check_tile_is_tftf ,check_tile_is_ftft) "); 
+
+            println!("\n\tCurrent tile TFTF -> {}", &cur_tile_is_tftf );
+            println!("\tCurrent tile FTFT -> {}", &cur_tile_is_ftft);
+            println!("\n\tCheck tile TFTF -> {}", &check_tile_is_tftf);
+            println!("\tCheck tile is FTFT -> {}\n", &check_tile_is_ftft);
+
             // if cur_tile is TFTF or FTFT then we need to determine which line endpoint
             //  has the current svg_line_end_point that we're drawing from.
             // otherwise just use cur_tile.end_point to match with check_tile
-            if cur_tile.is_tftf() { // TFTF Tile
-                println!("\n\tCurrent tile is TFTF");
-            } else if cur_tile.is_ftft() { //FTFT Tile
-                println!("\n\tCurrent tile is FTFT");
-            } else {
-                println!("\n\tCurrent tile is not TFTF or FTFT");
-            }
-
+            // or
             // if check tile is TFTF or FTFT then we need to determine which line start point
             // matches the previous line end point and use this to find the next tile
-            if check_tile.is_tftf() { // TFTF Tile
-                println!("\tCheck tile is TFTF\n\n\t{:?}", &check_tile);
-            } else if check_tile.is_ftft() { //FTFT Tile
-                println!("\tCheck tile is FTFT\n\n\t {:?}\n", &check_tile);
-            } else {
-                println!("\tCheck tile is not TFTF or FTFT");
-            }
 
-// FOLLOWING CODE IS A MESS
-// CLEAN IT UP   // if both tiles are not FTFT or TFTF then just do the simple check for start end points
-            if !cur_tile_is_tftf && !cur_tile_is_ftft && !check_tile_is_tftf && !check_tile_is_ftft
-             {
-                println!(" ----- 99 1 --------- ");
-                if check_tile.start_point == cur_tile.end_point {
-                    println!(" ----- 1a --------- ");
-                    println!("Next Tile Found\ncheck_tile.start_point == cur_tile.end_point");
-                    println!("Next Tile: \n {:?}", &check_tile);
-        
-                    res = (contig_row,contig_col);
-                    break;
-                } 
-            }
-            // if Current Tile is TFTF check tile is not then
-            else if cur_tile_is_tftf && !check_tile_is_tftf
+            // 
+            match (cur_tile_is_tftf, cur_tile_is_ftft, check_tile_is_tftf ,check_tile_is_ftft) 
             {
-                println!(" ----- 2 --------- TFTF ");
-                // check to see if edge not visited
-                // see if end point matches start point of non visited edge
-                // if so next tile found
-                // if not then we've got an error 
-                if cur_tile.end_point == check_tile.start_point
-                {   println!(" ----- 2a --------\n TFTF ");
-                    println!("Next Tile Found\ncur_tile.end_point == check_tile.start_point");
-                    println!("Next Tile: \n {:?}", &check_tile);
-                    res = (contig_row,contig_col);
-                    break;
-                } 
-                else if cur_tile.end_point_two == check_tile.start_point
-                {
-                    println!(" ----- 2b -------- TFTF ");
-                    println!("Next Tile Found\ncur_tile.end_point_two == check_tile.start_point");
-                    println!("Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                // just process tiles as regular tiles
+                // cur_tile NOT tftf 
+                // cur_tile NOT ftft, 
+                // check_tile NOT tftf 
+                // check_tile NOT ftft
+                (false, false, false, false) => {
+                    println!(" ----- 99 1 --------- ");
+                    if check_tile.start_point == cur_tile.end_point {
+                        println!(" ----- 1a --------- ");
+                        println!("Next Tile Found\ncheck_tile.start_point == cur_tile.end_point");
+                        println!("Next Tile: \n {:?}", &check_tile);
+            
+                        res = (contig_row,contig_col);
+                        break;
+                    } 
+                    // end match false, false, false, false) 
+                }
+                // cur_tile IS tftf 
+                // cur_tile NOT ftft, 
+                // check_tile NOT tftf 
+                // check_tile NOT ftft
+                (true, false, false, false) => {
+                    println!(" ----- 2 --------- TFTF ");
                     
-                    res = (contig_row,contig_col);
-                    break;
-                } else {
-                    println!(" ----- 2c --------\n TFTF ");
-                    println!(" somethings wrong TFTF ");
+                    // TODO Add check to see if edge not visited and respond if it has
+
+                    // see if end point matches start point of non visited edge
+                    // if so next tile found
+                    // if not then we've got an error 
+                    if cur_tile.end_point == check_tile.start_point
+                    {   println!(" ----- 2a --------\n TFTF ");
+                        println!("Next Tile Found\ncur_tile.end_point == check_tile.start_point");
+                        println!("Next Tile: \n {:?}", &check_tile);
+                        res = (contig_row,contig_col);
+                        break;
+                    } 
+                    else if cur_tile.end_point_two == check_tile.start_point
+                    {
+                        println!(" ----- 2b -------- TFTF ");
+                        println!("Next Tile Found\ncur_tile.end_point_two == check_tile.start_point");
+                        println!("Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                        
+                        res = (contig_row,contig_col);
+                        break;
+                    } else {
+                        println!(" ----- 2c --------\n TFTF ");
+                        println!(" somethings wrong TFTF ");
+                        panic!();
+                    } 
+                    // end match true, false, false, false) 
+                }
+                // cur_tile NOT tftf 
+                // cur_tile NOT ftft, 
+                // check_tile IS tftf 
+                // check_tile NOT ftft
+                (false, false, true, false) => {
+                    println!(" ----- 3 --------- TFTF ");
+                    // TODO Add check to see if edge not visited and respond if it has
+
+                    // see if end point matches start point of non visited edge
+                    // if so next tile found
+                    // if not then we've got an error 
+                    if cur_tile.end_point == check_tile.start_point
+                    {   println!(" ----- 3a --------\n TFTF ");
+                        println!("Next Tile Found\ncur_tile.end_point == check_tile.start_point");
+                        println!("Next Tile: \n {:?}", &check_tile);
+                        res = (contig_row,contig_col);
+                        break;
+                    } 
+                    else if cur_tile.end_point == check_tile.start_point_two
+                    {
+                        println!(" ----- 3b ------- TFTF ");
+                        println!("cur_tile.end_point == check_tile.start_point_one");
+                        println!("Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                        
+                        res = (contig_row,contig_col);
+                        break;
+                    } else {
+                        println!(" ----- 3c --------\n TFTF ");
+                        println!(" somethings wrong TFTF ");
+                        panic!();
+                    }
+                    // end match false, false, true, false) 
+                }
+                // cur_tile NOT tftf 
+                // cur_tile NOT ftft, 
+                // check_tile NOT tftf 
+                // check_tile IS ftft
+                (false, false, false, true) => {
+                    println!(" ----- 4 -------- FTFT ");   
+                    // TODO Add check to see if edge not visited and respond if it has
+
+                    // see if end point matches start point of non visited edge
+                    // if so next tile found
+                    // if not then we've got an error 
+                    if cur_tile.end_point == check_tile.start_point
+                    {   println!(" ----- 4a --------\n FTFT ");
+                        println!("Next Tile Found\ncur_tile.end_point == check_tile.start_point");
+                        println!("Next Tile: \n {:?}", &check_tile);
+                        res = (contig_row,contig_col);
+                        break;
+                    } 
+                    else if cur_tile.end_point == check_tile.start_point_two
+                    {
+                        println!(" ----- 4b -------b FTFT ");
+                        println!("cur_tile.end_point == check_tile.start_point_one");
+                        println!("Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                        
+                        res = (contig_row,contig_col);
+                        break;
+                    } else {
+                        println!(" ----- 4c --------\n TFTF ");
+                        println!(" somethings wrong TFTF ");
+                        panic!();
+                    }                    
+                    // end match false, false, false, true) 
+                }
+                // cur_tile NOT tftf 
+                // cur_tile IS ftft, 
+                // check_tile NOT tftf 
+                // check_tile NOT ftft
+                (false, true, false, false) => {
+                    println!(" ----- 5 -------- FTFT ");   
+                    // TODO Add check to see if edge not visited and respond if it has
+                    
+                    // see if end point matches start point of non visited edge
+                    // if so next tile found
+                    // if not then we've got an error 
+                    if cur_tile.end_point == check_tile.start_point
+                    {   println!(" ----- 5a --------\n FTFT ");
+                        println!("Next Tile Found\ncur_tile.end_point == check_tile.start_point");
+                        println!("Next Tile: \n {:?}", &check_tile);
+                        res = (contig_row,contig_col);
+                        break;
+                    } 
+                    else if cur_tile.end_point == check_tile.start_point_two
+                    {
+                        println!(" ----- 5b -------b FTFT ");
+                        println!("cur_tile.end_point == check_tile.start_point_one");
+                        println!("Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                        
+                        res = (contig_row,contig_col);
+                        break;
+                    } else {
+                        println!(" ----- 5c --------\n TFTF ");
+                        println!(" somethings wrong TFTF ");
+                        panic!();
+                    }                    
+                    // end match false, true, false, false) 
+                }
+
+// ;;;;;;;;;;;;;;;
+// ;;;;;;;;;;;;;;;
+                _ => {
+                    // want to explicitly match all cases and panic for unknown ones as these need to be checked
+                    println!("WHOOPS BAD STUFF");
                     panic!();
                 }
-        
-            } 
-// ***************
-            // if Current Tile is TFTF check tile is not then
-            else if !cur_tile_is_tftf && check_tile_is_tftf
-            {
-                println!(" ----- 3 --------- TFTF ");
-                // check to see if edge not visited
-                // see if end point matches start point of non visited edge
-                // if so next tile found
-                // if not then we've got an error 
-                if cur_tile.end_point == check_tile.start_point
-                {   println!(" ----- 3a --------\n TFTF ");
-                    println!("Next Tile Found\ncur_tile.end_point == check_tile.start_point");
-                    println!("Next Tile: \n {:?}", &check_tile);
-                    res = (contig_row,contig_col);
-                    break;
-                } 
-                else if cur_tile.end_point == check_tile.start_point_two
-                {
-                    println!(" ----- 2b -------b TFTF ");
-                    println!("cur_tile.end_point == check_tile.start_point_one");
-                    println!("Next Tile Index: [{},{}]", &contig_row,&contig_col);
-                    
-                    res = (contig_row,contig_col);
-                    break;
-                } else {
-                    println!(" ----- 2c --------\n TFTF ");
-                    println!(" somethings wrong TFTF ");
-                    panic!();
-                }
-        
-            } 
-
-// ****************
-
-             else if (!cur_tile_is_tftf || !cur_tile_is_ftft) && check_tile_is_ftft 
-            {
-                println!(" ----- 4 --------- \n FTFT ");
-                // check to see if edge not visited
-                // see if end point matches start point of non visited edge
-                // if so next tile found
-                // if not then we've got an error 
-                panic!()
             }
-            else {
-                println!(" ----- 5 --------- \n ");
-                println!("{:?} Cur_tile_end_point not found ", cur_tile.end_point);
-                }
+
+
+// ====================================
+// ====================================
 
             }
             else {
