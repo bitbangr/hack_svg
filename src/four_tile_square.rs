@@ -771,7 +771,7 @@ pub(crate) fn create_bot_left_grn_rest_blk_tile_data() -> Vec<Vec<(euclid::Box2D
     // (Box2D((100, 0), (200, 100)), RGB_VAL (#,#,#)),
     let top_left :(i32,i32) = (100,0);
     let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
+    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
     let _ = &pane_grid.push((tile_box, rgb));
 
     // green tile
