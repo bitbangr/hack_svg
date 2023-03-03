@@ -15,8 +15,10 @@ mod pane_build_utils;
 mod single_tile;
 mod two_tile_horiz;
 mod four_tile_square;
+mod six_tile_rect;
 mod nine_tile_square;
 mod two_op_line_tiles;
+mod twenty5_tile_square;
 
 use euclid::default::Box2D;
 use euclid::default::Point2D;
@@ -34,18 +36,28 @@ fn main() {
     // Below are the basic tests.
     // Run these everytime major changes are made to the code base
 
+    // let _ = six_tile_rect::svg_1();  // single color 2 rows by 3 cols. To check single line FTTT TFTT TTFT TTTF tiles
+    // let _ = six_tile_rect::svg_2();  // white row/black row color - 2 rows by 3 cols.
+    // let _ = six_tile_rect::svg_3();  // red red green row / black red red row - 2 rows by 3 cols.
+
     // let _ = two_op_line_tiles::svg_98();
     // let _ = two_op_line_tiles::svg_99();
     // let _ = two_op_line_tiles::svg_1();
-    let _ = two_op_line_tiles::svg_2();
+    // let _ = two_op_line_tiles::svg_2();
+    // let _ = two_op_line_tiles::svg_3();
     
+    let _ = twenty5_tile_square::svg_1(); // 5x5 25 tiles Single Center Black Tile surounded by white tiles
+
 
     // let _ = nine_tile_square::svg_1(); // create_3x3_rgb_checker_tile_data
     // let _ = nine_tile_square::svg_2(); // create_black_center_cross_tile_data
-    // let _ = nine_tile_square::svg_3(); // create_black_center_cross_tile_data
+    // let _ = nine_tile_square::svg_3(); // 
     
-    // TODO COME BACK TO THIS for oposing 2 lines test
-    // let _ = nine_tile_square::svg_4();//create_svg4_data_center_black
+    // Going to be a long test so leave this for later 
+    // let _ = nine_tile_square::svg_4(); // Center Black Tile surounded by red tiles
+
+    // // TODO COME BACK TO THIS for oposing 2 lines test
+    // // let _ = nine_tile_square::svg_4();//create_svg4_data_center_black
     
     // let _ = four_tile_square::svg_1();
     // let _ = four_tile_square::svg_2();
