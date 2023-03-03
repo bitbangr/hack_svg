@@ -157,6 +157,9 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     let mut visited_tiles: Array2<TileVisited> = create_visited_bool_arr(shape);
     println!("Visited Tiles {:?} ", &visited_tiles);
 
+    // helper function to set all TTTT tiles as visited as we will never process these to create an SVG path
+    let _ = set_tttt_visited_tiles(&mut visited_tiles,&pane_edge_nd_arr);
+
     // Grab a collection of contigous tiles
     for contig_group in &contiguous_tiles{
 
@@ -451,8 +454,28 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
     svg::save(op_svg_file_name, &document)   
 
-} // travel_contig_ext_int_svg
+    // end travel_contig_ext_int_svg
+}
 
+/// iterate over the visited tiles and set all TTTT tiles (i.e. tiles with no edges) as visited
+fn set_tttt_visited_tiles(visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>, 
+                                         pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) 
+{
+        // for all tttt tiles set visited tiles to [true,true,true,true]
+    let match_tttt = [Some(true), Some(true), Some(true), Some(true)];
+
+    for (((row, col), m_tile), ((_row1, _col1), edge_visited_bool)) in pane_edge_nd_arr.indexed_iter().zip(visited_tiles.indexed_iter_mut()) 
+    {
+        let m_tile_edge_bool = m_tile.edge_bool.clone();
+        let tile_is_tttt :bool = match_edge_boolean_pattern(match_tttt, &m_tile_edge_bool);
+
+        if tile_is_tttt {
+            *edge_visited_bool = TileVisited::new(vec![true, true, true, true]);
+        }
+        // println!("[{},{}] - {:?}" , row, col, &m_tile.edge_bool);
+        // println!("{:?}", &edge_visited_bool);
+    }
+}
 
 // ****************************** */
 // ****************************** */
@@ -503,7 +526,7 @@ fn find_next_tile_ext(curtile_row: usize,
             println!("We've NOT visited this tile ");
         }
 
-        // don't check for ourselves or previously visited tiles
+        // don't check for ourselves or tiles with all edges visited
         if !((contig_row == curtile_row) && (contig_col == curtile_col)) && !tile_prev_visited
         {
             let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
@@ -701,7 +724,7 @@ fn find_next_tile_ext(curtile_row: usize,
             }
             else {
             println!(" ----- 7 --------- \n ");
-            println!("...self...or already visited tile");
+            println!("...self...or edges all visited tile");
             }     
     }
 
