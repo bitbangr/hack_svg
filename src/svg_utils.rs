@@ -177,7 +177,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
         let mut col = *&start_tile_idx.1 as usize;
 
         // grab the first tile and keep track of it
-        let start_tile:MosaicTile  = pane_edge_nd_arr[[row,col]].clone(); 
+        let mut start_tile:MosaicTile  = pane_edge_nd_arr[[row,col]].clone(); 
         
         let start_tile_rgb_str = &start_tile.tile.rgb.to_string().replace(" ", "");
         let rgb_str = start_tile_rgb_str.to_string(); 
@@ -268,7 +268,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
 // **************************************
 // **************************************
-// UPDATE ALL THE CODE BELOW TO USE THE SAME 
+// TODO: UPDATE ALL THE CODE BELOW TO USE THE SAME 
 // MATCH STYLE used in find_next_tile_ext.
 // i.e. get rid of confusing if/else if/else if/else crap 
 // **************************************
@@ -388,11 +388,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                     // update curr svg line end point
                     // combine the data
                     // more tiles is set to true 
-
-
                     
                 }
-
 
             } else
 
@@ -421,12 +418,6 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
             if next_tile_clone.end_point == start_tile.start_point { 
                 println!("Completed external path traversal for this contigous group");
                 println!("Must check for and draw internal SVG paths");
-
-                // add the last tile data to the data 
-                // let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point );
-                // let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &visited_tiles );
-
-                // let next_tile_svg_line_data = get_ext_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &mut visited_tiles, row, col );
                 
                 let (next_tile_svg_line_data, svg_line_end_point) = get_ext_tile_svg_line_data(&next_tile_clone, &curr_svg_line_end_point, &mut visited_tiles, row, col );
             
@@ -434,16 +425,44 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                 curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32  );
 
                 line_data = combine_data(&line_data,&next_tile_svg_line_data );
-    
-                // External path completed
-                // check all the tiles in contig_group to see that there are no paths still to be processed
-                let unprocessed_contig_group_tiles: bool = check_un_visited(&contig_group, &visited_tiles);
-                if unprocessed_contig_group_tiles {
-                    println!("More tiles Internal path to be processed");
-                    panic!();
-                }
 
-                more_tiles = false;
+                // check for incomplete tiles in contig_group to see if there are more paths still to be processed
+                let incomplete_tile: Option<((isize, isize), MosaicTile)> = get_incomplete_tile(&contig_group, &visited_tiles, &pane_edge_nd_arr); 
+                match incomplete_tile {
+                    Some((index, tile)) => {
+                        println!("\nAn Incomplete tile was found: {:?},\n\t {:?}\n", &index, &tile);
+                        
+                        // close the current path line_data
+                        line_data = line_data.close();
+
+                        // move to the start location of the incomplete edge                        
+                        let start_xy = tile.get_start_point_as_i32();
+                        line_data = line_data.move_to(start_xy);
+
+                        // set to the end point of this tile
+                        curr_svg_line_end_point = tile.end_point;
+                        
+                        // set the row column values 
+                        // update row col to the found tile row col
+                        row = index.0 as usize;
+                        col = index.1 as usize;
+
+                        // update the start tile that we use to check for end of path
+                        start_tile = pane_edge_nd_arr[[row,col]].clone(); 
+
+                        // update the 
+                        more_tiles = true;
+                        // TODO CHECK THIS LOGIG
+                        // panic!();
+                    },
+                    None => {
+                        // External path completed 
+                        println!("\n External Path Completed\nNo Incomplete Tiles found - Wrap it up");
+                        more_tiles = false;
+                    }
+                }
+                // see None in above match
+                // more_tiles = false;
             }
             else {
                 println!("next_tile end_point != start_tile start_point\n Continue processing contigous group tiles");
@@ -473,12 +492,6 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     svg::save(op_svg_file_name, &document)   
 
     // end travel_contig_ext_int_svg
-}
-
-// Return True if there are more tiles to be processed
-// false otherwise
-fn check_un_visited(contig_group: &[(isize, isize)], visited_tiles: &ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>) -> bool {
-    false
 }
 
 // ****************************** */
@@ -848,6 +861,35 @@ fn set_tttt_visited_tiles(visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, 
         // println!("{:?}", &edge_visited_bool);
     }
 }
+
+// Return True if there are more tiles to be processed
+// false otherwise
+fn check_un_visited(contig_group: &[(isize, isize)], visited_tiles: &ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>) -> bool {
+    for (row, col) in contig_group {
+        let tile_visited = &visited_tiles[[*row as usize, *col as usize]];
+        if !tile_visited.edge_visited.iter().all(|&v| v) {
+            return true;
+        }
+    }
+    false
+}
+///
+/// Return the (row,col) location and Mosaic tile of first not completely visited tile 
+fn get_incomplete_tile(contig_group: &[(isize, isize)], 
+                             visited_tiles: &ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>, 
+                             pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> Option<((isize,isize), MosaicTile)> {
+    for (row, col) in contig_group {
+        let tile_visited = &visited_tiles[[*row as usize, *col as usize]];
+        if !tile_visited.edge_visited.iter().all(|&v| v) {
+            let tile: MosaicTile = pane_edge_nd_arr[[*row as usize, *col as usize]].clone();
+           // return index of item that has not had all edges set to visited 
+           return Some(((*row,*col),tile));
+        }
+    }
+    // nothing found so return none
+    None 
+}
+
 
 // ****************************** */
 // ****************************** */
