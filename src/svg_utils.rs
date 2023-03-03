@@ -266,6 +266,15 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
             let next_tile_clone = pane_edge_nd_arr[[found_tile_row,found_tile_col]].clone(); 
             println!("Next Tile using Tile mosaic_tile::Tile struct {:?} ", &next_tile_clone);
 
+// **************************************
+// **************************************
+// UPDATE ALL THE CODE BELOW TO USE THE SAME 
+// MATCH STYLE used in find_next_tile_ext.
+// i.e. get rid of confusing if/else if/else if/else crap 
+// **************************************
+// **************************************
+
+
         // TODO the below if ep = sp check does not work for FTFT or TFTF next_tile_clone tiles
         // as we don't know which point is the end of the path
         // modify this to check for FTFT || TFTF tiles -> if any visited edge end point (sp or ep) matches then we've completed travel
@@ -410,7 +419,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
             // } else 
             
             if next_tile_clone.end_point == start_tile.start_point { 
-                println!("Completed traversal of all tiles in contigous group");
+                println!("Completed external path traversal for this contigous group");
+                println!("Must check for and draw internal SVG paths");
 
                 // add the last tile data to the data 
                 // let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point );
@@ -418,13 +428,21 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
                 // let next_tile_svg_line_data = get_ext_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &mut visited_tiles, row, col );
                 
-            let (next_tile_svg_line_data, svg_line_end_point) = get_ext_tile_svg_line_data(&next_tile_clone, &curr_svg_line_end_point, &mut visited_tiles, row, col );
+                let (next_tile_svg_line_data, svg_line_end_point) = get_ext_tile_svg_line_data(&next_tile_clone, &curr_svg_line_end_point, &mut visited_tiles, row, col );
             
                 // update the curr_svg_line_end_point to the last svg line position
                 curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32  );
 
                 line_data = combine_data(&line_data,&next_tile_svg_line_data );
     
+                // External path completed
+                // check all the tiles in contig_group to see that there are no paths still to be processed
+                let unprocessed_contig_group_tiles: bool = check_un_visited(&contig_group, &visited_tiles);
+                if unprocessed_contig_group_tiles {
+                    println!("More tiles Internal path to be processed");
+                    panic!();
+                }
+
                 more_tiles = false;
             }
             else {
@@ -457,24 +475,10 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     // end travel_contig_ext_int_svg
 }
 
-/// iterate over the visited tiles and set all TTTT tiles (i.e. tiles with no edges) as visited
-fn set_tttt_visited_tiles(visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>, 
-                                         pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) 
-{
-        // for all tttt tiles set visited tiles to [true,true,true,true]
-    let match_tttt = [Some(true), Some(true), Some(true), Some(true)];
-
-    for (((row, col), m_tile), ((_row1, _col1), edge_visited_bool)) in pane_edge_nd_arr.indexed_iter().zip(visited_tiles.indexed_iter_mut()) 
-    {
-        let m_tile_edge_bool = m_tile.edge_bool.clone();
-        let tile_is_tttt :bool = match_edge_boolean_pattern(match_tttt, &m_tile_edge_bool);
-
-        if tile_is_tttt {
-            *edge_visited_bool = TileVisited::new(vec![true, true, true, true]);
-        }
-        // println!("[{},{}] - {:?}" , row, col, &m_tile.edge_bool);
-        // println!("{:?}", &edge_visited_bool);
-    }
+// Return True if there are more tiles to be processed
+// false otherwise
+fn check_un_visited(contig_group: &[(isize, isize)], visited_tiles: &ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>) -> bool {
+    false
 }
 
 // ****************************** */
@@ -482,20 +486,13 @@ fn set_tttt_visited_tiles(visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, 
 
 /// Find the next tile based on the end point of one tile is the start point of the next tile
 /// Note tiles must reside in the same contiguous group
-/// 
-/// TODO!!!! need to deal with cases where search returns a link to yourself 
-/// and the start point and end points are the same.  
-/// So somehow remove yourself from the contig array or if congtig_row and contig_col match then skip
-
 fn find_next_tile_ext(curtile_row: usize, 
     curtile_col: usize, 
     cur_tile: &MosaicTile, 
     contig_group: &[(isize, isize)], 
     pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>,
     visited_tiles: &ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>) -> (usize,usize) 
-    // pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) -> MosaicTile 
 {
-
     println!("\n******************\nfn find_next_tile\n******************");
     println!( "row {}\ncol {}\ncontig_group {:?}\ncur_tile {:?}", curtile_row, curtile_col, contig_group, cur_tile ); 
     println!("******************************************");
@@ -531,9 +528,6 @@ fn find_next_tile_ext(curtile_row: usize,
         {
             let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
 
-            // this is where we need to add logic to handle finding next tile for
-            // FTFT and TFTF tiles
-
             let cur_tile_is_tftf :bool = cur_tile.is_tftf();
             let cur_tile_is_ftft :bool = cur_tile.is_ftft();
             let check_tile_is_tftf:bool = check_tile.is_tftf();
@@ -548,13 +542,12 @@ fn find_next_tile_ext(curtile_row: usize,
             println!("\tCheck tile is FTFT -> {}\n", &check_tile_is_ftft);
 
             // if cur_tile is TFTF or FTFT then we need to determine which line endpoint
-            //  has the current svg_line_end_point that we're drawing from.
+            // has the current svg_line_end_point that we're drawing from.
             // otherwise just use cur_tile.end_point to match with check_tile
             // or
             // if check tile is TFTF or FTFT then we need to determine which line start point
             // matches the previous line end point and use this to find the next tile
 
-            // 
             match (cur_tile_is_tftf, cur_tile_is_ftft, check_tile_is_tftf ,check_tile_is_ftft) 
             {
                 // just process tiles as regular tiles
@@ -835,6 +828,25 @@ fn create_visited_bool_arr(shape: &[usize]) -> ArrayBase<OwnedRepr<TileVisited>,
     }
     
     result
+}
+
+/// iterate over the visited tiles and set all TTTT tiles (i.e. tiles with no edges) as visited
+fn set_tttt_visited_tiles(visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>,  pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>) 
+{
+    // for all tttt tiles set visited tiles to [true,true,true,true]
+    let match_tttt = [Some(true), Some(true), Some(true), Some(true)];
+
+    for (((row, col), m_tile), ((_row1, _col1), edge_visited_bool)) in pane_edge_nd_arr.indexed_iter().zip(visited_tiles.indexed_iter_mut()) 
+    {
+        let m_tile_edge_bool = m_tile.edge_bool.clone();
+        let tile_is_tttt :bool = match_edge_boolean_pattern(match_tttt, &m_tile_edge_bool);
+
+        if tile_is_tttt {
+            *edge_visited_bool = TileVisited::new(vec![true, true, true, true]);
+        }
+        // println!("[{},{}] - {:?}" , row, col, &m_tile.edge_bool);
+        // println!("{:?}", &edge_visited_bool);
+    }
 }
 
 // ****************************** */
