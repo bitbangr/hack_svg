@@ -19,24 +19,24 @@ use svg::node::element::path::Data;
 /// It is up to the caller to add the returned line data to the existing line data in order
 /// to complete a path
 /// 
-pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile, 
+pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile, 
                                 curr_svg_line_end_point: &Point2D<i32>, 
                                 visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>,
                                 row: usize, col: usize) -> (Data, (usize,usize)) {
     let mut line_data = Data::new();
 
     let svg_end_point: (usize,usize); 
-    let edge_bool = m_tile.edge_bool.clone();
+    let edge_bool = cur_tile.edge_bool.clone();
 
     let top = edge_bool[TOP];
     let right = edge_bool[RIGHT];
     let bottom = edge_bool[BOTTOM];
     let left = edge_bool[LEFT];
 
-    let start_point = m_tile.start_point; 
-    let end_point = m_tile.end_point;
+    let start_point = cur_tile.start_point; 
+    let end_point = cur_tile.end_point;
 
-    let corner = &m_tile.tile.corners();
+    let corner = &cur_tile.tile.corners();
 
     // visited_tiles[[0, 1]].edge_visited[TOP]
     let top_visited = visited_tiles[[row, col]].edge_visited[TOP];
@@ -246,9 +246,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             println!(" !!!!! Need to Deal with this!!!!!\n");
 
             // ***** TODO BELOW 
-            // TODO use bpoints instead of m_tile.start_point m_tile_end_point 
+            // TODO use bpoints instead of cur_tile.start_point cur_tile_end_point 
 
-            if *curr_svg_line_end_point == m_tile.start_point 
+            if *curr_svg_line_end_point == cur_tile.start_point 
             {
                 line_data = line_data.line_to(corner[TOP_RIGHT]);
 
@@ -261,10 +261,10 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                 visited_tiles[[row, col]].edge_visited[RIGHT] = true;
                 visited_tiles[[row, col]].edge_visited[LEFT] = true;
 
-                println!("curr_svg_line_end_point = m_tile.start_point");
+                println!("curr_svg_line_end_point = cur_tile.start_point");
 
             } //bottom
-            else if *curr_svg_line_end_point == m_tile.start_point_two 
+            else if *curr_svg_line_end_point == cur_tile.start_point_two 
             {
                 line_data = line_data.line_to(corner[BOT_LEFT]);
 
@@ -277,7 +277,7 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                 visited_tiles[[row, col]].edge_visited[LEFT] = true;
                 visited_tiles[[row, col]].edge_visited[BOTTOM] = true;
 
-                println!("curr_svg_line_end_point = m_tile.start_point_two");
+                println!("curr_svg_line_end_point = cur_tile.start_point_two");
 
             }
             else {
@@ -303,9 +303,9 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
             println!{"2nd line - end point corners[BOT_RIGHT]-> {:?} ", corner[BOT_RIGHT]};  
 
                 // ***** TODO BELOW 
-            // TODO use bpoints instead of m_tile.start_point m_tile_end_point 
+            // TODO use bpoints instead of cur_tile.start_point cur_tile_end_point 
 
-            if *curr_svg_line_end_point == m_tile.start_point 
+            if *curr_svg_line_end_point == cur_tile.start_point 
             {
                 line_data = line_data.line_to(corner[TOP_LEFT]);
 
@@ -318,10 +318,10 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                 visited_tiles[[row, col]].edge_visited[LEFT] = true;
                 visited_tiles[[row, col]].edge_visited[BOTTOM] = true;
 
-                println!("curr_svg_line_end_point = m_tile.start_point");
+                println!("curr_svg_line_end_point = cur_tile.start_point");
 
             } //bottom
-            else if *curr_svg_line_end_point == m_tile.start_point_two 
+            else if *curr_svg_line_end_point == cur_tile.start_point_two 
             {
                 line_data = line_data.line_to(corner[BOT_RIGHT]);
 
@@ -334,7 +334,7 @@ pub fn get_ext_tile_svg_line_data(m_tile: &MosaicTile,
                 visited_tiles[[row, col]].edge_visited[RIGHT] = true;
                 visited_tiles[[row, col]].edge_visited[BOTTOM] = true;
 
-                println!("curr_svg_line_end_point = m_tile.start_point_two");
+                println!("curr_svg_line_end_point = cur_tile.start_point_two -> {:?}", &curr_svg_line_end_point);
 
             }
             else {
