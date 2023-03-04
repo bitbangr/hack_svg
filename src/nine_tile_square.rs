@@ -29,13 +29,13 @@ pub fn svg_1() {
     ];
 
     let rgb_arr = rgb_vec_to_array(rgb_vec);
-    println!("rgb_arr {:?}", &rgb_arr);
+    // println!("rgb_arr {:?}", &rgb_arr);
 
     let col_width: i32 = 100;
     let row_height: i32 = 100;
     let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
 
-    println!("svg1 data_results = {:?}", data_results);
+    // println!("svg1 data_results = {:?}", data_results);
 
     let _ = create_svg(
         op_svg_file_name,
@@ -67,13 +67,13 @@ pub fn svg_2() {
     ];
 
     let rgb_arr = rgb_vec_to_array(rgb_vec);
-    println!("rgb_arr {:?}", &rgb_arr);
+    // println!("rgb_arr {:?}", &rgb_arr);
 
     let col_width: i32 = 100;
     let row_height: i32 = 100;
     let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
 
-    println!("svg1 data_results = {:?}", data_results);
+    // println!("svg1 data_results = {:?}", data_results);
 
     let _ = create_svg(
         op_svg_file_name,
@@ -104,13 +104,13 @@ pub fn svg_3() {
     ];
 
     let rgb_arr = rgb_vec_to_array(rgb_vec);
-    println!("rgb_arr {:?}", &rgb_arr);
+    // println!("rgb_arr {:?}", &rgb_arr);
 
     let col_width: i32 = 100;
     let row_height: i32 = 100;
     let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
 
-    println!("svg1 data_results = {:?}", data_results);
+    // println!("svg1 data_results = {:?}", data_results);
 
     let _ = create_svg(
         op_svg_file_name,
@@ -143,13 +143,13 @@ pub fn svg_4() {
     ];
 
     let rgb_arr = rgb_vec_to_array(rgb_vec);
-    println!("rgb_arr {:?}", &rgb_arr);
+    // println!("rgb_arr {:?}", &rgb_arr);
 
     let col_width: i32 = 100;
     let row_height: i32 = 100;
     let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
 
-    println!("svg1 data_results = {:?}", data_results);
+    // println!("svg1 data_results = {:?}", data_results);
 
     let _ = create_svg(
         op_svg_file_name,
