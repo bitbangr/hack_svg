@@ -268,9 +268,9 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
 // **************************************
 // **************************************
-// TODO: UPDATE ALL THE CODE BELOW TO USE THE SAME 
-// MATCH STYLE used in find_next_tile_ext.
-// i.e. get rid of confusing if/else if/else if/else crap 
+TODO: UPDATE ALL THE CODE BELOW TO USE THE SAME 
+MATCH STYLE used in find_next_tile_ext.
+i.e. get rid of confusing if/else if/else if/else crap 
 // **************************************
 // **************************************
 
@@ -1172,7 +1172,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             println!("\n\n********** cur_tile INFO **********");
             println!("(row: {} col: {})",row, col);
             println!("\tbox co-ords {:?}", &cur_tile.tile.coords);
-            println!("\trgb {:?}", &cur_tile.tile.coords);
+            println!("\trgb {:?}", &cur_tile.tile.rgb);
             println!("\tedge_bool {:?}", &cur_tile.edge_bool);
 
             let corner = cur_tile.tile.corners();
