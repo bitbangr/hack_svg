@@ -104,6 +104,13 @@ impl MosaicTile {
         let y: i32 = self.start_point.y.try_into().unwrap();
         (x, y)
     }
+
+    pub fn get_start_point_two_as_i32(&self) -> (i32, i32) {
+        let x: i32 = self.start_point_two.x.try_into().unwrap();
+        let y: i32 = self.start_point_two.y.try_into().unwrap();
+        (x, y)
+    }
+
     
 }
 
