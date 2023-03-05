@@ -18,3 +18,4 @@ pub const RGB_WHITE: RGB = RGB(255,255,255);
 pub const RGB_RED: RGB = RGB(255,0,0);
 pub const RGB_GREEN: RGB = RGB(0,255,0);
 pub const RGB_BLUE: RGB = RGB(0,0,255);
+pub const RGB_YELLOW: RGB = RGB(250,237,39);
