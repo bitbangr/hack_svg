@@ -29,13 +29,10 @@ pub fn svg_1() {
     ];
 
     let rgb_arr = rgb_vec_to_array(rgb_vec);
-    // println!("rgb_arr {:?}", &rgb_arr);
 
     let col_width: i32 = 100;
     let row_height: i32 = 100;
     let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
-
-    // println!("svg1 data_results = {:?}", data_results);
 
     let _ = create_svg(
         op_svg_file_name,
@@ -67,13 +64,10 @@ pub fn svg_2() {
     ];
 
     let rgb_arr = rgb_vec_to_array(rgb_vec);
-    // println!("rgb_arr {:?}", &rgb_arr);
 
     let col_width: i32 = 100;
     let row_height: i32 = 100;
     let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
-
-    // println!("svg1 data_results = {:?}", data_results);
 
     let _ = create_svg(
         op_svg_file_name,
@@ -104,13 +98,10 @@ pub fn svg_3() {
     ];
 
     let rgb_arr = rgb_vec_to_array(rgb_vec);
-    // println!("rgb_arr {:?}", &rgb_arr);
 
     let col_width: i32 = 100;
     let row_height: i32 = 100;
     let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
-
-    // println!("svg1 data_results = {:?}", data_results);
 
     let _ = create_svg(
         op_svg_file_name,
@@ -127,7 +118,7 @@ pub fn svg_3() {
 // Center Black Tile surounded by white tiles
 // This is going to be a long case so leave for now
 pub fn svg_4() {
-    let op_svg_file_name = "./svg_output/threeXthree/output_4.svg";
+    let op_svg_file_name = "./svg_output/threeXthree/output_4a.svg";
     let rows: usize = 3;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 3;
@@ -137,19 +128,16 @@ pub fn svg_4() {
 
     //  3x3 array    
     let rgb_vec: Vec<Vec<(RGB)>> = vec![
-        vec![RGB_WHITE, RGB_WHITE, RGB_WHITE],
-        vec![RGB_WHITE, RGB_BLACK, RGB_WHITE],
-        vec![RGB_WHITE, RGB_WHITE, RGB_WHITE],
+        vec![RGB_RED, RGB_RED, RGB_RED],
+        vec![RGB_RED, RGB_BLACK, RGB_RED],
+        vec![RGB_RED, RGB_RED, RGB_RED],
     ];
 
     let rgb_arr = rgb_vec_to_array(rgb_vec);
-    // println!("rgb_arr {:?}", &rgb_arr);
 
     let col_width: i32 = 100;
     let row_height: i32 = 100;
     let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
-
-    // println!("svg1 data_results = {:?}", data_results);
 
     let _ = create_svg(
         op_svg_file_name,
