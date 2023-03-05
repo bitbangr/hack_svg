@@ -54,6 +54,9 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
     println!("\tbottom visited:{:?}",bottom_visited );
     println!("\tleft visited:{:?}",left_visited );
 
+    println!("\n [{},{}] <- [row,col]", &row, &col );
+    println!("TILE EDGE MATCH \n\t(top,right,bottom,left)" );
+
     match (top, right, bottom, left) {
 
         // *******************************************
@@ -64,7 +67,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         // **********************************
 
         (false, false, false, false) => { // FFFF
-            println!("\nmatch -> false false false false - single tile");
+            println!("match -> false false false false - single tile");
             println!{"start point TOP_LEFT-> {:?} ", corner[TOP_LEFT]}; 
             println!{"end point TOP_LEFT-> {:?} ", corner[TOP_LEFT]}; 
 
@@ -85,7 +88,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         // Start of three false edge cases 
         // **********************************
         (true, false, false, false) => { //TFFF
-            println!("\nmatch -> true false false false - top open");
+            println!("match -> true false false false - top open");
             println!(" BOTTOM LEFT RIGHT Closed - Top side open tile\n");
 
             line_data = line_data.line_to(corner[BOT_RIGHT])
@@ -104,7 +107,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
             }, // TFFF
             // **********************************    
         (false, true, false, false) => { //FTFF
-            println!("\nmatch -> false true false false - right open");
+            println!("match -> false true false false - right open");
             println!(" TOP BOTTOM LEFT Closed - Right side open tile\n");
 
             line_data = line_data.line_to(corner[BOT_LEFT])
@@ -126,7 +129,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
             }, // FTFF
             // **********************************    
         (false, false, true, false) => { //FFTF
-            println!("\nmatch -> false false true false - bottom open");
+            println!("match -> false false true false - bottom open");
             println!(" TOP/LEFT/RIGHT Closed - bottom side open tile\n");
 
             line_data = line_data .line_to(corner[TOP_LEFT])
@@ -145,7 +148,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
 
         // **********************************
         (false, false, false, true) => { //FFFT
-            println!("\nmatch -> false false false true - left open");
+            println!("match -> false false false true - left open");
             println!(" TOP RIGHT BOTTOM Closed - Left side Open tile\n");
 
             line_data = line_data.line_to(corner[TOP_RIGHT])
@@ -165,7 +168,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         // Start of two false edge cases 
         // **********************************
         (false, false, true, true) => { //FFTT
-            println!("\nmatch -> false false true true - bottom left open");
+            println!("match -> false false true true - bottom left open");
             println!(" TOP/RIGHT Closed - Bottom-Left side open tile\n");
 
             line_data = line_data.line_to(corner[TOP_RIGHT])
@@ -182,7 +185,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
             }, // FFTT            
         // **********************************    
         (true, false, false, true) => { //TFFT
-            println!("\nmatch -> true false false true - top/left open");
+            println!("match -> true false false true - top/left open");
             println!(" BOTTOM RIGHT Closed - Top-Left side open tile\n");
 
             line_data = line_data.line_to(corner[BOT_RIGHT])
@@ -199,7 +202,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         }, // TFFT        
         // **********************************    
         (true, true, false, false) => { //TTFF
-            println!("\nmatch -> true true false false - top/right open");
+            println!("match -> true true false false - top/right open");
             println!(" BOTTOM LEFT Closed - Top-Right side open tile\n");
 
             line_data = line_data.line_to(corner[BOT_LEFT])
@@ -217,7 +220,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         }, // TTFF        
         // **********************************    
         (false, true, true, false) => { //FTTF
-            println!("\nmatch -> false true true false - right/bottom open");
+            println!("match -> false true true false - right/bottom open");
             println!(" TOP LEFT Closed - Right-Bottom side open tile\n");
 
             line_data = line_data.line_to(corner[TOP_LEFT])
@@ -241,12 +244,8 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         // **********************************
         // **********************************    
         (false, true, false, true) => { //FTFT
-            println!("\nmatch -> false true false true - left/right open");
+            println!("match -> false true false true - left/right open");
             println!(" TOP BOTTOM Closed - Left-Right side open tile\n");
-            println!(" !!!!! Need to Deal with this!!!!!\n");
-
-            // ***** TODO BELOW 
-            // TODO use bpoints instead of cur_tile.start_point cur_tile_end_point 
 
             if *curr_svg_line_end_point == cur_tile.start_point 
             {
@@ -261,7 +260,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
                 visited_tiles[[row, col]].edge_visited[RIGHT] = true;
                 visited_tiles[[row, col]].edge_visited[LEFT] = true;
 
-                println!("curr_svg_line_end_point = cur_tile.start_point");
+                println!("({:?}) curr_svg_line_end_point = cur_tile.start_point", &cur_tile.start_point);
 
             } //bottom
             else if *curr_svg_line_end_point == cur_tile.start_point_two 
@@ -281,7 +280,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
 
             }
             else {
-                println!("We should never get here!!!");
+                println!(" 11 We should never get here!!!");
                 panic!();                
             }
 
@@ -293,9 +292,8 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         }, // FTFT
         // **********************************    
         (true, false, true, false) => { //TFTF
-            println!("\nmatch -> true false true false - top/bottom open");
+            println!("match -> true false true false - top/bottom open");
             println!(" LEFT RIGHT Closed - Top-Bottom side open tile\n");
-            println!(" !!!!! Need to Deal with this!!!!!\n");
 
             println!{"1st line - start point BOT_LEFT-> {:?} ", &start_point}; 
             println!{"1st line - end point TOP_LEFT-> {:?} ", &end_point};  
@@ -305,7 +303,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
                 // ***** TODO BELOW 
             // TODO use bpoints instead of cur_tile.start_point cur_tile_end_point 
 
-            if *curr_svg_line_end_point == cur_tile.start_point 
+            if *curr_svg_line_end_point == cur_tile.start_point // curr_svg_line_end_point not set to move_to_loc
             {
                 line_data = line_data.line_to(corner[TOP_LEFT]);
 
@@ -338,7 +336,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
 
             }
             else {
-                println!("We should never get here!!!");
+                println!(" 22 We should never get here!!!");
                 panic!();                
             }
 
@@ -348,7 +346,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         // **********************************
         // **********************************    
         (false, true, true, true) => { //FTTT
-            println!("\nmatch -> false true true true - right/left/bottom open");
+            println!("match -> false true true true - right/left/bottom open");
             println!(" TOP Closed - Right-Left-Bottom side open tile\n");
 
             line_data = line_data.line_to(corner[TOP_RIGHT]);
@@ -365,7 +363,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         }, // FTTT
         // **********************************    
         (true, false, true, true) => { //TFTT
-            println!("\nmatch -> true false true true - top/bottom/left open");
+            println!("match -> true false true true - top/bottom/left open");
             println!(" RIGHT Closed - Top-Bottom-Left side open tile\n");
 
             line_data = line_data.line_to(corner[BOT_RIGHT]);
@@ -382,7 +380,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         }, // TFTT
         // **********************************    
         (true, true, false, true) => { //TTFT
-            println!("\nmatch -> true true false true - top/left/right open");
+            println!("match -> true true false true - top/left/right open");
             println!(" BOTTOM Closed - Top-Left-Right side open tile\n");
 
             line_data = line_data.line_to(corner[BOT_LEFT]);
@@ -399,7 +397,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         }, // TTFT
         // **********************************    
         (true, true, true, false) => { //TTTF
-            println!("\nmatch -> true true true false - top/right/bottom open");
+            println!("match -> true true true false - top/right/bottom open");
             println!(" LEFT Closed - Top-Right-Bottom side open tile\n");
 
             line_data = line_data.line_to(corner[TOP_LEFT]);
@@ -420,7 +418,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
         // **********************************
 
         (true, true, true, true) => { //TTTT
-            println!("\nmatch -> true true true true - top/right/bottom/left open");
+            println!("match -> true true true true - top/right/bottom/left open");
             println!(" NO EDGES - Top-Right-Bottom-Left side open tile\n");
 
             // There
@@ -632,7 +630,7 @@ pub fn get_tile_svg_line_data(m_tile: &MosaicTile,
                 line_data = line_data.line_to(corner[BOT_LEFT]);
             }
             else {
-                println!("We should never get here!!!");
+                println!(" 33 We should never get here!!!");
                 panic!();                
             }
 
