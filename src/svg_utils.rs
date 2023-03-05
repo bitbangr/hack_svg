@@ -3,7 +3,6 @@ use crate::dfs_tiles;
 use crate::constants::{FLAGGED, TOP, BOTTOM, LEFT, RIGHT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
-
 use euclid::default::{Box2D, Point2D};
 use ndarray::{Array2, ArrayBase, OwnedRepr, Dim};
 use svg::node::element::path::Data;
@@ -179,6 +178,9 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
         // grab the first tile and keep track of it
         let mut start_tile:MosaicTile  = pane_edge_nd_arr[[row,col]].clone(); 
+
+        // use this value to check if paths are complete as we can have FTFT or TFTF tiles which have two pairs of start/end points
+        let mut svg_line_data_begin_point =  start_tile.start_point.clone();
         
         let start_tile_rgb_str = &start_tile.tile.rgb.to_string().replace(" ", "");
         let rgb_str = start_tile_rgb_str.to_string(); 
@@ -296,7 +298,11 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 // hhhhhhhhhhhhhhhhhhhhhd
 // hhhhhhhhhhhhhhhhhhhhhd
 
-            if next_tile_clone.end_point == start_tile.start_point { 
+            // TODO update test for path closure to handle FTFT and TFTF 
+            // for next_tile_clone and start_tile
+            
+            if next_tile_clone.end_point == svg_line_data_begin_point || 
+               next_tile_clone.end_point_two == svg_line_data_begin_point{ 
                 println!("Completed external path traversal for this contigous group");
                 println!("Must check for and draw internal SVG paths");
                 
@@ -313,54 +319,82 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                     Some((index, tile)) => {
                         println!("\nAn Incomplete tile was found: {:?},\n\t {:?}\n", &index, &tile);
                         
-                        // close the current path line_data
+                        // close the above current path line_data in prep to start a new path
                         line_data = line_data.close();
 
-                        // we can get FTFT or TFTF tile in which case we need to set the start point to the 
-                        // non-visited edge start point
-                        // if tile.is_ftft(){
-                        // }
-
+                        // grab the start xy and end point for this new path
                         let (path_start_xy , svg_path_end_pt): ((i32, i32), euclid::Point2D<i32, euclid::UnknownUnit>) = 
                                 get_incomplete_tile_info(&tile, &visited_tiles, &index);
-
-                        // // move to the start location of the incomplete edge
-                        // let start_xy: (i32, i32) = tile.get_start_point_as_i32();
-
-                        // // set to the end point of this tile
-                        // curr_svg_line_end_point = tile.end_point;
 
                         // move to the start location of the incomplete edge
                         let start_xy: (i32, i32) = path_start_xy;
 
-                        // set to the end point of this tile
-                        curr_svg_line_end_point = svg_path_end_pt;
-
-
+                        // move to start of first incomplete tile
                         line_data = line_data.move_to(start_xy);
 
+                        // set to the end point of this tile
+                        // curr_svg_line_end_point = svg_path_end_pt;
+                        // This is where the path data currently sits after the move to
+                        curr_svg_line_end_point = Point2D::new(start_xy.0 as i32, start_xy.1 as i32) ;  
                         
+                        // this is the updated start point for the new path that we check against for completion
+                        svg_line_data_begin_point = Point2D::new(start_xy.0 as i32, start_xy.1 as i32);  
+
                         // set the row column values 
                         // update row col to the found tile row col
                         row = index.0 as usize;
                         col = index.1 as usize;
 
+                        let incomplete_tile_clone = pane_edge_nd_arr[[row,col]].clone(); 
+
+                        let (next_tile_svg_line_data, svg_line_end_point)  = get_ext_tile_svg_line_data(&incomplete_tile_clone, 
+                            &curr_svg_line_end_point, // 
+                            &mut visited_tiles, 
+                            row,
+                            col );
+
+                        // update the curr_svg_line_end_point to the last svg line position
+                        curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32, );
+
+                        line_data = combine_data(&line_data,&next_tile_svg_line_data );
+
                         // update the start tile that we use to check for end of path
                         start_tile = pane_edge_nd_arr[[row,col]].clone(); 
 
-                        // update the 
+                        // search for the next tile to process
+                        let (found_tile_row, found_tile_col) = find_next_tile_ext(row, col, 
+                            &start_tile, 
+                            &contig_group, 
+                            &pane_edge_nd_arr, 
+                            &mut visited_tiles ); 
+
+                        // update the find_next_tile_ext method to include error handling
+                        // so we can avoid panicing below
+                        // this should never happen. 
+                        if found_tile_row == FLAGGED && found_tile_col == FLAGGED {
+                        println!("Did not find next tile.  Panic!");
+                        panic!();
+                        }
+
+                        // update row col to the found tile row col
+                        row = found_tile_row;
+                        col = found_tile_col;
+
+                        // continue to search for more tiles
                         more_tiles = true;
-                        // TODO CHECK THIS LOGIG
-                        // panic!();
+
+                    // end of Some((index, tile)) returns index and tile if found otherwise None 
                     },
                     None => {
                         // External path completed 
                         println!("\n External Path Completed\nNo Incomplete Tiles found - Wrap it up");
                         more_tiles = false;
                     }
+
+                // end of match incomplete_tile 
                 }
-                // see None in above match
-                // more_tiles = false;
+            
+            // end of if next_tile_clone.end_point == svg_line_data_begin_point
             }
             else {
                 println!("next_tile end_point != start_tile start_point\n Continue processing contigous group tiles");
@@ -418,15 +452,15 @@ fn get_incomplete_tile_info(tile: &MosaicTile,
         
         if !top_edge_visited   // Bottom edge must be the incomplete edge
         {  
-            println!("top_edge_visited");
-            start_xy = tile.get_start_point_two_as_i32();
-            curr_svg_line_end_point = tile.end_point_two;
+            println!("top_edge_visited == false");
+            start_xy = tile.get_start_point_as_i32();
+            curr_svg_line_end_point = tile.end_point;
         } 
         else if !bot_edge_visited // Top edge must be the incomplete edge
         {        
-            println!("bot_edge_visited");
-            start_xy = tile.get_start_point_as_i32();
-            curr_svg_line_end_point = tile.end_point;
+            println!("bot_edge_visited == false");
+            start_xy = tile.get_start_point_two_as_i32();
+            curr_svg_line_end_point = tile.end_point_two;
         } else {
             println!("Houston we have a problem");
             start_xy = tile.get_start_point_two_as_i32();
