@@ -1,7 +1,7 @@
 #![allow(unused)]
 
 use euclid::default::Box2D;
-use crate::constants::{RGB_BLACK,RGB_WHITE,RGB_RED,RGB_GREEN,RGB_BLUE};
+use crate::constants::{RGB_BLACK,RGB_WHITE,RGB_RED,RGB_GREEN,RGB_BLUE, RGB_YELLOW};
 use crate::create_tile;
 use crate::mosaic_tile::{RGB, rgb_vec_to_array};
 use crate::pane_build_utils::create_pane_test_data;
@@ -103,15 +103,49 @@ pub fn svg_3() {
     let svg_height = 800;
 
     //  8x8 array     
+    // let rgb_vec: Vec<Vec<(RGB)>> = vec![
+    //     vec![RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
+    //     vec![RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
+    //     vec![RGB_BLUE, RGB_BLUE, RGB_RED, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
+    //     vec![RGB_BLUE, RGB_BLUE, RGB_RED, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
+    //     vec![RGB_BLUE, RGB_BLUE, RGB_RED, RGB_BLACK, RGB_BLACK, RGB_WHITE, RGB_BLUE, RGB_BLUE],
+    //     vec![RGB_BLUE, RGB_BLUE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
+    //     vec![RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
+    //     vec![RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
+    // ];
+
     let rgb_vec: Vec<Vec<(RGB)>> = vec![
         vec![RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
         vec![RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
-        vec![RGB_BLUE, RGB_BLUE, RGB_RED, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
-        vec![RGB_BLUE, RGB_BLUE, RGB_RED, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
-        vec![RGB_BLUE, RGB_BLUE, RGB_RED, RGB_BLACK, RGB_BLACK, RGB_WHITE, RGB_BLUE, RGB_BLUE],
+        vec![RGB_BLUE, RGB_BLUE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
+        vec![RGB_BLUE, RGB_BLUE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
+        vec![RGB_BLUE, RGB_BLUE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
         vec![RGB_BLUE, RGB_BLUE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
         vec![RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
         vec![RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
+    ];
+
+}
+
+// 8x8 Blue mosaic with a 4x4 black tiles in the center
+pub fn svg_4() {
+    let op_svg_file_name = "./svg_output/fiveXfive/output_4.svg";
+    let rows: usize = 8;
+    let cols: usize = 10;
+    let tiles_per_pane_height: usize = 8;
+    let tiles_per_pane_width: usize = 10;
+    let svg_width = 1000;
+    let svg_height = 800;
+
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_RED, RGB_BLUE, RGB_BLUE,  RGB_BLUE,  RGB_BLUE,  RGB_BLUE,  RGB_GREEN, RGB_BLUE, RGB_BLUE, RGB_BLUE],
+        vec![RGB_BLUE, RGB_BLUE, RGB_BLUE,  RGB_BLUE,  RGB_BLUE,  RGB_BLUE,  RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
+        vec![RGB_BLUE, RGB_BLUE, RGB_BLACK, RGB_BLACK, RGB_BLUE,  RGB_BLUE,  RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_GREEN],
+        vec![RGB_BLUE, RGB_BLUE, RGB_BLACK, RGB_BLACK, RGB_BLUE,  RGB_BLUE,  RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
+        vec![RGB_BLUE, RGB_BLUE, RGB_BLACK, RGB_BLACK, RGB_BLUE,  RGB_BLUE,  RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
+        vec![RGB_BLUE, RGB_BLUE, RGB_BLACK, RGB_BLACK, RGB_BLUE,  RGB_BLUE,  RGB_BLACK, RGB_BLACK, RGB_BLUE, RGB_BLUE],
+        vec![RGB_YELLOW, RGB_YELLOW, RGB_BLUE,  RGB_BLUE,  RGB_BLUE,  RGB_BLUE,  RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
+        vec![RGB_YELLOW, RGB_YELLOW, RGB_BLUE,  RGB_BLUE,  RGB_BLUE,  RGB_BLUE,  RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
     ];
 
     let rgb_arr = rgb_vec_to_array(rgb_vec);
@@ -133,4 +167,4 @@ pub fn svg_3() {
         tiles_per_pane_width,
         data_results,
     );
-} // svg3
+} // svg4
