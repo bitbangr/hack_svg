@@ -763,30 +763,45 @@ fn find_next_tile_ext(curtile_row: usize,
                 // cur_tile NOT ftft, 
                 // check_tile NOT tftf 
                 // check_tile NOT ftft
+                
+                // need to check which line is actually the line being drawn from
+
                 (true, false, false, false) => {
+                    // there is an issue here in that there are two possible paths to draw out for this cur_tile
+                    // so it can possibly match two tiles.
                     println!(" ----- 7 --------- TFTF cur_tile only");
-                    if cur_tile.end_point == check_tile.start_point
-                    {   
+                    println!( "----- 7   Cur Tile visited edges visited_bool [{},{}] -> {:?}", curtile_row, curtile_col, visited_tiles[[curtile_row,curtile_col]] ); 
+                    
+                    let vbool = visited_tiles[[curtile_row,curtile_col]].edge_visited.clone();
+                    let match_right_visited = [None,Some(true),None, None];        
+                    let right_edge_visited = match_edge_boolean_pattern(match_right_visited, &vbool);
+                    println!("----- 7 match_right_visited = {:?}" , &right_edge_visited);
+
+                    let match_left_visited = [None, None, None, Some(true)];        
+                    let left_edge_visited = match_edge_boolean_pattern(match_left_visited, &vbool);
+                    println!("----- 7 left_edge_visited = {:?}" , &left_edge_visited);
+                    
+                    if left_edge_visited  && cur_tile.end_point == check_tile.start_point_two
+                    {  
                         println!(" ----- 7a ------- TFTF ");
                         println!(" ----- 7a Next Tile Index: [{},{}]", &contig_row,&contig_col);
                         println!(" ----- 7a {:?} <- cur_tile.end_point == check_tile.start_point", &cur_tile.end_point );
-                        
+
                         res = (contig_row,contig_col);
                         break;
                     } 
-                    else if cur_tile.end_point_two == check_tile.start_point
+                    else if right_edge_visited && cur_tile.end_point_two == check_tile.start_point
                     {
-                        println!(" ----- 7b ------- TFTF ");
+                        println!(" ----- 7b ------- TFTF/FTFT ");
                         println!(" ----- 7b Next Tile Index: [{},{}]", &contig_row,&contig_col);
-                        println!(" ----- 7b {:?} <- cur_tile.end_point_two == check_tile.start_point", &cur_tile.end_point_two );
-
+                        println!(" ----- 7b {:?} <- cur_tile.end_point_two == check_tile.start_point", &cur_tile.end_point );
+                        
                         res = (contig_row,contig_col);
                         break;
                     } else {
                         println!(" ----- 7c ------- TFTF ");
                         println!(" ----- 7c no match - keep looking");
-
-                    } 
+                    }                    
                     // end match true, false, false, false) 
                 }
                 // cur_tile IS tftf 
