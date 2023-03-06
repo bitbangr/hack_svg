@@ -526,8 +526,8 @@ fn find_next_tile_ext(curtile_row: usize,
     pane_edge_nd_arr: &ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>,
     visited_tiles: &ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>) -> (usize,usize) 
 {
-    println!("\n******************\nfn find_next_tile\n******************");
-    println!( "cur_tile row {}\n cur_tile col {}\ncontig_group {:?}\ncur_tile {:?}", curtile_row, curtile_col, contig_group, cur_tile ); 
+    println!("\n******************\nfn find_next_tile for [{},{}]\n******************", curtile_row, curtile_col);
+    println!( "cur_tile row {}\ncur_tile col {} \n\ncur_tile {:?}\n", curtile_row, curtile_col, cur_tile ); 
     println!("******************************************");
     println!("******************************************\n");
 
@@ -551,7 +551,7 @@ fn find_next_tile_ext(curtile_row: usize,
 
         let tile_prev_visited = visited_tiles[[contig_row,contig_col]].visited();
         if tile_prev_visited {
-            println!("We've visited this tile[{},{}]", &contig_row , &contig_col);
+            println!("We've visited tile [{},{}]", &contig_row , &contig_col);
         } else {
             println!("We've NOT visited tile [{},{}]", &contig_row , &contig_col);
         }
@@ -567,7 +567,7 @@ fn find_next_tile_ext(curtile_row: usize,
             let check_tile_is_ftft:bool = check_tile.is_ftft();
 
             println!("match find_next_tile_ext "); 
-            println!("(cur_tile_is_tftf, cur_tile_is_ftft, check_tile_is_tftf ,check_tile_is_ftft) "); 
+            println!("(cur_tile check_tile is_tftf() is_ftft()) "); 
 
             println!("\n\tCurrent tile TFTF -> {}", &cur_tile_is_tftf );
             println!("\tCurrent tile FTFT -> {}", &cur_tile_is_ftft);
@@ -757,15 +757,10 @@ fn find_next_tile_ext(curtile_row: usize,
                     }                    
                     // end match false, true, true, false) 
                 }
-
-
                 // cur_tile IS tftf 
                 // cur_tile NOT ftft, 
                 // check_tile NOT tftf 
                 // check_tile NOT ftft
-                
-                // need to check which line is actually the line being drawn from
-
                 (true, false, false, false) => {
                     // there is an issue here in that there are two possible paths to draw out for this cur_tile
                     // so it can possibly match two tiles.
@@ -882,8 +877,8 @@ fn find_next_tile_ext(curtile_row: usize,
 // ;;;;;;;;;;;;;;;
                 _ => {
                     // want to explicitly match all cases and panic for unknown ones as these need to be checked
-                    println!(" ----- 99c ------- FTFT TFTF cur_tile check_tile  ");
-                    println!(" ----- 99c unhandled match case ");
+                    println!(" ----- 99a ------- FTFT TFTF cur_tile check_tile  ");
+                    println!(" ----- 99a unhandled match case ");
                     println!(" ----- ");
                 panic!();
                 }
@@ -895,8 +890,9 @@ fn find_next_tile_ext(curtile_row: usize,
 
             }
             else {
-            println!(" ----- 7 --------- \n ");
-            println!("...self...or edges all visited tile");
+            println!(" ----- 99b --------- ");
+            println!(" ----- 99b !((contig_row == curtile_row) && (contig_col == curtile_col)) && !tile_prev_visited");
+            println!("\t ...self...or all edges visited tile\n");
             }     
     }
 
@@ -1142,11 +1138,7 @@ impl TileVisited {
 
     // if all edges marked visited then return true otherwise return false
     pub(crate) fn visited(&self) -> bool {
-        
         let res:bool  = self.edge_visited[TOP] == true && self.edge_visited[RIGHT] == true && self.edge_visited[BOTTOM] == true && self.edge_visited[LEFT] == true;
-
-        println!("Tile Has Been Visited -> {}", res);
-        
         res
     }
 }
