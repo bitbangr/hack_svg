@@ -869,9 +869,26 @@ fn find_next_tile_ext(curtile_row: usize,
                                     
                                     res = (contig_row,contig_col);
                                     break;
-                                } else {
-                                    println!(" ----- 7c ------- TFTF ");
-                                    println!(" ----- 7c no match - keep looking");
+                                } 
+                                else if right_edge_visited && left_edge_visited // 
+                                {
+                                    println!(" ----- 7c ------- TFTF/FTFT ");
+                                    println!(" ----- 7c Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                                    println!(" ----- 7c {:?} <- right_edge_visited && left_edge_visited both true ", &cur_tile.end_point );
+                                    
+                                    // TODO REVIEW main test for let _ = twenty5_tile_square::svg_4(); 
+                                    // 8x10  mosaic with 
+                                    // Last tile has both Left and Right edges visited.
+                                    // Perhaps we need to find next tile before setting the edges?
+                                    println!(" ----- 7c Not sure why this works - really need to have a look at this logic");
+
+                                    res = (contig_row,contig_col);
+                                    break;
+
+                                }
+                                else {
+                                    println!(" ----- 7d ------- TFTF ");
+                                    println!(" ----- 7d no match - keep looking");
                                 }                    
                                 // end match true, false, false, false) 
                             }
