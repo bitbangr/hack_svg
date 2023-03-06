@@ -19,6 +19,7 @@ mod six_tile_rect;
 mod nine_tile_square;
 mod two_op_line_tiles;
 mod twenty5_tile_square;
+mod adjacent_tiles;
 
 use euclid::default::Box2D;
 use euclid::default::Point2D;

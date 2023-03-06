@@ -1,57 +1,74 @@
-// let curtile_row: usize = 3;
-// let curtile_col: usize = 7;
-// contig_group: &[(isize, isize)],
+use std::collections::HashMap;
 
-// write a function to return all elements in contig_group that are within +/- 1 row and +/1 one column from curtile_row and curtile_col
 
-// Min value for a contig_group element is (0,0)
-// Max value for a contig_group element isis indeterminate
-
-// return all elements in contig_group that are within +/- 1 row and +/- 1 column 
-// from curtile_row and curtile_col. 
-// Do not include element with value (curtile_row, curtile_col)
-pub fn get_adjacent_tiles(curtile_row: usize, curtile_col: usize, contig_group: &[(isize, isize)]) -> Vec<(isize, isize)> {
+/// return all elements in contig_group that are within +/- 1 cur_tile row and +/- 1 cur_tile column 
+/// from curtile_row and curtile_col. 
+/// Do not include element with value (curtile_row, curtile_col)
+pub fn get_adjacent_tiles(curtile_row: usize, curtile_col: usize, contig_group:  &Vec<(isize, isize)>) -> Vec<(isize, isize)> {
     let mut result = Vec::new();
+
+    // Min value for a contig_group element is (0,0)
+    // Max value for a contig_group element isis indeterminate
+
     for &(row, col) in contig_group {
-        if row >= (curtile_row as isize - 1) && row <= (curtile_row as isize + 1)
-            && col >= (curtile_col as isize - 1) && col <= (curtile_col as isize + 1)
-            && !(row == curtile_row as isize && col == curtile_col as isize)
-        {
+
+        if (row as isize - curtile_row as isize).abs() <= 1 &&
+           (col as isize - curtile_col as isize).abs() <= 1 &&
+           !(row == curtile_row as isize && col == curtile_col as isize) {
             result.push((row, col));
         }
     }
+
     result
 }
 
-// Use get_adjacent_tiles() function to construct a rust Map or dictionary for an Row by Column grid of tiles.  
-// so adjacent[x,y] returns the above result for that row, col.  This means we set up the map once and can be 
-// used again without have to call get_adjacent_tiles again.
 
-// Here's an example implementation using a HashMap to store the adjacent tiles for each tile in an N by N grid:
-use std::collections::HashMap;
+/// Use get_adjacent_tiles() function to construct a Hashmap for each entry of a contig_group
+/// so adjacent_map[row,col] returns the above result for that row, col.  
+/// i.e.  set up the map once used again without have to call get_adjacent_tiles repeatedly
+pub fn build_adjacent_map( contig_group:  &Vec<(isize, isize)>) -> HashMap<(isize, isize), Vec<(isize, isize)>> 
+{
+    let mut adjacent_map: HashMap<(isize, isize), Vec<(isize, isize)>> = HashMap::new();
 
-pub fn build_adjacent_map(R: usize, C:usize) -> HashMap<(usize, usize), Vec<(usize, usize)>> {
-    let mut adjacent_map: HashMap<(usize, usize), Vec<(usize, usize)>> = HashMap::new();
+    println!("{:?}" , contig_group );
 
-    for row in 0..R {
-        for col in 0..C {
-            let mut adjacents = get_adjacent_tiles(row, col, N);
-            adjacents.retain(|&(r, c)| r != row || c != col); // remove the current tile from adjacents
-            adjacent_map.insert((row, col), adjacents);
-        }
+    for (row, col) in contig_group {
+        let adjacents: Vec<(isize, isize)> = get_adjacent_tiles(*row as usize, *col as usize, &contig_group);
+        let mut adjacents_cloned: Vec<(isize, isize)> = adjacents.iter().cloned().collect();
+
+        // Remove the current tile from adjacents
+        adjacents_cloned.retain(|&(r, c)| r != *row || c != *col);
+
+        adjacent_map.insert((*row, *col), adjacents_cloned);
+    }
+
+    // Print the adjacent map for debug purposes
+    // TODO Remove when development complete
+    println!("Adjacent Tiles Map"); 
+    for ((row, col), adjacents) in adjacent_map.iter() {
+        println!("({},{}) -> {:?}", row, col, adjacents);
     }
 
     adjacent_map
 }
 
-fn test() {
+/// quick test to see that the adjacents is working properly
+/// Note the R C do need to be a valid element in the contig_group otherwise
+/// a None Exception is thrown.
+pub fn _test_adjacents(R:isize, C:isize, contig_group:  &Vec<(isize, isize)>) {
 
-    let N = 10;
-    let adjacent_map = build_adjacent_map(N);
+    let adjacent_map = build_adjacent_map(&contig_group);
     
     // get the adjacent tiles for tile at (3, 7)
-    let adjacents = adjacent_map.get(&(3, 7)).unwrap();
-    
-    println!("Adjacent tiles for (3, 7): {:?}", adjacents);
-    
+    let adjacents = adjacent_map.get(&(R, C));
+    if let Some(adj) = adjacents {
+        // adjacent tiles found
+        // do something with the adjacent tiles
+        println!("Adjacent tiles for ({},{}): {:?}", R,C, adjacents);
+    } else {
+        // adjacent tiles not found
+        // handle the case when there are no adjacent tiles
+        println!("No Adjacent tiles for ({},{}):", R,C );
+    }
+
 }
