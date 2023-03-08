@@ -18,6 +18,7 @@ mod four_tile_square;
 mod six_tile_rect;
 mod nine_tile_square;
 mod two_op_line_tiles;
+mod sixteen_tile_square;
 mod twenty5_tile_square;
 mod adjacent_tiles;
 
@@ -47,10 +48,14 @@ fn main() {
     // let _ = two_op_line_tiles::svg_2();
     // let _ = two_op_line_tiles::svg_3();
     
+    // let _ = sixteen_tile_square::svg_1(); // 4x4 Blue mosaic
+    let _ = sixteen_tile_square::svg_2(); // 4x4 Blue mosaic with a 4 black tiles in the center
+    // let _ = sixteen_tile_square::svg_3(); // 4x4 Blue mosaic with a 2 opposing red tiles in the center
+
     // let _ = twenty5_tile_square::svg_1(); // 5x5 25 tiles Single Center Black Tile surounded by blue tiles
     // let _ = twenty5_tile_square::svg_2(); // 6x6 36 tiles 2x2 block Center Black Tile surounded by blue tiles
     // let _ = twenty5_tile_square::svg_3(); // // 8x8 Blue mosaic with a 4x4 black tiles in the center
-    let _ = twenty5_tile_square::svg_4(); // // 8x8 Blue mosaic with a 4x4 black tiles in the center
+    // let _ = twenty5_tile_square::svg_4(); // // 8x8 Blue mosaic with a 4x4 black tiles in the center
 
 
     // let _ = nine_tile_square::svg_1(); // create_3x3_rgb_checker_tile_data
