@@ -632,11 +632,22 @@ fn find_next_tile_ext(curtile_row: usize,
                     } else {
                         println!("We've NOT visited tile [{},{}]", &contig_row , &contig_col);
                     }
-                    
+
+                    let cur_tile_top_visited = visited_tiles[[curtile_row, curtile_col]].edge_visited[TOP];
+                    let cur_tile_right_visited = visited_tiles[[curtile_row, curtile_col]].edge_visited[RIGHT];
+                    let cur_tile_bot_visited = visited_tiles[[curtile_row, curtile_col]].edge_visited[BOTTOM];
+                    let cur_tile_left_visited = visited_tiles[[curtile_row, curtile_col]].edge_visited[LEFT];
+        
                     if !tile_prev_visited
                     {
                         let check_tile: MosaicTile = pane_edge_nd_arr[[contig_row,contig_col]].clone();
-            
+
+                        // get the edge visited booleans.
+                        let check_tile_top_visited = visited_tiles[[contig_row, contig_col]].edge_visited[TOP];
+                        let check_tile_right_visited = visited_tiles[[contig_row, contig_col]].edge_visited[RIGHT];
+                        let check_tile_bot_visited = visited_tiles[[contig_row, contig_col]].edge_visited[BOTTOM];
+                        let check_tile_left_visited = visited_tiles[[contig_row, contig_col]].edge_visited[LEFT];
+    
                         let cur_tile_is_tftf :bool = cur_tile.is_tftf();
                         let cur_tile_is_ftft :bool = cur_tile.is_ftft();
                         let check_tile_is_tftf:bool = check_tile.is_tftf();
@@ -770,8 +781,13 @@ fn find_next_tile_ext(curtile_row: usize,
                             // check_tile NOT tftf 
                             // check_tile IS ftft
                             (false, true, false, true) => {
+                                // We want to find next tile for a visited edge only
+                                // otherwise we will get a match for two adjacent FTFT tiles
+                                // NOTE THAT at least one of TOP or BOT MUST be visited otherwise we cannot be looking for the next tile 
+                                // for this tile
                                 println!(" ----- 5 -------- FTFT cur_tile FTFT check_tile");   
-                                if cur_tile.end_point == check_tile.start_point
+                                if cur_tile_top_visited && !cur_tile_bot_visited && 
+                                    cur_tile.end_point == check_tile.start_point
                                 {  
                                     println!(" ----- 5a ------- FTFT ");
                                     println!(" ----- 5a Next Tile Index: [{},{}]", &contig_row,&contig_col);
@@ -780,7 +796,8 @@ fn find_next_tile_ext(curtile_row: usize,
                                     res = (contig_row,contig_col);
                                     break;
                                 } 
-                                else if cur_tile.end_point_two == check_tile.start_point_two
+                                else if !cur_tile_top_visited && cur_tile_bot_visited && 
+                                    cur_tile.end_point_two == check_tile.start_point_two
                                 {
                                     println!(" ----- 5b ------- FTFT ");
                                     println!(" ----- 5b Next Tile Index: [{},{}]", &contig_row,&contig_col);
@@ -788,9 +805,32 @@ fn find_next_tile_ext(curtile_row: usize,
                                     
                                     res = (contig_row,contig_col);
                                     break;
-                                } else {
+                                } 
+                                else if cur_tile_top_visited && cur_tile_bot_visited && 
+                                        check_tile_top_visited && !check_tile_bot_visited &&
+                                    cur_tile.end_point_two == check_tile.start_point_two
+                                {
                                     println!(" ----- 5c ------- FTFT ");
-                                    println!(" ----- 5c no match - keep looking");
+                                    println!(" ----- 5c Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                                    println!(" ----- 5c {:?} <- cur_tile.end_point_two == check_tile.start_point_two", &cur_tile.end_point );
+                                    
+                                    res = (contig_row,contig_col);
+                                    break;
+                                } 
+                                else if cur_tile_top_visited && cur_tile_bot_visited && 
+                                        !check_tile_top_visited && check_tile_bot_visited &&
+                                    cur_tile.end_point == check_tile.start_point
+                                {
+                                    println!(" ----- 5c ------- FTFT ");
+                                    println!(" ----- 5c Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                                    println!(" ----- 5c {:?} <- cur_tile.end_point == check_tile.start_point", &cur_tile.end_point );
+                                    
+                                    res = (contig_row,contig_col);
+                                    break;
+                                }                                 
+                                else {
+                                    println!(" ----- 5d ------- FTFT ");
+                                    println!(" ----- 5d no match - keep looking");
                                 }                    
                                 // end match false, true, false, true) 
                             }
@@ -941,9 +981,16 @@ fn find_next_tile_ext(curtile_row: usize,
                             // cur_tile NOT ftft, 
                             // check_tile IS tftf 
                             // check_tile NOT ftft
+
                             (true, false, true, false) => {
-                                println!(" ----- 9 -------- TFTF cur_tile, TFTF check_tile");   
-                                if cur_tile.end_point == check_tile.start_point
+
+                            // if both cur_tile_left_visited and cur_tile_right_visited are true
+                            // then this means that we must see which edge of check_tile has not been visited
+                            // and match this to the corresponding cur_tile start end point 
+
+                                println!(" ----- 9 -------- TFTF cur_tile, TFTF check_tile");
+                                if cur_tile_left_visited && !cur_tile_right_visited &&   
+                                    cur_tile.end_point == check_tile.start_point
                                 {  
                                     println!(" ----- 9a ------- TFTF/TFTF ");
                                     println!(" ----- 9a Next Tile Index: [{},{}]", &contig_row,&contig_col);
@@ -952,7 +999,8 @@ fn find_next_tile_ext(curtile_row: usize,
                                     res = (contig_row,contig_col);
                                     break;
                                 } 
-                                else if cur_tile.end_point_two == check_tile.start_point_two
+                                else if !cur_tile_left_visited && cur_tile_right_visited && 
+                                    cur_tile.end_point_two == check_tile.start_point_two
                                 {
                                     println!(" ----- 9b ------- TFTF/TFTF ");
                                     println!(" ----- 9b Next Tile Index: [{},{}]", &contig_row,&contig_col);
@@ -960,9 +1008,31 @@ fn find_next_tile_ext(curtile_row: usize,
                                     
                                     res = (contig_row,contig_col);
                                     break;
-                                } else {
-                                    println!(" ----- 9c ------- TFTF/TFTF ");
-                                    println!(" ----- 9c no match - keep looking");
+                                } // we've just completed both edges of this tile and are now looking for next tile
+                                else if cur_tile_left_visited && cur_tile_right_visited &&
+                                        check_tile_left_visited && !check_tile_right_visited &&
+                                    cur_tile.end_point_two == check_tile.start_point_two
+                            {
+                                println!(" ----- 9c ------- TFTF/TFTF ");
+                                println!(" ----- 9c Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                                println!(" ----- 9c {:?} <- cur_tile.end_point_two == check_tile.start_point_two", &cur_tile.end_point );
+                                
+                                res = (contig_row,contig_col);
+                                break;
+                            }else if cur_tile_left_visited && cur_tile_right_visited &&
+                                        !check_tile_left_visited && check_tile_right_visited &&
+                                    cur_tile.end_point == check_tile.start_point
+                            {
+                                println!(" ----- 9d ------- TFTF/TFTF ");
+                                println!(" ----- 9d Next Tile Index: [{},{}]", &contig_row,&contig_col);
+                                println!(" ----- 9d {:?} <- cur_tile.end_point == check_tile.start_point", &cur_tile.end_point );
+                                
+                                res = (contig_row,contig_col);
+                                break;
+                            }                                 
+                                else {
+                                    println!(" ----- 9e ------- TFTF/TFTF ");
+                                    println!(" ----- 9e no match - keep looking");
                                 }                    
                                 // end match true, false, true, false) 
                             }
