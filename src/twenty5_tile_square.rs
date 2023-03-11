@@ -53,7 +53,7 @@ pub fn svg_1() {
 
 // 6x6 Blue mosaic with a 4 black tiles in the center
 pub fn svg_2() {
-    let op_svg_file_name = "./svg_output/fiveXfive/output_2.svg";
+    let op_svg_file_name = "./svg_output/fiveXfive/output_2_6x6.svg";
     let rows: usize = 6;
     let cols: usize = 6;
     let tiles_per_pane_height: usize = 6;
@@ -94,7 +94,7 @@ pub fn svg_2() {
 
 // 8x8 Blue mosaic with a 4x4 black tiles in the center
 pub fn svg_3() {
-    let op_svg_file_name = "./svg_output/fiveXfive/output_3.svg";
+    let op_svg_file_name = "./svg_output/fiveXfive/output_3_8x8.svg";
     let rows: usize = 8;
     let cols: usize = 8;
     let tiles_per_pane_height: usize = 8;
@@ -125,11 +125,31 @@ pub fn svg_3() {
         vec![RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE, RGB_BLUE],
     ];
 
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+    // println!("rgb_arr {:?}", &rgb_arr);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    // println!("svg1 data_results = {:?}", data_results);
+
+    let _ = create_svg(
+        op_svg_file_name,
+        svg_width,
+        svg_height,
+        rows,
+        cols,
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        data_results,
+    );
+
 }
 
 // 8x8 Blue mosaic with a 4x4 black tiles in the center
 pub fn svg_4() {
-    let op_svg_file_name = "./svg_output/fiveXfive/output_4.svg";
+    let op_svg_file_name = "./svg_output/fiveXfive/output_4_8x10.svg";
     let rows: usize = 8;
     let cols: usize = 10;
     let tiles_per_pane_height: usize = 8;
@@ -179,7 +199,7 @@ pub fn svg_4() {
 
 // 8x10 Blue mosaic with a 4x4 black tiles in the center
 pub fn svg_5() {
-    let op_svg_file_name = "./svg_output/fiveXfive/output_4.svg";
+    let op_svg_file_name = "./svg_output/fiveXfive/output_5_8x10.svg";
     let rows: usize = 8;
     let cols: usize = 10;
     let tiles_per_pane_height: usize = 8;
