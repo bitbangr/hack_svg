@@ -273,42 +273,52 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
             col = found_tile_col;
 
             let next_tile_clone = pane_edge_nd_arr[[found_tile_row,found_tile_col]].clone(); 
-            // println!("Next Tile using Tile mosaic_tile::Tile struct {:?} ", &next_tile_clone);
 
-// **************************************
-// **************************************
-// TODO: UPDATE ALL THE CODE BELOW TO USE THE SAME 
-// MATCH STYLE used in find_next_tile_ext.
-// i.e. get rid of confusing if/else if/else if/else crap 
-// **************************************
-// **************************************
+            // Determine if path traversal is complete.  Extra handling for FTFT and TFTF tiles as they
+            // have two pairs of start end points.
 
+            // Check if next_tile_clone end_point or end_point_one matches the cur_tile start_point.
+            // if it does match then we draw the last line segment(s) and set more_tiles to false;
 
-        // TODO the below if ep = sp check does not work for FTFT or TFTF next_tile_clone tiles
-        // as we don't know which point is the end of the path
-        // modify this to check for FTFT || TFTF tiles -> if any visited edge end point (sp or ep) matches then we've completed travel
-        
-        // we want to check if next_tile_clone end_point or end_point_one matches the cur_tile start_point.
-        // if it does match then we draw the last line segment(s) and set more_tiles to false;
+            let next_tile_clone_tftf = next_tile_clone.is_tftf();
+            let next_tile_clone_ftft = next_tile_clone.is_ftft();
 
+            let mut path_traversal_complete = false;
 
-// hhhhhhhhhhhhhhhhhhhhhd
-// hhhhhhhhhhhhhhhhhhhhhd
-// hhhhhhhhhhhhhhhhhhhhhd
-// hhhhhhhhhhhhhhhhhhhhhd
+            // FTFT 
+            if next_tile_clone_ftft && next_tile_clone.start_point == curr_svg_line_end_point &&
+                   next_tile_clone.end_point == svg_line_data_begin_point
+            {
+                path_traversal_complete = true;   
+            }
+            // FTFT
+            else if next_tile_clone_ftft && next_tile_clone.start_point_two == curr_svg_line_end_point &&
+            next_tile_clone.end_point_two == svg_line_data_begin_point
+            {
+                path_traversal_complete = true;   
+            } 
+            // TFTF
+            else if next_tile_clone_tftf && next_tile_clone.start_point == curr_svg_line_end_point &&
+                    next_tile_clone.end_point == svg_line_data_begin_point
+            {
+                path_traversal_complete = true;   
+            } 
+            // TFTF
+            else if next_tile_clone_tftf && next_tile_clone.start_point_two == curr_svg_line_end_point &&
+                        next_tile_clone.end_point_two == svg_line_data_begin_point
+            {
+                path_traversal_complete = true;   
+            }
+            // TFTF
+            else 
+            if !next_tile_clone_ftft && !next_tile_clone_tftf && 
+                next_tile_clone.end_point == svg_line_data_begin_point
+            { 
+                path_traversal_complete = true;   
+            }
 
-// code snippet removed from travel_contig_ext_int_svg
-
-// hhhhhhhhhhhhhhhhhhhhhd
-// hhhhhhhhhhhhhhhhhhhhhd
-// hhhhhhhhhhhhhhhhhhhhhd
-// hhhhhhhhhhhhhhhhhhhhhd
-
-            // TODO update test for path closure to handle FTFT and TFTF 
-            // for next_tile_clone and start_tile
-            
-            if next_tile_clone.end_point == svg_line_data_begin_point || 
-               next_tile_clone.end_point_two == svg_line_data_begin_point{ 
+            if (path_traversal_complete)
+            {
                 println!("Completed external path traversal for this contigous group");
                 println!("Must check for and draw internal SVG paths");
                 
