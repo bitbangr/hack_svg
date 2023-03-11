@@ -21,6 +21,7 @@ mod two_op_line_tiles;
 mod sixteen_tile_square;
 mod twenty5_tile_square;
 mod adjacent_tiles;
+mod one_44_tile;
 
 use euclid::default::Box2D;
 use euclid::default::Point2D;
@@ -38,6 +39,8 @@ fn main() {
     // Below are the basic tests.
     // Run these everytime major changes are made to the code base
 
+    let _ = one_44_tile::svg_1(); // 12x12 Mosaic
+
     // let _ = six_tile_rect::svg_1();  // single color 2 rows by 3 cols. To check single line FTTT TFTT TTFT TTTF tiles
     // let _ = six_tile_rect::svg_2();  // white row/black row color - 2 rows by 3 cols.
     // let _ = six_tile_rect::svg_3();  // red red green row / black red red row - 2 rows by 3 cols.
@@ -50,12 +53,24 @@ fn main() {
     
     // let _ = sixteen_tile_square::svg_1(); // 4x4 Blue mosaic
     // let _ = sixteen_tile_square::svg_2(); // 4x4 Blue mosaic with a 4 black tiles in the center
-    let _ = sixteen_tile_square::svg_3(); // 4x4 Blue mosaic with a 2 opposing red tiles in the center
+    // let _ = sixteen_tile_square::svg_3(); // 4x4 Blue mosaic with a 2 opposing red tiles in the center
+    // let _ = sixteen_tile_square::svg_4(); // 4x4 Blue mosaic with a 2 opposing red tiles in the center opposite of svg3() above
+    // let _ = sixteen_tile_square::svg_5(); // 4x4 Blue mosaic with a red 'L' in center
+    // let _ = sixteen_tile_square::svg_6(); // 4x4 Blue mosaic with a red 'L' in center
+    // let _ = sixteen_tile_square::svg_7(); // 4x4 Blue mosaic with a red 'L' in center
+    // let _ = sixteen_tile_square::svg_8(); // 4x4 Blue mosaic with a red 'L' in center
+    // let _ = sixteen_tile_square::svg_9(); // // 4x4 4 colour Diagonal opposite white black  
+    // let _ = sixteen_tile_square::svg_10(); // 4x4 4 colour FTFT TFTF test
+
 
     // let _ = twenty5_tile_square::svg_1(); // 5x5 25 tiles Single Center Black Tile surounded by blue tiles
     // let _ = twenty5_tile_square::svg_2(); // 6x6 36 tiles 2x2 block Center Black Tile surounded by blue tiles
+    
+    // this test not output file 
     // let _ = twenty5_tile_square::svg_3(); // // 8x8 Blue mosaic with a 4x4 black tiles in the center
+
     // let _ = twenty5_tile_square::svg_4(); // // 8x8 Blue mosaic with a 4x4 black tiles in the center
+    // let _ = twenty5_tile_square::svg_5(); // // 8x8 Blue mosaic with a 4x4 black tiles in the center
 
 
     // let _ = nine_tile_square::svg_1(); // create_3x3_rgb_checker_tile_data
@@ -73,7 +88,7 @@ fn main() {
     // let _ = four_tile_square::svg_2();
     // let _ = four_tile_square::svg_3();
     // let _ = four_tile_square::svg_4();
-    // let _ = four_tile_square::svg_5();   // 2x2 1st row (black, black), 2nd row (white, green)
+    // // let _ = four_tile_square::svg_5();   // 2x2 1st row (black, black), 2nd row (white, green)
     // let _ = four_tile_square::svg_6();   // 2x2 1st row (white, green), 2nd row (black, black) 
     // let _ = four_tile_square::svg_7();   // 2x2 1st col (white, green), 2nd col (black, black)
     // let _ = four_tile_square::svg_8();   // 2x2 1st col (black, black), 2nd col (green, white)

@@ -140,7 +140,7 @@ pub fn svg_3() {
 
 
 
-pub fn _svg_98() {
+pub fn svg_98() {
     let op_svg_file_name = "./svg_output/two_op_lines/output_98.svg";
     let rows: usize = 4;
     let cols: usize = 4;
@@ -179,7 +179,7 @@ pub fn _svg_98() {
 
 
 
-pub fn _svg_99() {
+pub fn svg_99() {
     let op_svg_file_name = "./svg_output/two_op_lines/output_99.svg";
     let rows: usize = 3;
     let cols: usize = 3;

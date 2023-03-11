@@ -438,6 +438,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
     } // for contig_group in &contiguous_tiles{
 
+    println!("Writing to ouptput file {}", &op_svg_file_name);
     svg::save(op_svg_file_name, &document)   
 
     // end travel_contig_ext_int_svg
