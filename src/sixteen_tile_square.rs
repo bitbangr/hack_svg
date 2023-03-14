@@ -432,3 +432,44 @@ pub fn svg_10() {
     );
 } // svg10
 
+// 4x4 4 colour FTFT TFTF test
+pub fn svg_11() {
+    let op_svg_file_name = "./svg_output/fourXfour/output_11.svg";
+    let rows: usize = 4;
+    let cols: usize = 4;
+    let tiles_per_pane_height: usize = 4;
+    let tiles_per_pane_width: usize = 4;
+    let svg_width = 400;
+    let svg_height = 400;
+
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        //   [0,0],     [0,1],     [0,2],      [0,3],   
+        vec![RGB_GREEN, RGB_WHITE,  RGB_BLUE, RGB_BLUE  ],
+        //   [1,0],     [1,1],     [1,2],      [1,3],  
+        vec![RGB_BLUE, RGB_BLUE,  RGB_BLUE,  RGB_BLUE ],
+        //   [2,0],     [2,1],     [2,2],      [2,3],  
+        vec![RGB_BLACK, RGB_BLUE,  RGB_GREEN, RGB_BLACK],
+        //   [3,0],     [3,1],     [3,2],      [3,3],  
+        vec![RGB_WHITE,   RGB_BLUE,   RGB_GREEN, RGB_BLACK],
+    ];
+
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+    // println!("rgb_arr {:?}", &rgb_arr);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    // println!("svg1 data_results = {:?}", data_results);
+
+    let _ = create_svg(
+        op_svg_file_name,
+        svg_width,
+        svg_height,
+        rows,
+        cols,
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        data_results,
+    );
+} // svg11
