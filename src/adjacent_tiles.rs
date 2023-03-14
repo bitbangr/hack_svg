@@ -55,20 +55,20 @@ pub fn build_adjacent_map( contig_group:  &Vec<(isize, isize)>) -> HashMap<(isiz
 /// quick test to see that the adjacents is working properly
 /// Note the R C do need to be a valid element in the contig_group otherwise
 /// a None Exception is thrown.
-pub fn _test_adjacents(R:isize, C:isize, contig_group:  &Vec<(isize, isize)>) {
+pub fn _test_adjacents(r:isize, c:isize, contig_group:  &Vec<(isize, isize)>) {
 
     let adjacent_map = build_adjacent_map(&contig_group);
     
     // get the adjacent tiles for tile at (3, 7)
-    let adjacents = adjacent_map.get(&(R, C));
+    let adjacents = adjacent_map.get(&(r, c));
     if let Some(adj) = adjacents {
         // adjacent tiles found
         // do something with the adjacent tiles
-        println!("Adjacent tiles for ({},{}): {:?}", R,C, adjacents);
+        println!("Adjacent tiles for ({},{}): {:?}", r,c, adjacents);
     } else {
         // adjacent tiles not found
         // handle the case when there are no adjacent tiles
-        println!("No Adjacent tiles for ({},{}):", R,C );
+        println!("No Adjacent tiles for ({},{}):", r,c );
     }
 
 }
