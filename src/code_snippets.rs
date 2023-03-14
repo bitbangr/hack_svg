@@ -365,3 +365,29 @@ fn vec_to_ndarray(vec: &Vec<i32>) -> Array2<i32> {
     let data = vec.as_slice();
     Array::from_shape_vec((3, 3), data.to_vec()).unwrap()
 }
+
+
+// // quick sanity check
+// if let Some(adj_tile ) = adjacents {
+//     // adjacent tiles found
+//     // do something with the adjacent tiles
+//     println!("900 Adjacent tiles for [{},{}]: {:?}", curtile_row,curtile_col, adj_tile);
+//     for (row, col) in adj_tile {
+//         // do something with `row` and `col`
+//         println!(" 950  Row: {}, Col: {}", row, col);
+//     }
+// } else {
+//     // adjacent tiles not found
+//     // handle the case when there are no adjacent tiles
+//     println!("900 No Adjacent tiles for ({},{}):", curtile_row,curtile_col );
+// }
+
+// for adj_tile  in adjacents{
+//     println!("AAAA");    
+//     println!("adjacent {:?}", &adj_tile); 
+//     let rrrr:usize = adj_tile[0].0 as usize;
+//     let cccc:usize = adj_tile[0].1 as usize;
+//     println!("adjacent row col {:?},{:?}", &rrrr, &cccc); 
+
+// }
+
