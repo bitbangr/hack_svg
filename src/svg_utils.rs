@@ -425,7 +425,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
         line_data = line_data.close();
 
         let stroke_colour =  "purple";
-        let stroke_width =  0.25; 
+        // let stroke_width =  0.25; 
+        let stroke_width =  0.0; 
     
         // create a path and add it to the svg document
         let tile_path = Path::new().set("fill", rgb_str.to_owned()) // ie -> .set("fill", "rgb(255, 0, 0)")
@@ -988,17 +989,19 @@ fn find_next_tile_ext(curtile_row: usize,
                                     break;
                                 } 
                                 // else if right_edge_visited && left_edge_visited // 
-                                else if cur_tile_right_visited && cur_tile_left_visited // 
+                                else if cur_tile_right_visited && cur_tile_left_visited &&  
+                                    ( cur_tile.end_point_two == check_tile.start_point || cur_tile.end_point == check_tile.start_point)// 
                                 {
                                     println!(" ----- 7c ------- TFTF/FTFT ");
                                     println!(" ----- 7c Next Tile Index: [{},{}]", &contig_row,&contig_col);
-                                    println!(" ----- 7c {:?} <- right_edge_visited && left_edge_visited both true ", &cur_tile.end_point );
+                                    println!(" ----- 7c {:?} <- right_edge_visited && left_edge_visited both true ", &check_tile.start_point );
+                                    println!(" ----- 7c one of two end points matches the check_tile start point" );
                                     
                                     // TODO REVIEW main test for let _ = twenty5_tile_square::svg_4(); 
                                     // 8x10  mosaic with 
                                     // Last tile has both Left and Right edges visited.
                                     // Perhaps we need to find next tile before setting the edges?
-                                    println!(" ----- 7c Not sure why this works - really need to have a look at this logic");
+                                    println!(" ----- 7c New Logic implemented - rerun all tests");
 
                                     res = (contig_row,contig_col);
                                     break;
