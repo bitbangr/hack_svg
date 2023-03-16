@@ -22,12 +22,20 @@ mod sixteen_tile_square;
 mod twenty5_tile_square;
 mod adjacent_tiles;
 mod one_44_tile;
+// mod svg_binpack_util;
+// mod roxml_tree;
 
 use euclid::default::Box2D;
 use euclid::default::Point2D;
 use ndarray::{Axis,Array, Array2};
 use mosaic_tile::RGB;
 use constants::{TOP,RIGHT,BOTTOM,LEFT};
+
+// use crate::svg_binpack_util::test_bin_pack;
+
+// use crate::svg_dfs_layout_two::test_dfs_layout;
+// use crate::svg_fdg_layout::test_svg_fdg;
+
 
 /// This application will create an SVG files from a various window pane/tile configurations
 /// 
@@ -36,10 +44,16 @@ fn main() {
 
     println!("Hack SVG");
     
+
+    // let _ = test_bin_pack(); 
     // Below are the basic tests.
     // Run these everytime major changes are made to the code base
 
-    let _ = one_44_tile::svg_1(); // 12x12 Mosaic
+    // let _ = svg_binpack_util::test_bin_pack();
+    let _ = one_44_tile::svg_frank_two(); // 40x40 Mosaic
+    // let _ = one_44_tile::svg_frank_tr12();   // BUGGY - Work this out .  Try sixteen_tile_square svg_11 as smaller subset test
+    // let _ = sixteen_tile_square::svg_11(); // 4x4 mosaic 
+    // let _ = one_44_tile::svg_1(); // 12x12 Mosaic
 
     // let _ = six_tile_rect::svg_1();  // single color 2 rows by 3 cols. To check single line FTTT TFTT TTFT TTTF tiles
     // let _ = six_tile_rect::svg_2();  // white row/black row color - 2 rows by 3 cols.

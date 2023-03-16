@@ -153,7 +153,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     println!("\n***********\nfn travel_contig_ext_int_svg\n***********");
     println!("\nVector of contigous tiles -> {:?}", contiguous_tiles);
 
-    let mut document = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+    let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
 
     let shape = pane_edge_nd_arr.shape();
     let mut visited_tiles: Array2<TileVisited> = create_visited_bool_arr(shape);
@@ -430,7 +430,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     
         // create a path and add it to the svg document
         let tile_path = Path::new().set("fill", rgb_str.to_owned()) // ie -> .set("fill", "rgb(255, 0, 0)")
-                                   .set("stroke", stroke_colour)
+                                   .set("stroke", rgb_str.to_owned())
                                    .set("stroke-width", stroke_width)
                                    .set("d", line_data);
                                 
