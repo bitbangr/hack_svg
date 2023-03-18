@@ -11,6 +11,36 @@ impl Line {
     }
 }
 
+
+// This is a simple macro named `say_hello`.
+macro_rules! say_hello {
+    // `()` indicates that the macro takes no argument.
+    () => {
+        // The macro will expand into the contents of this block.
+        println!("Hello!")
+    };
+}
+
+macro_rules! letr_rip {
+    // `()` indicates that the macro takes no argument.
+    () => {
+        // The macro will expand into the contents of this block.
+        println!("brrrrp!")
+    };
+}
+
+// fn main() {
+//     // This call will expand into `println!("Hello");`
+//     say_hello!()
+// }
+
+fn macro_test() {
+    // This call will expand into `println!("Hello");`
+    say_hello!();
+    letr_rip!();
+
+}
+
 /// Create an Array2 nd array of booleans
 /// 
 /// Each tile has a north, east, SOUTH and west direction
