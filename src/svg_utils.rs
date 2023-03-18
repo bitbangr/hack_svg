@@ -6,13 +6,17 @@ use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
 use euclid::default::{Box2D, Point2D};
 use ndarray::{Array2, ArrayBase, OwnedRepr, Dim};
+use rosvgtree::svgtypes::Paint;
 use svg::node::element::path::Data;
 use svg::node::element::Path;
 use svg::Document;
 
 use usvg::{roxmltree, Tree, NodeKind};
+use rosvgtree::{AttributeId, Attribute};
 
 
+// ("fill", AttributeId::Fill),
+// use rosvgtree::{AttributeId, AttributeType};
 
 
 use crate::get_edge_bools;
@@ -447,6 +451,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
     let _ = sort_paths(&document);
 
+    doo_eet();
+
     println!("Writing to ouptput file {}", &op_svg_file_name);
     svg::save(op_svg_file_name, &document)   
 
@@ -455,10 +461,81 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
 fn doo_eet() {
 
-    let input = std::fs::read_to_string("./svg_output/frank_24x24.svg").unwrap();
-    let svg = rosvgtree::Document::parse_str(&input).unwrap();
+    let input = std::fs::read_to_string("./svg_output/twoXtwo/output_7.svg").unwrap();        
+    let rosvg_doc: rosvgtree::Document = rosvgtree::Document::parse_str(&input).unwrap();
+
+    println!("rosvgtree -> {:?}", &rosvg_doc);
+
+    let root = &rosvg_doc.root();
+    println!(" root -> {:?}", &root);
+
+    for descendant in rosvg_doc.descendants(){
+        
+        let tag_name = descendant.tag_name();
+        // println!("\ndescendant {:?}" , &descendant);
+        println!("\ndescendant {:?}" , &tag_name);
+
+        let attributes: &[rosvgtree::Attribute] = descendant.attributes();
+        println!("\ndec attributes {:?}" , &attributes);
+
+        match descendant.has_attribute(AttributeId::Fill) {
+            true => {
+                println!("\ndec has a fill attribute" ); 
+
+                match rosvgtree::Node::attribute::<Paint>(&descendant, AttributeId::Fill) {    
+                    Some(fill_color) => {
+                        println!("fill color: {:?}", fill_color);
+                    }
+                    None => {
+                        println!("fill attribute is not a valid color");
+                    }
+                }
+            }
+            // false => (),
+            false => {
+                println!("\ndec does not have a fill attribute" );   
+            },
+        }
+
+    }
 
 }
+    // for child in root.children() {
+    //     // traverse_node(&child);
+    //     print!("AZ")
+    // }
+
+    // for descendant in rosvg_doc.descendants(){
+        
+    //     let tag_name = descendant.tag_name();
+    //     // println!("\ndescendant {:?}" , &descendant);
+    //     println!("\ndescendant {:?}" , &tag_name);
+
+    //     let attributes: &[rosvgtree::Attribute] = descendant.attributes();
+    //     println!("\ndec attributes {:?}" , &attributes);
+
+    //     match descendant.has_attribute(AttributeId::Fill) {
+    //         true => {
+    //             println!("\ndec has a fill attribute" ); 
+    //             // let fill_colour  = descendant.attribute(AttributeId::Fill);
+    //             let fill_colour  = rosvgtree::FromValue(descendant, attribute(AttributeId::Fill));
+                
+    //             println!("fill colour {:?} " , fill_colour ); 
+    //         }
+    //         // false => (),
+    //         false => {
+    //             println!("\ndec does not have a fill attribute" );   
+    //         },
+    //     }
+    
+
+    // }
+
+
+    // grab the first element with black colour
+    // let n = svg.
+
+
 
 fn sort_paths(document: &svg::node::element::SVG)
 {
@@ -501,26 +578,27 @@ fn sort_paths(document: &svg::node::element::SVG)
     // println!("svg doc tree - > {}", &tree);
 }
 
-// fn iterate_svg_elements(tree: &usvg::Tree) {
-//     let root = tree.root;
-//     traverse_node(&root);
-// }
+fn iterate_svg_elements(tree: &usvg::Tree) {
+    let root = &tree.root;
+    traverse_node(&root);
+}
 
 
-// fn traverse_node(node: &usvg::Node) {
-//     let node_kind = node.kind();
+fn traverse_node(node: &usvg::Node) {
+    // let node_kind = node.kind;
 
-//     match node_kind {
-//         NodeKind::Element(ref elem) => {
-//             println!("Element: {:?}", elem);
-//         }
-//         _ => {}
-//     }
+    // match node_kind {
+    //     NodeKind::Element(ref elem) => {
+    //         println!("Element: {:?}", elem);
+    //     }
+    //     _ => {}
+    // }
 
-//     for child in node.children() {
-//         traverse_node(&child);
-//     }
-// }
+    for child in node.children() {
+        traverse_node(&child);
+        print!(".")
+    }
+}
 
 // fn traverse_node(node: &usvg::Node) {
 //     match &node.data {
