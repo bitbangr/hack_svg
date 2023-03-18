@@ -84,7 +84,7 @@ pub fn svg_frank() {
     let svg_width = 4000;
     let svg_height = 4000 ;
 
-    let rgb_vec_result = read_config("../rgb_json/franky.json");
+    let rgb_vec_result = read_config("./rgb_json/franky.json");
     let rgb_vec = match rgb_vec_result {
         Ok(rgb_vec) => rgb_vec,
         Err(e) => {
@@ -123,7 +123,7 @@ pub fn svg_frank_two() {
     let svg_width = 4000;
     let svg_height = 4000 ;
 
-    let rgb_vec_result = read_config("../rgb_json/franky_mar16.json");
+    let rgb_vec_result = read_config("./rgb_json/franky_mar16.json");
     let rgb_vec = match rgb_vec_result {
         Ok(rgb_vec) => rgb_vec,
         Err(e) => {
@@ -162,7 +162,7 @@ pub fn svg_frank_tr12() {
     let svg_width = 1200;
     let svg_height = 1200 ;
 
-    let rgb_vec_result = read_config("../rgb_json/frank_tr12.json");
+    let rgb_vec_result = read_config("./rgb_json/frank_tr12.json");
     let rgb_vec = match rgb_vec_result {
         Ok(rgb_vec) => rgb_vec,
         Err(e) => {
