@@ -6,6 +6,7 @@ use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
 use euclid::default::{Box2D, Point2D};
 use ndarray::{Array2, ArrayBase, OwnedRepr, Dim};
+use rosvgtree::roxmltree::StringStorage;
 use rosvgtree::svgtypes::Paint;
 use svg::node::element::path::Data;
 use svg::node::element::Path;
@@ -13,6 +14,8 @@ use svg::Document;
 
 use usvg::{roxmltree, Tree, NodeKind};
 use rosvgtree::{AttributeId, Attribute};
+
+use regex::Regex;
 
 
 // ("fill", AttributeId::Fill),
@@ -449,7 +452,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
     } // for contig_group in &contiguous_tiles{
 
-    let _ = sort_paths(&document);
+    // let _ = sort_paths(&document);
+
 
     doo_eet();
 
@@ -459,15 +463,19 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     // end travel_contig_ext_int_svg
 }
 
+/// figure out how rosvgtree module works
 fn doo_eet() {
 
-    let input = std::fs::read_to_string("./svg_output/twoXtwo/output_7.svg").unwrap();        
+    // let input = std::fs::read_to_string("./svg_output/twoXtwo/output_7.svg").unwrap();        
+    let input = std::fs::read_to_string("./svg_output/twelveXtwelve/frank_mar15.svg").unwrap();        
     let rosvg_doc: rosvgtree::Document = rosvgtree::Document::parse_str(&input).unwrap();
 
     println!("rosvgtree -> {:?}", &rosvg_doc);
 
     let root = &rosvg_doc.root();
     println!(" root -> {:?}", &root);
+
+    let mut single_tile_count: i32 = 0; 
 
     for descendant in rosvg_doc.descendants(){
         
@@ -490,118 +498,77 @@ fn doo_eet() {
                         println!("fill attribute is not a valid color");
                     }
                 }
+
+                // let regex_str :String = "Attribute \\{ name: d, value: M\\d{1,5},\\d{1,5} L\\d{1,5},\\d{1,5} L\\d{1,5},\\d{1,5} L\\d{1,5},\\d{1,5} L\\d{1,5},\\d{1,5} z \\}".to_owned();
+                let regex_str :String = "^M\\d{1,5},\\d{1,5} L\\d{1,5},\\d{1,5} L\\d{1,5},\\d{1,5} L\\d{1,5},\\d{1,5} L\\d{1,5},\\d{1,5} z".to_owned();
+                let pattern = Regex::new(&regex_str).unwrap();
+
+                // grab the d attribute and regex match for single tile
+                match rosvgtree::Node::attribute::<&str>(&descendant, AttributeId::D) {    
+                    Some(data) => {
+                        println!("data: {:?}", &data);
+
+                        // Perform a regular expression match on the data string
+                        match pattern.find(&data) {
+                            Some(matched) => {
+                                println!("Single Tile Match found: {:?}", matched.as_str());
+                                single_tile_count  += 1;
+                            }
+                            None => {
+                                println!("Single Tile Match Not found");
+                            }
+                        }
+
+                    }
+                    None => {
+                        println!("no valid data attribute found");
+                    }
+                }
+
             }
             // false => (),
             false => {
                 println!("\ndec does not have a fill attribute" );   
             },
         }
-
-    }
-
-}
-    // for child in root.children() {
-    //     // traverse_node(&child);
-    //     print!("AZ")
-    // }
-
-    // for descendant in rosvg_doc.descendants(){
-        
-    //     let tag_name = descendant.tag_name();
-    //     // println!("\ndescendant {:?}" , &descendant);
-    //     println!("\ndescendant {:?}" , &tag_name);
-
-    //     let attributes: &[rosvgtree::Attribute] = descendant.attributes();
-    //     println!("\ndec attributes {:?}" , &attributes);
-
-    //     match descendant.has_attribute(AttributeId::Fill) {
-    //         true => {
-    //             println!("\ndec has a fill attribute" ); 
-    //             // let fill_colour  = descendant.attribute(AttributeId::Fill);
-    //             let fill_colour  = rosvgtree::FromValue(descendant, attribute(AttributeId::Fill));
-                
-    //             println!("fill colour {:?} " , fill_colour ); 
-    //         }
-    //         // false => (),
-    //         false => {
-    //             println!("\ndec does not have a fill attribute" );   
-    //         },
-    //     }
     
-
-    // }
-
-
-    // grab the first element with black colour
-    // let n = svg.
-
-
-
-fn sort_paths(document: &svg::node::element::SVG)
-{
-    println!(" %^%^%^%");
-
-
-    let opt = roxmltree::ParsingOptions { allow_dtd: true, ..roxmltree::ParsingOptions::default() };
-
-    let binding = document.to_string();
-    let doc = match roxmltree::Document::parse_with_options(&binding, opt) {
-        Ok(doc) => doc,
-        Err(e) => {
-            println!("Error: {}.", e);
-            panic!();
-        }
-    };
-
-    // let tree = Tree::from_file(file_path, &usvg::Options::default()).map_err(|e| e.to_string())?;
-    // let tree = Tree::from_xmltree(&doc, &usvg::Options::default()).map_err(|e| e.to_string())?;
-    // let tree = Tree::from_xmltree(&doc, &usvg::Options::default()).map_err(|e| e.to_string());
-    let tree = Tree::from_xmltree(&doc, &usvg::Options::default()).map_err(|e| e.to_string()).unwrap();
-
-    // iterate_svg_elements(&tree);
-
-    // tree.into_iter().for_each(|node| {
-
-    //     println!(" got an svg node tree ");
-    //     // if let Some(rect) = rectangle_from_node(node) {
-    //     //     let fill_color = format!("{:x}", rect.fill);
-    //     //     if let Some(rect_list) = shape_list.get_mut(&fill_color) {
-    //     //         rect_list.push(rect);
-    //     //     } else {
-    //     //         shape_list.insert(fill_color, vec![rect]);
-    //     //     }
-    //     // }
-    // });
-
-
-
-    // println!("svg doc tree - > {}", &tree);
-}
-
-fn iterate_svg_elements(tree: &usvg::Tree) {
-    let root = &tree.root;
-    traverse_node(&root);
-}
-
-
-fn traverse_node(node: &usvg::Node) {
-    // let node_kind = node.kind;
-
-    // match node_kind {
-    //     NodeKind::Element(ref elem) => {
-    //         println!("Element: {:?}", elem);
-    //     }
-    //     _ => {}
-    // }
-
-    for child in node.children() {
-        traverse_node(&child);
-        print!(".")
     }
+    println!(" {} <- Single Tile Count in mosaic", single_tile_count);
 }
+
+// fn sort_paths(document: &svg::node::element::SVG)
+// {
+//     println!(" %^%^%^%");
+
+//     let opt = roxmltree::ParsingOptions { allow_dtd: true, ..roxmltree::ParsingOptions::default() };
+
+//     let binding = document.to_string();
+//     let doc = match roxmltree::Document::parse_with_options(&binding, opt) {
+//         Ok(doc) => doc,
+//         Err(e) => {
+//             println!("Error: {}.", e);
+//             panic!();
+//         }
+//     };
+
+//     // let tree = Tree::from_file(file_path, &usvg::Options::default()).map_err(|e| e.to_string())?;
+//     // let tree = Tree::from_xmltree(&doc, &usvg::Options::default()).map_err(|e| e.to_string())?;
+//     // let tree = Tree::from_xmltree(&doc, &usvg::Options::default()).map_err(|e| e.to_string());
+//     let tree = Tree::from_xmltree(&doc, &usvg::Options::default()).map_err(|e| e.to_string()).unwrap();
+
+//     iterate_svg_elements(&tree);
+//     // println!("svg doc tree - > {}", &tree);
+// }
+
+// fn iterate_svg_elements(tree: &usvg::Tree) {
+//     let root = &tree.root;
+//     traverse_node(&root);
+// }
+
+
 
 // fn traverse_node(node: &usvg::Node) {
-//     match &node.data {
+//     match &node. {
 //         NodeKind::Element(ref elem) => {
 //             println!("Element: {:?}", elem);
 //         }
@@ -612,6 +579,7 @@ fn traverse_node(node: &usvg::Node) {
 //         traverse_node(&child);
 //     }
 // }
+
 
 
 
