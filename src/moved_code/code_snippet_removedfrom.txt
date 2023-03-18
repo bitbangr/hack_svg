@@ -1,0 +1,158 @@
+// code snippet removed from travel_contig_ext_int_svg
+
+
+// ----------------------------------------
+// ----------------------------------------
+// may come back to use _tile_prev_visited as part of overall check
+let _tile_prev_visited = visited_tiles[[row,col]].visited();
+
+if next_tile_clone.is_ftft() 
+{
+    println!("\t is_ftft() true "); 
+    
+    let top_visited = visited_tiles[[row,col]].edge_visited[TOP];
+    let bot_visited = visited_tiles[[row,col]].edge_visited[BOTTOM];
+    
+    println!("\ttop_visited {} \n\tbot_visited {}", &top_visited, &bot_visited );
+    
+    // use visited to determine which start point end point pair to compare to start tile
+    if top_visited && !bot_visited 
+    { 
+            println!("top_visited && !bot_visited");
+
+            if next_tile_clone.end_point_two == start_tile.start_point { 
+                println!(" next_tile_clone.end_point_two == start_tile.start_point  ");
+                println!("and handle things accordingly ");
+                // panic!();
+                println!("FTFT check Completed traversal of all tiles in contigous group");
+
+                // let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point, &visited_tiles );
+
+                let (next_tile_svg_line_data, svg_line_end_point)  = get_ext_tile_svg_line_data(&next_tile_clone, 
+                                                                        //  &start_tile.start_point, // CHECK Called with start tile start point
+                                                                         &curr_svg_line_end_point, // 
+                                                                         &mut visited_tiles, 
+                                                                         row,
+                                                                         col );
+
+                // update the curr_svg_line_end_point to the last svg line position
+                curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32, );
+
+                // call from above 
+                // let cur_tile_svg_line_data = get_ext_tile_svg_line_data(&cur_tile,
+                //                                                         &curr_svg_line_end_point, // CHECK Called with end point
+                //                                                         &mut visited_tiles,
+                //                                                         row,
+                //                                                         col);
+        
+                                                                        //  m_tile: &MosaicTile, 
+                                                                        //  curr_svg_line_end_point: &Point2D<i32>, 
+                                                                        //  visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>,
+                                                                        //  row: usize, col: usize) ->
+
+                line_data = combine_data(&line_data,&next_tile_svg_line_data );
+    
+                more_tiles = false;
+            }
+
+    } else if !top_visited && bot_visited {
+        println!("!top_visited && bot_visited");
+        panic!();
+    }
+} 
+else if next_tile_clone.is_tftf() 
+{
+    println!("\t is_tftf() true "); 
+
+// *****************************
+// (((((((((((((())))))))))))))
+// (((((((((((((())))))))))))))
+// ****************************
+    /* 
+    Lets try somehting different here. Forget about left_visited right_visited and just
+    match startpoint to end point
+     */
+    let left_visited = visited_tiles[[row,col]].edge_visited[LEFT];
+    let right_visited = visited_tiles[[row,col]].edge_visited[RIGHT];
+    
+    println!("\tleft_visited {} \n\tright_visited {}", &left_visited, &right_visited );
+    
+    // use visited to determine which start point end point pair to compare to start tile
+    if right_visited && !left_visited
+    { 
+            println!("right_visited && !left_visited");
+
+            if next_tile_clone.end_point == start_tile.start_point { 
+                println!(" next_tile_clone.end_point == start_tile.start_point  ");
+                println!("and handle things accordingly ");
+                // panic!();
+                println!("TFTF check Completed traversal of all tiles in contigous group");
+
+                let (next_tile_svg_line_data, svg_line_end_point)  = get_ext_tile_svg_line_data(&next_tile_clone, 
+                                                                        //  &start_tile.start_point, // CHECK Called with start tile start point
+                                                                         &curr_svg_line_end_point, // 
+                                                                         &mut visited_tiles, 
+                                                                         row,
+                                                                         col );
+
+                // update the curr_svg_line_end_point to the last svg line position
+                curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32, );
+
+                line_data = combine_data(&line_data,&next_tile_svg_line_data );
+    
+                more_tiles = false;
+            }
+
+    } else if !right_visited && left_visited {
+        println!("!right_visited && left_visited");
+        panic!();
+    } else if !right_visited && !left_visited { 
+        // first tile through this tile
+        // still more paths to process 
+        println!("!right_visited && !left_visited");
+        println!("First time processing this tile");
+
+        // get the ext tile svg line data
+        // update curr svg line end point
+        // combine the data
+        // set more tiles is set to true 
+
+        let (next_tile_svg_line_data, svg_line_end_point)  = get_ext_tile_svg_line_data(&next_tile_clone, 
+                                                                                        &curr_svg_line_end_point, // 
+                                                                                        &mut visited_tiles, 
+                                                                                        row,
+                                                                                        col );
+
+        // update the curr_svg_line_end_point to the last svg line position
+        curr_svg_line_end_point = Point2D::new(svg_line_end_point.0 as i32, svg_line_end_point.1 as i32, );
+
+        line_data = combine_data(&line_data,&next_tile_svg_line_data );
+
+        more_tiles = true;
+        
+    }
+
+} else
+
+// if next_tile_clone.start_point_two.x as usize != FLAGGED {
+//     println!("\n\t FTFT or TFTF -- check all corners to see if end match");
+
+//     // check to see if any of check_tile corners match start_tile.start_point;
+//     let corners: [euclid::Point2D<i32, euclid::UnknownUnit>; 4] = next_tile_clone.tile.get_tile_corners();
+//     let start_tile_start_point: &euclid::Point2D<i32, euclid::UnknownUnit> = &start_tile.start_point;
+    
+//     // find out if curtile endpoint is in corners 
+//     // and which which corner it is [top_left, top_right, bottom_right, bottom_left] 
+//     if let Some(idx) = corners.iter().position(|&corner| corner == *start_tile_start_point) {
+//         println!("Found {:?} at index {}", start_tile_start_point, idx);
+        
+//         println!("FTFT TFTF -> Completed contigous tile group traversal");
+//         println!("need to get_tile_svg_line_data with correct info here ");
+//         more_tiles = false;
+//     } else {
+//         println!("{:?} Cur_tile_end_point not found in check_tile corners array", cur_tile_end_point);
+//     }
+// }
+
+// } else 
+
