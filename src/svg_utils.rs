@@ -10,6 +10,11 @@ use svg::node::element::path::Data;
 use svg::node::element::Path;
 use svg::Document;
 
+use usvg::{roxmltree, Tree, NodeKind};
+
+
+
+
 use crate::get_edge_bools;
 use crate::pane_to_2d_vec;
 use crate::pane_vec_to_ndarray;
@@ -18,6 +23,7 @@ use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combine_data, get_ext
 
 use num_traits::Zero;
 use std::collections::HashMap;
+
 
 ///
 /// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
@@ -317,7 +323,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                 path_traversal_complete = true;   
             }
 
-            if (path_traversal_complete)
+            if path_traversal_complete
             {
                 println!("Completed external path traversal for this contigous group");
                 println!("Must check for and draw internal SVG paths");
@@ -439,11 +445,97 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
     } // for contig_group in &contiguous_tiles{
 
+    let _ = sort_paths(&document);
+
     println!("Writing to ouptput file {}", &op_svg_file_name);
     svg::save(op_svg_file_name, &document)   
 
     // end travel_contig_ext_int_svg
 }
+
+fn doo_eet() {
+
+    let input = std::fs::read_to_string("./svg_output/frank_24x24.svg").unwrap();
+    let svg = rosvgtree::Document::parse_str(&input).unwrap();
+
+}
+
+fn sort_paths(document: &svg::node::element::SVG)
+{
+    println!(" %^%^%^%");
+
+
+    let opt = roxmltree::ParsingOptions { allow_dtd: true, ..roxmltree::ParsingOptions::default() };
+
+    let binding = document.to_string();
+    let doc = match roxmltree::Document::parse_with_options(&binding, opt) {
+        Ok(doc) => doc,
+        Err(e) => {
+            println!("Error: {}.", e);
+            panic!();
+        }
+    };
+
+    // let tree = Tree::from_file(file_path, &usvg::Options::default()).map_err(|e| e.to_string())?;
+    // let tree = Tree::from_xmltree(&doc, &usvg::Options::default()).map_err(|e| e.to_string())?;
+    // let tree = Tree::from_xmltree(&doc, &usvg::Options::default()).map_err(|e| e.to_string());
+    let tree = Tree::from_xmltree(&doc, &usvg::Options::default()).map_err(|e| e.to_string()).unwrap();
+
+    // iterate_svg_elements(&tree);
+
+    // tree.into_iter().for_each(|node| {
+
+    //     println!(" got an svg node tree ");
+    //     // if let Some(rect) = rectangle_from_node(node) {
+    //     //     let fill_color = format!("{:x}", rect.fill);
+    //     //     if let Some(rect_list) = shape_list.get_mut(&fill_color) {
+    //     //         rect_list.push(rect);
+    //     //     } else {
+    //     //         shape_list.insert(fill_color, vec![rect]);
+    //     //     }
+    //     // }
+    // });
+
+
+
+    // println!("svg doc tree - > {}", &tree);
+}
+
+// fn iterate_svg_elements(tree: &usvg::Tree) {
+//     let root = tree.root;
+//     traverse_node(&root);
+// }
+
+
+// fn traverse_node(node: &usvg::Node) {
+//     let node_kind = node.kind();
+
+//     match node_kind {
+//         NodeKind::Element(ref elem) => {
+//             println!("Element: {:?}", elem);
+//         }
+//         _ => {}
+//     }
+
+//     for child in node.children() {
+//         traverse_node(&child);
+//     }
+// }
+
+// fn traverse_node(node: &usvg::Node) {
+//     match &node.data {
+//         NodeKind::Element(ref elem) => {
+//             println!("Element: {:?}", elem);
+//         }
+//         _ => {}
+//     }
+
+//     for child in node.children() {
+//         traverse_node(&child);
+//     }
+// }
+
+
 
 // given the first tile incomplete tile return the first start point and tile end 
 fn get_incomplete_tile_info(tile: &MosaicTile, 
@@ -794,8 +886,8 @@ fn find_next_tile_ext(curtile_row: usize,
                                     // Perhaps we need to find next tile before setting the edges?
                                     println!(" ----- 3e Not sure why this works - really need to have a look at this logic");
                                     panic!();
-                                    res = (contig_row,contig_col);
-                                    break;
+                                    // res = (contig_row,contig_col);
+                                    // break;
                                 }
                                 else {
                                     println!(" ----- 3f ------- TFTF check_tile only");
