@@ -1,25 +1,9 @@
 /target
 .DS_Store
 Cargo.lock
-my_mod.rs
 *.svg
-src/compareNeighbours_NDArray.rs
 .vscode/launch.json
 /svg_output
-src/FuncCalledWithFunctParameter.rs
-src/dfs_arr.rs
-BrewUpgradeFontForgeCommandLineToolsMsg.txt
-PstoEdit_Output.txt
-PstoEdit_SVG-DXF_ChatGPT.txt
-src/create_contig_path.rs
-src/fn combine_pane_edges.rs
-src/get_matching_row_indices.rs
-src/get_rows_with_pattern_v2.rs
-src/get_rows_with_pattern_v2_option_match_this.rs
-src/pv_eb_hack.rs
-src/tile_builder_pattern.rs
-svg_output Feb24/
-svg_output Mar02/
-src/svg_utils_workingMar3.rs
-src/code_snippet_removedfrom.txt
-svg_output_copiedMar10/
+laser_files/
+src/moved_code/
+svg_ouptput_feb_to_mar_Archive.zip
