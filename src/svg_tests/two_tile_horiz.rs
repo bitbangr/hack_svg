@@ -11,7 +11,7 @@ use crate::svg_utils::test_create_svg;
 // There is one test for each option
 
 pub(crate) fn svg_1(){
-    let op_svg_file_name = "./svg_output/one_two/horiz_1.svg";
+    let op_svg_file_name = "../svgoutput/one_two/horiz_1.svg";
     let rows: usize = 1;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 1; 
@@ -30,7 +30,7 @@ pub(crate) fn svg_1(){
 } // svg1
 
 pub(crate) fn svg_2(){
-    let op_svg_file_name = "./svg_output/one_two/horiz_2.svg";
+    let op_svg_file_name = "../svgoutput/one_two/horiz_2.svg";
     let rows: usize = 1;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 1; 
@@ -49,7 +49,7 @@ pub(crate) fn svg_2(){
 } // svg2
 
 pub(crate) fn svg_3(){
-    let op_svg_file_name = "./svg_output/one_two/vert_1.svg";
+    let op_svg_file_name = "../svgoutput/one_two/vert_1.svg";
     let rows: usize = 2;
     let cols: usize = 1;
     let tiles_per_pane_height: usize = 2; 
@@ -68,7 +68,7 @@ pub(crate) fn svg_3(){
 } // svg3
 
 pub(crate) fn svg_4(){
-    let op_svg_file_name = "./svg_output/one_two/vert_2.svg";
+    let op_svg_file_name = "../svgoutput/one_two/vert_2.svg";
     let rows: usize = 2;
     let cols: usize = 1;
     let tiles_per_pane_height: usize = 2; 

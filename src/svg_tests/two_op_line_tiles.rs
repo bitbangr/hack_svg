@@ -10,7 +10,7 @@ use crate::svg_utils::create_svg;
 // tile. So tiles with FTFT and TFTF configs
 
 pub fn svg_1() {
-    let op_svg_file_name = "./svg_output/two_op_lines/output_1.svg";
+    let op_svg_file_name = "../svgoutput/two_op_lines/output_1.svg";
     let rows: usize = 1;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 1;
@@ -50,7 +50,7 @@ pub fn svg_1() {
 } // svg1
 
 pub fn svg_2() {
-    let op_svg_file_name = "./svg_output/two_op_lines/output_2.svg";
+    let op_svg_file_name = "../svgoutput/two_op_lines/output_2.svg";
     let rows: usize = 3;
     let cols: usize = 1;
     let tiles_per_pane_height: usize = 3;
@@ -94,7 +94,7 @@ pub fn svg_2() {
 
 // test one vertical TFTF tile plus one horiz FTFT tile in same file
 pub fn svg_3() {
-    let op_svg_file_name = "./svg_output/two_op_lines/output_3.svg";
+    let op_svg_file_name = "../svgoutput/two_op_lines/output_3.svg";
     let rows: usize = 3;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 3;
@@ -141,7 +141,7 @@ pub fn svg_3() {
 
 
 pub fn svg_98() {
-    let op_svg_file_name = "./svg_output/two_op_lines/output_98.svg";
+    let op_svg_file_name = "../svgoutput/two_op_lines/output_98.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -180,7 +180,7 @@ pub fn svg_98() {
 
 
 pub fn svg_99() {
-    let op_svg_file_name = "./svg_output/two_op_lines/output_99.svg";
+    let op_svg_file_name = "../svgoutput/two_op_lines/output_99.svg";
     let rows: usize = 3;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 3;

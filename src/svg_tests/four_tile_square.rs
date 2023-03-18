@@ -12,7 +12,7 @@ use crate::svg_utils::test_create_svg;
 // tile  For a four tile square mosiac of one single tile the dimension are 2 row by 2 col
 
 pub fn svg_1(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_1.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_1.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -31,7 +31,7 @@ pub fn svg_1(){
 } // svg1
 
 pub(crate) fn svg_2(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_2.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_2.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -50,7 +50,7 @@ pub(crate) fn svg_2(){
 } // svg_2
 
 pub(crate) fn svg_3(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_3.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_3.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -71,7 +71,7 @@ pub(crate) fn svg_3(){
 
 
 pub(crate) fn svg_4(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_4.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_4.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -90,7 +90,7 @@ pub(crate) fn svg_4(){
 } // svg4
 
 pub(crate) fn svg_5(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_5.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_5.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -109,7 +109,7 @@ pub(crate) fn svg_5(){
 } // svg5
 
 pub(crate) fn svg_6(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_6.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_6.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -128,7 +128,7 @@ pub(crate) fn svg_6(){
 } // svg6
 
 pub(crate) fn svg_7(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_7.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_7.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -147,7 +147,7 @@ pub(crate) fn svg_7(){
 } // svg7
 
 pub(crate) fn svg_8(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_8.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_8.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -166,7 +166,7 @@ pub(crate) fn svg_8(){
 } // svg8
 
 pub(crate) fn svg_9(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_9.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_9.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -185,7 +185,7 @@ pub(crate) fn svg_9(){
 } // svg9
 
 pub(crate) fn svg_10(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_10.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_10.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -204,7 +204,7 @@ pub(crate) fn svg_10(){
 } // svg10
 
 pub(crate) fn svg_11(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_11.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_11.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -223,7 +223,7 @@ pub(crate) fn svg_11(){
 } // svg11
 
 pub(crate) fn svg_12(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output_12.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output_12.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -243,7 +243,7 @@ pub(crate) fn svg_12(){
 
 // used to call random stuff for testing
 pub(crate) fn svg_98(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output98.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output98.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -267,7 +267,7 @@ pub(crate) fn svg_98(){
 
 // used to call random stuff for testing
 pub(crate) fn svg_99(){
-    let op_svg_file_name = "./svg_output/twoXtwo/output99.svg";
+    let op_svg_file_name = "../svgoutput/twoXtwo/output99.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 

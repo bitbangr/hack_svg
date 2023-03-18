@@ -11,7 +11,7 @@ const TILES_PER_PANE_WIDTH: usize = 1;
 const TILES_PER_PANE_HEIGHT: usize = 1;
 
 pub(crate) fn svg_1(){
-    let op_svg_file_name = "./svg_output/one_two/output_single_tile.svg";
+    let op_svg_file_name = "../svgoutput/one_two/output_single_tile.svg";
     let rows: usize = 1;
     let cols: usize = 1;
     let tiles_per_pane_height: usize = 1; 
