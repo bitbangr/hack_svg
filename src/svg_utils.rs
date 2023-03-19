@@ -478,9 +478,13 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
 fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_width: usize, svg_height: usize) 
 {
-    let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+    
+    let op_file_name : String = "./svg_output/twelveXtwelve/fy_laser_org".to_string();
+    let mut count: i32= 1 ; 
 
     for (rgb_value_key, line_data_vec) in path_data_hashmap {
+
+        let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
         // create a path group with name of that rgb value
         let mut path_group = svg::node::element::Group::new()
                 .set("id", rgb_value_key.clone())
@@ -505,11 +509,15 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
 
         // add the path group to the document
         document = document.add(path_group);
+        
+        // let mut op_svg_file_name= "./svg_output/twelveXtwelve/fy_laser_org.svg";
+        let op_svg_file_name = op_file_name.clone() + &count.to_string() + ".svg"; 
+        println!("Writing to ouptput file {}", &op_file_name);
+        svg::save(&op_svg_file_name, &document).expect("Error saving SVG file");
+
+        count += 1;
     }
 
-    let op_svg_file_name = "./svg_output/twelveXtwelve/fy_laser_org.svg";
-    println!("Writing to ouptput file {}", &op_svg_file_name);
-    svg::save(op_svg_file_name, &document).expect("Error saving SVG file");
 }
 
 
