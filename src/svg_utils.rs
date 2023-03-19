@@ -1,26 +1,23 @@
 use crate::adjacent_tiles::build_adjacent_map;
 use crate::mosaic_tile::{Tile, RGB, MosaicTile};
-use crate::dfs_tiles;
+use crate::{dfs_tiles, modtile};
 use crate::constants::{FLAGGED, TOP, BOTTOM, LEFT, RIGHT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
 use euclid::default::{Box2D, Point2D};
 use ndarray::{Array2, ArrayBase, OwnedRepr, Dim};
-use rosvgtree::roxmltree::StringStorage;
+
+use rosvgtree::{AttributeId, Attribute};
 use rosvgtree::svgtypes::Paint;
+
 use svg::node::element::path::Data;
 use svg::node::element::Path;
 use svg::Document;
 
 use usvg::{roxmltree, Tree, NodeKind};
-use rosvgtree::{AttributeId, Attribute};
+use usvg::{PathData, PathSegment, Rect};
 
 use regex::Regex;
-
-
-// ("fill", AttributeId::Fill),
-// use rosvgtree::{AttributeId, AttributeType};
-
 
 use crate::get_edge_bools;
 use crate::pane_to_2d_vec;
@@ -174,6 +171,9 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
     // helper function to set all TTTT tiles as visited as we will never process these to create an SVG path
     let _ = set_tttt_visited_tiles(&mut visited_tiles,&pane_edge_nd_arr);
+
+    // for each colour store all the line Data elements
+    let mut path_data_hashmap: HashMap<String,Vec<Data>> = HashMap::new();
 
     // Grab a collection of contigous tiles
     for contig_group in &contiguous_tiles{
@@ -436,6 +436,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
         // finally close the path
         line_data = line_data.close();
+        let line_data_clone = line_data.clone();
+        let line_data_clone1 = line_data.clone();
 
         let stroke_colour =  "purple";
         // let stroke_width =  0.25; 
@@ -449,12 +451,22 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                                 
         // add the tile path to the document
         document = document.add(tile_path);
+        
+        // also add the line data to the the path data hash map with the corresponding rgb_str as the key
+        path_data_hashmap.entry(rgb_str.to_owned())
+                .and_modify(|v| v.push(line_data_clone)) // clone the line data for path data hash map
+                .or_insert(vec![(line_data_clone1)]); // clone the line data for path data hash map
+    
+        let _ = create_laser_svg_doc(&path_data_hashmap, svg_width, svg_height);
+
+        // we should create new document for each colour and add the tile path to the specific doc for that colour
+        // or we can create a hash map for each colour to store all the paths for that colour
+        // when done reog all these into layers and drawa  box around them 
 
     } // for contig_group in &contiguous_tiles{
 
-    // let _ = sort_paths(&document);
-
-
+    println!("path_data_hashmap -> {:?}", path_data_hashmap);
+    
     doo_eet();
 
     println!("Writing to ouptput file {}", &op_svg_file_name);
@@ -462,6 +474,70 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
     // end travel_contig_ext_int_svg
 }
+
+
+fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_width: usize, svg_height: usize) 
+{
+    let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+
+    for (rgb_value_key, line_data_vec) in path_data_hashmap {
+        // create a path group with name of that rgb value
+        let mut path_group = svg::node::element::Group::new()
+                .set("id", rgb_value_key.clone())
+                .set("fill", rgb_value_key.to_owned())
+                .set("stroke", rgb_value_key.to_owned())
+                .set("stroke-width", 0.0);
+
+        for line_data_element in line_data_vec {
+            // create a path and add it to the svg document
+            let tile_path = Path::new().set("d", line_data_element.to_owned());
+
+            // create a path and add it to the svg document
+            // let tile_path = Path::new()
+            //     .set("fill", rgb_value_key.to_owned())
+            //     .set("stroke", rgb_value_key.to_owned())
+            //     .set("stroke-width", 0.0)
+            //     .set("d", line_data_element.to_owned());
+
+            // add the tile path to the path group
+            path_group = path_group.add(tile_path);
+        }
+
+        // add the path group to the document
+        document = document.add(path_group);
+    }
+
+    let op_svg_file_name = "./svg_output/twelveXtwelve/fy_laser_org.svg";
+    println!("Writing to ouptput file {}", &op_svg_file_name);
+    svg::save(op_svg_file_name, &document).expect("Error saving SVG file");
+}
+
+
+// fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_width: usize, svg_height: usize) 
+// {
+//     let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+
+//     for rgb_value_key in path_data_hashmap {
+
+//         // create a path group with name of that rgb value
+//         for each line_data_path for  rgb_value_key in path_data_hashmap {
+
+//             // create a path and add it to the svg document
+//             let tile_path = Path::new().set("fill", rgb_str.to_owned()) // ie -> .set("fill", "rgb(255, 0, 0)")
+//                                     .set("stroke", rgb_str.to_owned())
+//                                     .set("stroke-width", stroke_width)
+//                                     .set("d", line_data_element);
+                                    
+//         // add the tile path to the document
+//         document = document.add(tile_path);
+    
+//     }
+
+//     let op_svg_file_name = ".\laser_cut_svg.svg";
+//     println!("Writing to ouptput file {}", &op_svg_file_name);
+//     svg::save(op_svg_file_name, &document)   
+
+// }
 
 /// figure out how rosvgtree module works
 fn doo_eet() {
@@ -477,25 +553,44 @@ fn doo_eet() {
 
     let mut single_tile_count: i32 = 0; 
 
+    let mut single_tile_hashmap: HashMap<String,i32> = HashMap::new();
+
+    // let mut single_svg_tiles: HashMap<modtile::RGB, i32> = HashMap::new();
+    let mut single_svg_tiles: HashMap<String, i32> = HashMap::new();
+    // for (_i, tile) in pane.iter().enumerate() {
+    //     let tile_rgb = tile.1;
+    //     *single_svg_tiles.entry(tile_rgb).or_insert(0) += 1;
+    // }
+
     for descendant in rosvg_doc.descendants(){
         
         let tag_name = descendant.tag_name();
         // println!("\ndescendant {:?}" , &descendant);
         println!("\ndescendant {:?}" , &tag_name);
 
-        let attributes: &[rosvgtree::Attribute] = descendant.attributes();
-        println!("\ndec attributes {:?}" , &attributes);
+        // let attributes: &[rosvgtree::Attribute] = descendant.attributes();
+        // println!("\ndec attributes {:?}" , &attributes);
 
         match descendant.has_attribute(AttributeId::Fill) {
             true => {
-                println!("\ndec has a fill attribute" ); 
+                println!("\tdec has a fill attribute" ); 
 
-                match rosvgtree::Node::attribute::<Paint>(&descendant, AttributeId::Fill) {    
-                    Some(fill_color) => {
-                        println!("fill color: {:?}", fill_color);
+                // match rosvgtree::Node::attribute::<Paint>(&descendant, AttributeId::Fill) {    
+                //     Some(fill_color) => {
+                //         println!("fill color: {:?}", fill_color);
+                //     }
+                //     None => {
+                //         println!("fill attribute is not a valid color");
+                //     }
+                // }
+
+                match rosvgtree::Node::attribute::<&str>(&descendant, AttributeId::Fill) {    
+                    Some(fill_color_str) => {
+                        println!("\tfill color string: {:?}", fill_color_str);
+                        *single_svg_tiles.entry(fill_color_str.to_owned()).or_insert(0) += 1;
                     }
                     None => {
-                        println!("fill attribute is not a valid color");
+                        println!("\tfill attribute is not a valid color");
                     }
                 }
 
@@ -511,11 +606,12 @@ fn doo_eet() {
                         // Perform a regular expression match on the data string
                         match pattern.find(&data) {
                             Some(matched) => {
-                                println!("Single Tile Match found: {:?}", matched.as_str());
+                                // println!("\tSingle Tile Match found: {:?}", matched.as_str());
+                                println!("\tSingle Tile Match found:");
                                 single_tile_count  += 1;
                             }
                             None => {
-                                println!("Single Tile Match Not found");
+                                println!("\tSingle Tile Match Not found");
                             }
                         }
 
@@ -533,8 +629,99 @@ fn doo_eet() {
         }
     
     }
-    println!(" {} <- Single Tile Count in mosaic", single_tile_count);
+    println!("\n {} <- Single Tile Count in mosaic", single_tile_count);
+    println!("Single Tiles -> {:?}", &single_svg_tiles);
+
+    test_trans_bound();
+
 }
+
+
+
+fn translate_path_and_compute_bounding_box(path_data: &str, startx: f64, starty: f64) -> Option<(PathData, Rect)> {
+    
+    let mut path_data: PathData = PathData::new(); 
+    // {
+    //     Ok(data) => data,
+    //     Err(_) => return None,
+    // };
+    let x:f64 = 10.0;
+    let y:f64 = 10.0;
+    PathData::push_move_to(&mut path_data, x, y);
+    PathData::push_line_to(&mut path_data, 100.0, 10.0 );
+    PathData::push_line_to(&mut path_data, 100.0, 100.0 );
+    PathData::push_line_to(&mut path_data, 10.0, 100.0 );
+    PathData::push_close_path(&mut path_data);
+
+
+    let mut min_x = f64::INFINITY;
+    let mut min_y = f64::INFINITY;
+    let mut max_x = f64::NEG_INFINITY;
+    let mut max_y = f64::NEG_INFINITY;
+
+    for segment in path_data.segments() {
+        let (x, y) = match segment {
+            PathSegment::MoveTo { x, y } | PathSegment::LineTo { x, y } => (x, y),
+            _ => continue,
+        };
+
+        min_x = min_x.min(x);
+        min_y = min_y.min(y);
+        max_x = max_x.max(x);
+        max_y = max_y.max(y);
+    }
+
+    let mut translated_path_data: PathData = PathData::new();
+    let mut prev_x = min_x;
+    let mut prev_y = min_y;
+
+    for segment in path_data.segments() {
+        match segment {
+            PathSegment::MoveTo { x, y } => {
+                let new_x = x - min_x + startx;
+                let new_y = y - min_y + starty;
+
+                // translated_path_data.push(PathSegment::MoveTo { x: new_x, y: new_y });
+                PathData::push_move_to(&mut translated_path_data,  new_x , new_y);
+                prev_x = new_x;
+                prev_y = new_y;
+            }
+            PathSegment::LineTo { x, y } => {
+                let new_x = x - prev_x;
+                let new_y = y - prev_y;
+
+                // translated_path_data.push(PathSegment::LineTo { x: new_x, y: new_y });
+                PathData::push_line_to(&mut translated_path_data,  new_x , new_y);
+                prev_x = x - min_x + startx;
+                prev_y = y - min_y + starty;
+            }
+            // other => translated_path_data.push(other),
+            other => PathData::push_close_path(&mut translated_path_data),
+        }
+    }
+
+    if min_x.is_infinite() || min_y.is_infinite() || max_x.is_infinite() || max_y.is_infinite() {
+        None
+    } else {
+        let bounding_box = Rect::new(startx, starty, max_x - min_x, max_y - min_y).unwrap();
+        Some((translated_path_data, bounding_box))
+    }
+}
+
+
+fn test_trans_bound() {
+    let path_data = "M500,4000 L400,4000 L400,3900 L500,3900 L600,3900 L600,4000 L500,4000 z";
+    let startx = 10.0;
+    let starty = 20.0;
+    if let Some((translated_path_data, bounding_box)) = translate_path_and_compute_bounding_box(path_data, startx, starty) {
+        println!("Translated path data: {:?}", translated_path_data);
+        println!("Bounding box: {:?}", bounding_box);
+    } else {
+        println!("Failed to translate path data and compute bounding box");
+    }
+}
+
+
 
 // fn sort_paths(document: &svg::node::element::SVG)
 // {
