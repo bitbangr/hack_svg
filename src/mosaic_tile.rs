@@ -531,7 +531,7 @@ impl Tile {
         [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
     }
 
-    pub fn get_tile_corners(&self) -> [Point2D<i32>; 4] {
+    pub fn _get_tile_corners(&self) -> [Point2D<i32>; 4] {
         let top_left = self.coords.min;
         let top_right = Point2D::new(self.coords.max.x, self.coords.min.y);
         let bottom_right = self.coords.max;
