@@ -441,8 +441,28 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
 
 } // get_ext_tile_svg_line_data
 
-
-/// Combine two SVG line data elements and return
+/// /// Combines the commands from two SVG line `Data` objects into a single `Data` object.
+///
+/// This function takes references to two `Data` objects as input and returns a new `Data` object
+/// containing the commands from both input objects, in the order they appear.
+///
+/// # Arguments
+///
+/// * `data1` - A reference to the first `Data` object.
+/// * `data2` - A reference to the second `Data` object.
+///
+/// # Returns
+///
+/// A `Data` object containing the combined commands from `data1` and `data2`.
+///
+/// # Example
+///
+/// ```rust
+/// let data1 = Data::from(vec![Command1, Command2]);
+/// let data2 = Data::from(vec![Command3, Command4]);
+/// let combined_data = combine_data(&data1, &data2);
+/// assert_eq!(combined_data, Data::from(vec![Command1, Command2, Command3, Command4]));
+/// ```
 pub fn combine_data (data1:&Data, data2:&Data) -> Data {
     
     let commands: Vec<_> = data1.iter().chain(data2.iter()).cloned().collect();
