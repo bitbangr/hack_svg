@@ -23,7 +23,7 @@ use crate::get_edge_bools;
 use crate::pane_to_2d_vec;
 use crate::pane_vec_to_ndarray;
 
-use crate::mosaic_tile_svg_utils::{get_tile_svg_line_data, combine_data, get_ext_tile_svg_line_data};
+use crate::mosaic_tile_svg_utils::{combine_data, get_ext_tile_svg_line_data};
 
 use num_traits::Zero;
 use std::collections::HashMap;
@@ -188,6 +188,8 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                             svg_width: usize, 
                             svg_height: usize) -> Result<(), std::io::Error> 
 {
+    let create_laser_files = false;
+
     println!("\n***********\nfn travel_contig_ext_int_svg\n***********");
     println!("\n {} <- Number of contiguous tile groups", contiguous_tiles.len()); 
     println!("\nVector of contiguous tiles -> {:?}", contiguous_tiles);
@@ -509,8 +511,10 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
     // Save each tile colour to a new svg doc just for that colour
     // Possible todos bin pack, add legend, and sizing box to each layer doc
-    let _ = create_laser_svg_doc(&path_data_hashmap, svg_width, svg_height, &op_svg_file_name);
-
+    if create_laser_files {
+        let _ = create_laser_svg_doc(&path_data_hashmap, svg_width, svg_height, &op_svg_file_name);
+    } 
+    
     // Output the complete SVG
     println!("Writing to ouptput file {}", &op_svg_file_name);
     svg::save(op_svg_file_name, &document)   
