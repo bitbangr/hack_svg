@@ -49,7 +49,7 @@ use std::collections::HashMap;
 ///  10.0) Interior Tile borders are always drawn in counter clockwise fzashion in the output SVG
 ///  11) SVG Lines(borders) are drawn for tile edges that are marked False. 
 ///  12) There are 16 possible configurations of borders (tile edges which have been marked false) for a Topbound(Northbound) tile ranging from none to all 4 edges being a border
-///  13) A vector containing collections of contigous tiles has been returned by a Depth First Search Algorithm
+///  13) A vector containing collections of contiguous tiles has been returned by a Depth First Search Algorithm
 ///  14) All completely interior tiles (i.e tiles with zero borders, all edges marked true) will be ignored. i.e. no drawing will take place for these
 /// 
 /// Drawing Process is
@@ -62,8 +62,8 @@ use std::collections::HashMap;
 ///     2d. The end point is the end of the last line drawn for this tile
 ///     2e. Mark all the borders (false edges) for this tile that have been drawn as visited.
 ///       2e1 - if all borders visited the mark tile as completed and or remove from tiles to be inspected 
-///       if tile border is not contigous then we need to add code to handle interior voids i.e. 
-///       starting a new svg path drawing process for the non-contigous border (false edge)
+///       if tile border is not contiguous then we need to add code to handle interior voids i.e. 
+///       starting a new svg path drawing process for the non-contiguous border (false edge)
 ///      | | or _
 ///             _
 /// 
@@ -119,7 +119,7 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
 
     // println!("edge_booleans = {:?}" , &edge_booleans);
 
-    // get Vec of Vec of contigous tiles
+    // get Vec of Vec of contiguous tiles
     let contiguous_tiles = dfs_tiles::get_contiguous_tiles_mod(&pane_2d_vec);
     // println!("fn get_contiguous_tiles_mod search results -> {:?}", &contiguous_tiles);
 
@@ -130,7 +130,7 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
     // println! ("*********\nmosaic_pane_edge_nd_arr\n\n{:?}", &pane_edge_nd_arr);
 
     // Working CODE - We shall leave as is for now
-    // testing the travel contigous tiles function
+    // testing the travel contiguous tiles function
     // let _ = travel_contig_svg_refact(pane_edge_nd_arr, 
     //                     contiguous_tiles, 
     //                     op_svg_file_name ,
@@ -148,12 +148,40 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
     
 }
 
-
-
-
 // ****************************** */
 // ****************************** */
 
+/// Generates SVG output file with the provided pane edge data, contiguous tile coordinates, 
+/// dimensions, and output file name.  It also creates a separate svg file for each RGB colour
+/// that can be used for laser cutting
+///
+/// This function processes pane edge data and contiguous tile coordinates to create an SVG file
+/// with the specified dimensions and file name. The function returns a Result, which is either
+/// an empty tuple (Ok case) or an error (Err case) in case of I/O issues.
+///
+/// # Arguments
+///
+/// * `pane_edge_nd_arr` - A 2-dimensional array of MosaicTile objects representing the pane edge data.
+/// * `contiguous_tiles` - A vector containing vectors of tuples, where each tuple represents the (row, col) coordinates of a contiguous tile.
+/// * `op_svg_file_name` - A reference to a string containing the output SVG file name.
+/// * `svg_width` - The width of the SVG document.
+/// * `svg_height` - The height of the SVG document.
+///
+/// # Returns
+///
+/// * `Result<(), std::io::Error>` - A Result indicating success (empty tuple) or an error in case of I/O issues.
+///
+/// # Example
+///
+/// ```rust
+/// let pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>> = ...
+/// let contiguous_tiles: Vec<Vec<(isize, isize)>> = ...
+/// let op_svg_file_name = "output_file.svg";
+/// let svg_width = 4000;
+/// let svg_height = 4000;
+///
+/// let result = travel_contig_ext_int_svg(pane_edge_nd_arr, contiguous_tiles, op_svg_file_name, svg_width, svg_height);
+/// ```
 fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>, 
                             contiguous_tiles: Vec<Vec<(isize, isize)>>, 
                             op_svg_file_name: &str, 
@@ -161,9 +189,25 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                             svg_height: usize) -> Result<(), std::io::Error> 
 {
     println!("\n***********\nfn travel_contig_ext_int_svg\n***********");
-    println!("\nVector of contigous tiles -> {:?}", contiguous_tiles);
+    println!("\n {} <- Number of contiguous tile groups", contiguous_tiles.len()); 
+    println!("\nVector of contiguous tiles -> {:?}", contiguous_tiles);
 
-    let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+    let viewBoxWidth = 4000;
+    let viewBoxHeight = 4000;
+    let desiredWidthInInches = 20.0;
+    let desiredHeightInInches = 20.0;
+    let scaleX = desiredWidthInInches / viewBoxWidth as f32;
+    let scaleY = desiredHeightInInches / viewBoxHeight as f32;
+    
+    let mut document: svg::node::element::SVG = Document::new()
+        .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
+        .set("width", "20in")
+        .set("height", "20in")
+        .set("transform", format!("scale({}, {})", scaleX, scaleY));
+    
+    // let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+    // let mut document: svg::node::element::SVG = Document::new().set("viewBox", "(0, 0, 20in, 20in)")
+                                                            //    .set("transform", format!("scale({}, {})", scaleX, scaleY));
 
     let shape = pane_edge_nd_arr.shape();
     let mut visited_tiles: Array2<TileVisited> = create_visited_bool_arr(shape);
@@ -175,7 +219,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     // for each colour store all the line Data elements
     let mut path_data_hashmap: HashMap<String,Vec<Data>> = HashMap::new();
 
-    // Grab a collection of contigous tiles
+    // Grab a collection of contiguous tiles
     for contig_group in &contiguous_tiles{
 
         // build a map of adjacent tiles for each entry in contous_group
@@ -332,7 +376,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
 
             if path_traversal_complete
             {
-                println!("Completed external path traversal for this contigous group");
+                println!("Completed external path traversal for this contiguous group");
                 println!("Must check for and draw internal SVG paths");
                 
                 let (next_tile_svg_line_data, svg_line_end_point) = get_ext_tile_svg_line_data(&next_tile_clone, &curr_svg_line_end_point, &mut visited_tiles, row, col );
@@ -427,7 +471,7 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
             // end of if next_tile_clone.end_point == svg_line_data_begin_point
             }
             else {
-                println!("next_tile end_point != start_tile start_point\n Continue processing contigous group tiles");
+                println!("next_tile end_point != start_tile start_point\n Continue processing contiguous group tiles");
                 more_tiles = true;
             }
 
@@ -457,34 +501,80 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                 .and_modify(|v| v.push(line_data_clone)) // clone the line data for path data hash map
                 .or_insert(vec![(line_data_clone1)]); // clone the line data for path data hash map
     
-        let _ = create_laser_svg_doc(&path_data_hashmap, svg_width, svg_height);
-
-        // we should create new document for each colour and add the tile path to the specific doc for that colour
-        // or we can create a hash map for each colour to store all the paths for that colour
-        // when done reog all these into layers and drawa  box around them 
-
     } // for contig_group in &contiguous_tiles{
 
-    println!("path_data_hashmap -> {:?}", path_data_hashmap);
+    // println!("path_data_hashmap -> {:?}", path_data_hashmap);
     
-    doo_eet();
+    // doo_eet();
 
+    // Save each tile colour to a new svg doc just for that colour
+    // Possible todos bin pack, add legend, and sizing box to each layer doc
+    let _ = create_laser_svg_doc(&path_data_hashmap, svg_width, svg_height, &op_svg_file_name);
+
+    // Output the complete SVG
     println!("Writing to ouptput file {}", &op_svg_file_name);
     svg::save(op_svg_file_name, &document)   
 
     // end travel_contig_ext_int_svg
 }
 
-
-fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_width: usize, svg_height: usize) 
+/// Creates an SVG document with the given path data and dimensions.
+///
+/// The function takes a HashMap of path data, the width and height of the SVG, and an output file name.
+/// The path data HashMap maps RGB color strings to vectors of path data strings. An output svg document
+/// is created for each RGB colour. Each colour layer can then be separately cut on a laser cutter.
+///
+/// # Arguments
+///
+/// * `path_data_hashmap` - A reference to a HashMap containing the path data, where the key is an RGB color string and the value is a vector of path data strings.
+/// * `svg_width` - The width of the SVG document.
+/// * `svg_height` - The height of the SVG document.
+/// * `op_svg_file_name` - A reference to a string containing the output SVG file name.
+///
+/// # Example
+///
+/// ```rust
+/// let path_data: HashMap<String, Vec<String>> = ...
+/// create_laser_svg_doc(&path_data, 4000, 4000, "output_file.svg");
+/// ```
+fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_width: usize, svg_height: usize, op_svg_file_name:&str) 
 {
     
-    let op_file_name : String = "./svg_output/twelveXtwelve/fy_laser_org".to_string();
+    let op_file_name : String = op_svg_file_name.trim_end_matches(".svg").to_string();
+    //  "./svg_output/twelveXtwelve/fy_laser_org".to_string();
+
+    // file_name.trim_end_matches(".svg").to_string()
+    let viewBoxWidth = 4000;
+    let viewBoxHeight = 4000;
+    let desiredWidthInInches = 20.0;
+    let desiredHeightInInches = 20.0;
+    let scaleX = desiredWidthInInches / viewBoxWidth as f32;
+    let scaleY = desiredHeightInInches / viewBoxHeight as f32;
+    
+    // let mut document: svg::node::element::SVG = Document::new()
+    //     .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
+    //     .set("width", "20in")
+    //     .set("height", "20in")
+    //     .set("transform", format!("scale({}, {})", scaleX, scaleY));
+    
+    // let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+    // let mut document: svg::node::element::SVG = Document::new().set("viewBox", "(0, 0, 20in, 20in)")
+    //                                                            .set("transform", format!("scale({}, {})", scaleX, scaleY));
+
+
     let mut count: i32= 1 ; 
 
     for (rgb_value_key, line_data_vec) in path_data_hashmap {
 
-        let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+        // let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+        let mut document: svg::node::element::SVG = Document::new()
+                .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
+                .set("width", "20in")
+                .set("height", "20in")
+                .set("transform", format!("scale({}, {})", scaleX, scaleY));
+        
+
+
         // create a path group with name of that rgb value
         let mut path_group = svg::node::element::Group::new()
                 .set("id", rgb_value_key.clone())
@@ -511,8 +601,8 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
         document = document.add(path_group);
         
         // let mut op_svg_file_name= "./svg_output/twelveXtwelve/fy_laser_org.svg";
-        let op_svg_file_name = op_file_name.clone() + &count.to_string() + ".svg"; 
-        println!("Writing to ouptput file {}", &op_file_name);
+        let op_svg_file_name = op_file_name.clone() + "_lry" + &count.to_string() + ".svg"; 
+        println!("Writing to ouptput file {}", &op_svg_file_name);
         svg::save(&op_svg_file_name, &document).expect("Error saving SVG file");
 
         count += 1;
@@ -547,7 +637,20 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
 
 // }
 
-/// figure out how rosvgtree module works
+
+/// Examines an SVG file to understand the rosvgtree module and extract relevant information.
+///
+/// This function reads an SVG file and creates a `rosvgtree::Document` from it. It then explores
+/// the document structure and extracts information such as fill color, single tile count, and
+/// single tile occurrences in the SVG. The function also demonstrates the use of regular expressions
+/// to match specific patterns in the SVG data.
+///
+/// Meant as an exercise to figure out how rosvgtree module works
+/// # Example
+///
+/// ```rust
+/// doo_eet();
+/// ```
 fn doo_eet() {
 
     // let input = std::fs::read_to_string("./svg_output/twoXtwo/output_7.svg").unwrap();        
@@ -645,7 +748,33 @@ fn doo_eet() {
 }
 
 
-
+/// Translates the given path data by a specified amount and computes its bounding box.
+///
+/// This function takes a path data string, and starting x and y coordinates as input. It then
+/// translates the path data to the specified coordinates and computes its axis-aligned
+/// bounding box.
+///
+/// # Arguments
+///
+/// * `path_data` - The input path data as a string.
+/// * `startx` - The starting x coordinate to translate the path to.
+/// * `starty` - The starting y coordinate to translate the path to.
+///
+/// # Returns
+///
+/// An `Option` containing a tuple of the translated `PathData` and the computed `Rect` (bounding box),
+/// or `None` if the path data cannot be processed.
+///
+/// # Example
+///
+/// ```rust
+/// let path_data_str = "M 10,10 L 100,10 L 100,100 L 10,100 Z";
+/// let result = translate_path_and_compute_bounding_box(path_data_str, 20.0, 20.0);
+/// if let Some((translated_path_data, bounding_box)) = result {
+///     println!("Translated path data: {:?}", translated_path_data);
+///     println!("Bounding box: {:?}", bounding_box);
+/// }
+/// ```
 fn translate_path_and_compute_bounding_box(path_data: &str, startx: f64, starty: f64) -> Option<(PathData, Rect)> {
     
     let mut path_data: PathData = PathData::new(); 
@@ -660,7 +789,6 @@ fn translate_path_and_compute_bounding_box(path_data: &str, startx: f64, starty:
     PathData::push_line_to(&mut path_data, 100.0, 100.0 );
     PathData::push_line_to(&mut path_data, 10.0, 100.0 );
     PathData::push_close_path(&mut path_data);
-
 
     let mut min_x = f64::INFINITY;
     let mut min_y = f64::INFINITY;
@@ -1804,7 +1932,7 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
 
     println!("edge_booleans = {:?}" , &edge_booleans);
 
-    // get Vec of Vec of contigous tiles
+    // get Vec of Vec of contiguous tiles
     let contiguous_tiles = dfs_tiles::get_contiguous_tiles_mod(&pane_2d_vec);
     println!("fn get_contiguous_tiles_mod search results -> {:?}", &contiguous_tiles);
 
@@ -1814,14 +1942,14 @@ pub(crate) fn test_create_svg(op_svg_file_name: &str,
 
     println! ("*********\nmosaic_pane_edge_nd_arr\n\n{:?}", &pane_edge_nd_arr);
 
-    // testing the travel contigous tiles function
+    // testing the travel contiguous tiles function
     // let _ = travel_contig_svg(pane_nd_arr, 
     //                     edge_booleans, 
     //                     contiguous_tiles, 
     //                     op_svg_file_name ,
    //                      svg_width as usize,
     //                     svg_height as usize);
-    // testing the travel contigous tiles function
+    // testing the travel contiguous tiles function
     let _ = travel_contig_svg_refact(pane_edge_nd_arr, 
                         contiguous_tiles, 
                         op_svg_file_name ,
@@ -1842,7 +1970,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
                             svg_height: usize) -> Result<(), std::io::Error> 
 {
     println!("\n***********\nfn travel_contig_svg_refact\n***********");
-    println!("\nVector of contigous tiles -> {:?}", contiguous_tiles);
+    println!("\nVector of contiguous tiles -> {:?}", contiguous_tiles);
 
     let mut document = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
 
@@ -1875,7 +2003,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
     // //     println!("\nnext tile found is FTFT {:?}", &cur_tile);
     // // }
 
-    // Grab a collection of contigous tiles
+    // Grab a collection of contiguous tiles
     for contig_group in &contiguous_tiles{
 
         // current end location of last line drawn (x,y)
@@ -1981,7 +2109,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
                 if let Some(idx) = corners.iter().position(|&corner| corner == *start_tile_start_point) {
                     println!("Found {:?} at index {}", start_tile_start_point, idx);
                     
-                    println!("FTFT TFTF -> Completed contigous tile group traversal");
+                    println!("FTFT TFTF -> Completed contiguous tile group traversal");
                     println!("need to get_tile_svg_line_data with correct info here ");
                     more_tiles = false;
                 } else {
@@ -1991,7 +2119,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
             } else 
             
             if next_tile_clone.end_point == start_tile.start_point { 
-                println!("Completed traversal of all tiles in contigous group");
+                println!("Completed traversal of all tiles in contiguous group");
 
                 // add the last tile data to the data 
                 // let next_tile_svg_line_data = get_tile_svg_line_data(&next_tile_clone, &start_tile.start_point );
@@ -2003,7 +2131,7 @@ fn travel_contig_svg_refact(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, D
                 more_tiles = false;
             }
             else {
-                println!("next_tile end_point != start_tile start_point\n Continue processing contigous group tiles");
+                println!("next_tile end_point != start_tile start_point\n Continue processing contiguous group tiles");
                 more_tiles = true;
             }
 
