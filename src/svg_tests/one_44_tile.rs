@@ -5,7 +5,7 @@ use crate::constants::{RGB_BLACK,RGB_WHITE,RGB_RED,RGB_GREEN,RGB_BLUE, RGB_YELLO
 use crate::create_tile;
 use crate::mosaic_tile::{RGB, rgb_vec_to_array};
 use crate::pane_build_utils::create_pane_test_data;
-use crate::svg_utils::{test_create_svg, create_svg};
+use crate::svg_utils::create_svg;
 
 // This file holds a 12x12 square mosaic with mosiac self portrait
 // using Kroma Colours

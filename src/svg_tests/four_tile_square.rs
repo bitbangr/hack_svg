@@ -3,8 +3,9 @@
 use euclid::default::Box2D;
 use crate::constants::{RGB_BLACK,RGB_WHITE,RGB_GREEN};
 use crate::create_tile;
-use crate::mosaic_tile::RGB;
-use crate::svg_utils::test_create_svg;
+use crate::mosaic_tile::{RGB, rgb_vec_to_array};
+use crate::pane_build_utils::create_pane_test_data;
+use crate::svg_utils::create_svg;
 // use crate::{modtile::{RGB, self}};
 
 // This file holds functions to create various configurations for
@@ -12,7 +13,7 @@ use crate::svg_utils::test_create_svg;
 // tile  For a four tile square mosiac of one single tile the dimension are 2 row by 2 col
 
 pub fn svg_1(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_1.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_1.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -20,18 +21,30 @@ pub fn svg_1(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_white_row_black_row_tile_data);
+    //  2x2 array White row black row
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_WHITE, RGB_WHITE],
+        vec![RGB_BLACK, RGB_BLACK],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg1
 
+
 pub(crate) fn svg_2(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_2.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_2.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -39,18 +52,29 @@ pub(crate) fn svg_2(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_2x2_white_tile_data);
+    //  2x2 array White row black row
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_WHITE, RGB_WHITE],
+        vec![RGB_WHITE, RGB_WHITE],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg_2
 
 pub(crate) fn svg_3(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_3.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_3.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -58,20 +82,31 @@ pub(crate) fn svg_3(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_white_black_checkerboard_data);
+    //  2x2 array  white black checkerboard
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_WHITE, RGB_BLACK],
+        vec![RGB_BLACK, RGB_WHITE],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg3
 
 
 
 pub(crate) fn svg_4(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_4.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_4.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -79,18 +114,29 @@ pub(crate) fn svg_4(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_white_col_black_col_tile_data);
+    //  2x2 array  white col black col
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_WHITE, RGB_BLACK],
+        vec![RGB_WHITE, RGB_BLACK],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg4
 
 pub(crate) fn svg_5(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_5.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_5.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -98,18 +144,29 @@ pub(crate) fn svg_5(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_blk_blk_row_wht_grn_row_tile_data);
+    //  2x2 array  create_blk_blk_row_wht_grn_row_tile
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_BLACK, RGB_BLACK],
+        vec![RGB_WHITE, RGB_GREEN],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg5
 
 pub(crate) fn svg_6(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_6.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_6.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -117,18 +174,29 @@ pub(crate) fn svg_6(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_wht_grn_row_blk_blk_row_tile_data);
+    //  2x2 array  create_wht_grn_row_blk_blk_row_tile_data
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_WHITE, RGB_GREEN],
+        vec![RGB_BLACK, RGB_BLACK],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg6
 
 pub(crate) fn svg_7(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_7.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_7.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -136,18 +204,29 @@ pub(crate) fn svg_7(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_wht_grn_col_blk_blk_col_tile_data);
+    //  2x2 array  create_wht_grn_col_blk_blk_col_tile_data
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_WHITE, RGB_BLACK],
+        vec![RGB_GREEN, RGB_BLACK],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg7
 
 pub(crate) fn svg_8(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_8.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_8.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -155,18 +234,29 @@ pub(crate) fn svg_8(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_blk_blk_col_grn_wht_col_tile_data);
+    //  2x2 array  create_blk_blk_col_grn_wht_col_tile_data
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_BLACK, RGB_GREEN],
+        vec![RGB_BLACK, RGB_WHITE],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg8
 
 pub(crate) fn svg_9(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_9.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_9.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -174,18 +264,29 @@ pub(crate) fn svg_9(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_top_left_grn_rest_blk_tile_data);
+    //  2x2 array  create_top_left_grn_rest_blk_tile_data
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_GREEN, RGB_BLACK],
+        vec![RGB_BLACK, RGB_BLACK],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg9
 
 pub(crate) fn svg_10(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_10.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_10.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -193,18 +294,29 @@ pub(crate) fn svg_10(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_top_right_grn_rest_blk_tile_data);
+    //  2x2 array  create_top_right_grn_rest_blk_tile_data
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_BLACK, RGB_GREEN],
+        vec![RGB_BLACK, RGB_BLACK],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg10
 
 pub(crate) fn svg_11(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_11.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_11.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -212,18 +324,29 @@ pub(crate) fn svg_11(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_bot_left_grn_rest_blk_tile_data);
+    //  2x2 array  create_bot_left_grn_rest_blk_tile_data
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_BLACK, RGB_BLACK],
+        vec![RGB_GREEN, RGB_BLACK],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg11
 
 pub(crate) fn svg_12(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output_12.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output_12.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -231,19 +354,30 @@ pub(crate) fn svg_12(){
     let svg_width = 200;
     let svg_height = 200;
 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_bot_right_grn_rest_blk_tile_data);
+    //  2x2 array  create_bot_right_grn_rest_blk_tile_data
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_BLACK, RGB_BLACK],
+        vec![RGB_BLACK, RGB_GREEN],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg12
 
 // used to call random stuff for testing
 pub(crate) fn svg_98(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output98.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output98.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -251,23 +385,32 @@ pub(crate) fn svg_98(){
     let svg_width = 200;
     let svg_height = 200;
 
-    // calling test_create_svg to instead of create_svg() 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_wht_grn_col_blk_blk_col_tile_data);
-} // svg98
+    //  2x2 array  create_wht_grn_col_blk_blk_col_tile_data
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_WHITE, RGB_BLACK],
+        vec![RGB_GREEN, RGB_BLACK],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
 
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
+} // svg98
 
 
 
 // used to call random stuff for testing
 pub(crate) fn svg_99(){
-    let op_svg_file_name = "../svgoutput/twoXtwo/output99.svg";
+    let op_svg_file_name = "./svg_output/twoXtwo/output99.svg";
     let rows: usize = 2;
     let cols: usize = 2;
     let tiles_per_pane_height: usize = 2; 
@@ -275,571 +418,23 @@ pub(crate) fn svg_99(){
     let svg_width = 200;
     let svg_height = 200;
 
-    // calling test_create_svg to instead of create_svg() 
-    let _ = test_create_svg(op_svg_file_name,
-        svg_width,
-        svg_height, 
-        rows, 
-        cols, 
-        tiles_per_pane_height,
-        tiles_per_pane_width,
-        create_top_right_grn_rest_blk_tile_data);
+    //  2x2 array  create_top_right_grn_rest_blk_tile_data
+    let rgb_vec: Vec<Vec<(RGB)>> = vec![
+        vec![RGB_BLACK, RGB_GREEN],
+        vec![RGB_BLACK, RGB_BLACK],
+    ];
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    let _ = create_svg(op_svg_file_name,
+                        svg_width,
+                        svg_height, 
+                        rows, 
+                        cols, 
+                        tiles_per_pane_height,
+                        tiles_per_pane_width,
+                        data_results);
 } // svg99
-
-
-
-// ******************************************************
-// ******************************************************
-// Create 2x2 White Black checkerboard 
-fn create_white_black_checkerboard_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // white tile
-    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // black tile
-    // (Box2D((100, 0), (200, 100)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black tile 
-    // (Box2D((0,100), (100, 200)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // white tile
-    // (Box2D((100,100), (200, 200)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_white_black_checkerboard_data
-
-// ******************************************************
-// ******************************************************
-fn create_white_col_black_col_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // white col first row
-    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // black col first row
-    // (Box2D((100, 0), (200, 100)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // white col 2nd row
-    // (Box2D((0,100), (100, 200)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black col second row
-    // (Box2D((100,100), (200, 200)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_white_col_black_col_tile_data
-
-
-// ******************************************************
-// ******************************************************
-pub(crate) fn create_white_row_black_row_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // white row
-    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black row
-    // (Box2D((0,100), (100, 200)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // (Box2D((100,100), (200, 200)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_white_row_black_row_tile_data
-
-// ******************************************************
-// ******************************************************
-/// Make a 2x2 mosaic of a single pane of all white tiles
-/// 
-fn create_2x2_white_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // (Box2D((100, 0), (200, 100)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // (Box2D((0,100), (100, 200)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // (Box2D((100,100), (200, 200)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_2x2_white_tile_data
-
-
-// ******************************************************
-// ******************************************************
-/// Make a 2x2 mosaic of 4 tiles in two rows 
-///  Black Black
-///  White Green
-pub(crate) fn create_blk_blk_row_wht_grn_row_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // black row
-    // [(Box2D((0, 0), (100, 100)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // (Box2D((100, 0), (200, 100)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // white tile second row first col
-    // (Box2D((0,100), (100, 200)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right ,RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // green tile second row second col
-    // (Box2D((100,100), (200, 200)), RGB(0, 255, 0)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_GREEN);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_blk_blk_row_wht_grn_row_tile_data
-
-// ******************************************************
-// ******************************************************
-/// Make a 2x2 mosaic of 4 tiles in two rows 
-///  Black Black
-///  White Green
-pub(crate) fn create_wht_grn_row_blk_blk_row_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // white tile
-    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // green tile
-    // (Box2D((100, 0), (200, 100)), RGB(0, 255, 0)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_GREEN);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black row
-    // (Box2D((0,100), (100, 200)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black row
-    // (Box2D((100,100), (200, 200)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_blk_blk_row_wht_grn_row_tile_data
-
-
-
-// ******************************************************
-// ******************************************************
-/// Make a 2x2 mosaic of 4 tiles in two cols 
-///  White Black
-///  Greet Black
-pub(crate) fn create_wht_grn_col_blk_blk_col_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // white tile
-    // [(Box2D((0, 0), (100, 100)), RGB(255, 255, 255)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // black tile
-    // (Box2D((100, 0), (200, 100)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // green tile
-    // (Box2D((0,100), (100, 200)), RGB(0, 255, 0)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_GREEN);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black row
-    // (Box2D((100,100), (200, 200)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_wht_grn_col_blk_blk_col_tile_data
-
-// ******************************************************
-// ******************************************************
-/// Make a 2x2 mosaic of 4 tiles in two cols 
-///  White Black
-///  Greet Black
-pub(crate) fn create_blk_blk_col_grn_wht_col_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // black tile
-    // [(Box2D((0, 0), (100, 100)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // green tile
-    // (Box2D((100, 0), (200, 100)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_GREEN);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black tile
-    // (Box2D((0,100), (100, 200)), RGB(0, 255, 0)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // white tile
-    // (Box2D((100,100), (200, 200)), RGB(0, 0, 0)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_WHITE);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_blk_blk_col_grn_wht_col_tile_data
-
-// ******************************************************
-// ******************************************************
-/// Make a 2x2 mosaic of 4 tiles 1 green, rest black (L shape)
-///  Green Black
-///  Black Black
-pub(crate) fn create_top_left_grn_rest_blk_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // green tile
-    // [(Box2D((0, 0), (100, 100)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_GREEN);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // black tile
-    // (Box2D((100, 0), (200, 100)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black tile
-    // (Box2D((0,100), (100, 200)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black tile
-    // (Box2D((100,100), (200, 200)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_top_left_grn_rest_blk_tile_data
-
-
-
-// ******************************************************
-// ******************************************************
-/// Make a 2x2 mosaic of 4 tiles 1 green, rest black (L shape)
-///  Black Green
-///  Black Black
-pub(crate) fn create_top_right_grn_rest_blk_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // black tile
-    // [(Box2D((0, 0), (100, 100)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // green tile
-    // (Box2D((100, 0), (200, 100)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_GREEN);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black tile
-    // (Box2D((0,100), (100, 200)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black tile
-    // (Box2D((100,100), (200, 200)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_top_right_grn_rest_blk_tile_data
-
-// ******************************************************
-// ******************************************************
-/// Make a 2x2 mosaic of 4 tiles 1 green, rest black (L shape)
-///  Black Black
-///  Green Black
-pub(crate) fn create_bot_left_grn_rest_blk_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // black tile
-    // [(Box2D((0, 0), (100, 100)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // black tile
-    // (Box2D((100, 0), (200, 100)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // green tile
-    // (Box2D((0,100), (100, 200)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_GREEN);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black tile
-    // (Box2D((100,100), (200, 200)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} //create_bot_left_grn_rest_blk_tile_data
-
-
-
-// ******************************************************
-// ******************************************************
-/// Make a 2x2 mosaic of 4 tiles 1 green, rest black (L shape)
-///  Black Black
-///  Black Green
-pub(crate) fn create_bot_right_grn_rest_blk_tile_data() -> Vec<Vec<(euclid::Box2D<i32, euclid::UnknownUnit>, RGB)>> {
-    let mut result_window: Vec<Vec<(Box2D<i32>, RGB)>> = Vec::new();
-
-    // ****************************
-    // Start the first pane
-    let mut pane_grid: Vec<(Box2D<i32>, RGB)> = Vec::new();
-
-    // black tile
-    // [(Box2D((0, 0), (100, 100)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (0,0);
-    let bot_right:(i32,i32) = (100,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-    
-    // black tile
-    // (Box2D((100, 0), (200, 100)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (100,0);
-    let bot_right:(i32,i32) = (200,100);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // black tile
-    // (Box2D((0,100), (100, 200)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (0,100);
-    let bot_right:(i32,i32) = (100,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_BLACK);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // green tile
-    // (Box2D((100,100), (200, 200)), RGB_VAL (#,#,#)),
-    let top_left :(i32,i32) = (100,100);
-    let bot_right:(i32,i32) = (200,200);
-    let (tile_box, rgb): (Box2D<i32>, RGB) = create_tile(top_left, bot_right , RGB_GREEN);
-    let _ = &pane_grid.push((tile_box, rgb));
-
-    // save the pane to the result window
-    let _ = &result_window.push(pane_grid);
-
-    result_window
-
-} // create_bot_right_grn_rest_blk_tile_data

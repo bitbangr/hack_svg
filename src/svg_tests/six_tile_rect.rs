@@ -5,7 +5,7 @@ use crate::constants::{RGB_BLACK,RGB_WHITE,RGB_RED,RGB_GREEN,RGB_BLUE};
 use crate::create_tile;
 use crate::mosaic_tile::{RGB, rgb_vec_to_array};
 use crate::pane_build_utils::create_pane_test_data;
-use crate::svg_utils::{test_create_svg, create_svg};
+use crate::svg_utils::create_svg;
 
 // This file holds functions to create various configurations for
 // mosaics consisting of 6 tiles
@@ -13,7 +13,7 @@ use crate::svg_utils::{test_create_svg, create_svg};
 
 // single color 2 rows by 3 cols. To check single line FTTT TFTT TTFT TTTF tiles
 pub fn svg_1() {
-    let op_svg_file_name = "../svgoutput/twoXthree/output_1.svg";
+    let op_svg_file_name = "./svg_output/twoXthree/output_1.svg";
     let rows: usize = 2;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 2;
@@ -50,7 +50,7 @@ pub fn svg_1() {
 
 // white row/black row color - 2 rows by 3 cols.
 pub fn svg_2() {
-    let op_svg_file_name = "../svgoutput/twoXthree/output_2.svg";
+    let op_svg_file_name = "./svg_output/twoXthree/output_2.svg";
     let rows: usize = 2;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 2;
@@ -87,7 +87,7 @@ pub fn svg_2() {
 
 // red red green row row/ black red red row - 2 rows by 3 cols.
 pub fn svg_3() {
-    let op_svg_file_name = "../svgoutput/twoXthree/output_3.svg";
+    let op_svg_file_name = "./svg_output/twoXthree/output_3.svg";
     let rows: usize = 2;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 2;

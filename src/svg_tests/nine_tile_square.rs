@@ -5,7 +5,7 @@ use crate::constants::{RGB_BLACK,RGB_WHITE,RGB_RED,RGB_GREEN,RGB_BLUE};
 use crate::create_tile;
 use crate::mosaic_tile::{RGB, rgb_vec_to_array};
 use crate::pane_build_utils::create_pane_test_data;
-use crate::svg_utils::{test_create_svg, create_svg};
+use crate::svg_utils::create_svg;
 
 // This file holds functions to create various configurations for
 // a 3x3 square mosaic made of of tiles in various colour configurations.
@@ -13,7 +13,7 @@ use crate::svg_utils::{test_create_svg, create_svg};
 
 // rgb tiles shifted left once per row
 pub fn svg_1() {
-    let op_svg_file_name = "../svgoutput/threeXthree/output_1.svg";
+    let op_svg_file_name = "./svg_output/threeXthree/output_1.svg";
     let rows: usize = 3;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 3;
@@ -48,7 +48,7 @@ pub fn svg_1() {
 
 // a black cross or plus sign on white backgroud
 pub fn svg_2() {
-    let op_svg_file_name = "../svgoutput/threeXthree/output_2.svg";
+    let op_svg_file_name = "./svg_output/threeXthree/output_2.svg";
     let rows: usize = 3;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 3;
@@ -82,7 +82,7 @@ pub fn svg_2() {
 } // svg2
 
 pub fn svg_3() {
-    let op_svg_file_name = "../svgoutput/threeXthree/output_3.svg";
+    let op_svg_file_name = "./svg_output/threeXthree/output_3.svg";
     let rows: usize = 3;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 3;
@@ -118,7 +118,7 @@ pub fn svg_3() {
 // Center Black Tile surounded by white tiles
 // This is going to be a long case so leave for now
 pub fn svg_4() {
-    let op_svg_file_name = "../svgoutput/threeXthree/output_4a.svg";
+    let op_svg_file_name = "./svg_output/threeXthree/output_4a.svg";
     let rows: usize = 3;
     let cols: usize = 3;
     let tiles_per_pane_height: usize = 3;

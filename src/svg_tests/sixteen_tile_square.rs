@@ -5,7 +5,7 @@ use crate::constants::{RGB_BLACK,RGB_WHITE,RGB_RED,RGB_GREEN,RGB_BLUE, RGB_YELLO
 use crate::create_tile;
 use crate::mosaic_tile::{RGB, rgb_vec_to_array};
 use crate::pane_build_utils::create_pane_test_data;
-use crate::svg_utils::{test_create_svg, create_svg};
+use crate::svg_utils::create_svg;
 
 // This file holds functions to create various configurations for
 // a 5x5 square mosaic made of of tiles in various colour configurations.
@@ -13,7 +13,7 @@ use crate::svg_utils::{test_create_svg, create_svg};
 
 // 4x4 Blue mosaic
 pub fn svg_1() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_1.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_1.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -52,7 +52,7 @@ pub fn svg_1() {
 
 // 4x4 Blue mosaic with a 4 black tiles in the center
 pub fn svg_2() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_2.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_2.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -96,7 +96,7 @@ pub fn svg_2() {
 
 // 4x4 Blue mosaic with a 2 opposing red tiles in the center
 pub fn svg_3() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_3.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_3.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -139,7 +139,7 @@ pub fn svg_3() {
 
 // 4x4 Blue mosaic with a 2 opposing red tiles in the center opposite of svg3
 pub fn svg_4() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_4.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_4.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -181,7 +181,7 @@ pub fn svg_4() {
 
 // 4x4 Blue mosaic with a red 'L' in center
 pub fn svg_5() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_5.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_5.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -223,7 +223,7 @@ pub fn svg_5() {
 
 // 4x4 Blue mosaic with a red 'L' in center
 pub fn svg_6() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_6.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_6.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -265,7 +265,7 @@ pub fn svg_6() {
 
 // 4x4 Blue mosaic with a red 'L' in center
 pub fn svg_7() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_7.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_7.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -307,7 +307,7 @@ pub fn svg_7() {
 
 // 4x4 Blue mosaic with a red 'L' in center
 pub fn svg_8() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_8.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_8.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -350,7 +350,7 @@ pub fn svg_8() {
 
 // 4x4 4 colour Diagonal opposite white black  
 pub fn svg_9() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_9.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_9.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -392,7 +392,7 @@ pub fn svg_9() {
 
 // 4x4 4 colour FTFT TFTF test
 pub fn svg_10() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_10.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_10.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
@@ -434,7 +434,7 @@ pub fn svg_10() {
 
 // 4x4 4 colour FTFT TFTF test
 pub fn svg_11() {
-    let op_svg_file_name = "../svgoutput/fourXfour/output_11.svg";
+    let op_svg_file_name = "./svg_output/fourXfour/output_11.svg";
     let rows: usize = 4;
     let cols: usize = 4;
     let tiles_per_pane_height: usize = 4;
