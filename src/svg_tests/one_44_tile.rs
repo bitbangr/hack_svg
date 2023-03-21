@@ -11,7 +11,7 @@ use crate::svg_utils::{test_create_svg, create_svg};
 // using Kroma Colours
 
 pub fn svg_1() {
-    let op_svg_file_name = "../svg_output/twelveXtwelve/output_1.svg";
+    let op_svg_file_name = "./svg_output/twelveXtwelve/output_1.svg";
     let rows: usize = 12;
     let cols: usize = 12;
     let tiles_per_pane_height: usize = 12;
@@ -76,7 +76,7 @@ pub fn svg_1() {
 
 
 pub fn svg_frank() {
-    let op_svg_file_name = "../svg_output/twelveXtwelve/frank.svg";
+    let op_svg_file_name = "./svg_output/twelveXtwelve/frank.svg";
     let rows: usize = 40;
     let cols: usize = 40;
     let tiles_per_pane_height: usize = 40;
@@ -115,7 +115,7 @@ pub fn svg_frank() {
 
 
 pub fn svg_frank_two() {
-    let op_svg_file_name = "../svg_output/twelveXtwelve/frank_two.svg";
+    let op_svg_file_name = "./svg_output/twelveXtwelve/frank_two.svg";
     let rows: usize = 40;
     let cols: usize = 40;
     let tiles_per_pane_height: usize = 40;
@@ -154,7 +154,7 @@ pub fn svg_frank_two() {
 
 
 pub fn svg_frank_tr12() {
-    let op_svg_file_name = "../svg_output/twelveXtwelve/frank_tr12.svg";
+    let op_svg_file_name = "./svg_output/twelveXtwelve/frank_tr12.svg";
     let rows: usize = 12;
     let cols: usize = 12;
     let tiles_per_pane_height: usize = 12;
