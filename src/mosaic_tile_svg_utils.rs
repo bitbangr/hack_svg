@@ -10,15 +10,40 @@ use svg::node::element::path::Data;
 
 
 
-/// This will construct an SVG absolute line to data element
+/// Computes the SVG line data for a given mosaic tile and updates the visited tiles status.
+///
+/// This function generates the SVG line data for the external edges of the provided `cur_tile`.
+/// For each external edge that has a SVG line data drawn the corresponding visited_tiles[[row, col]].edge_visited 
+/// is set to true. The function also returns the ending SVG point. 
+///
+/// This will construct SVG absolute line data elements
 /// 
 /// - it is assumed that the caller is already at the start point of this tile so
 /// there is no move to start_point of the tile and the first line to will be 
 /// to the endpoint of the first segment of the Mosaic tile
 /// 
 /// It is up to the caller to add the returned line data to the existing line data in order
-/// to complete a path
+/// to construct a complete a path
 /// 
+/// # Arguments
+///
+/// * `cur_tile` - A reference to the current `MosaicTile` object.
+/// * `curr_svg_line_end_point` - A reference to the current SVG line end point.
+/// * `visited_tiles` - A mutable reference to the visited tiles 2D array.
+/// * `row` - The row index of the current tile in the mosaic.
+/// * `col` - The column index of the current tile in the mosaic.
+///
+/// # Returns
+///
+/// A tuple containing the `Data` object with the generated SVG line data and the ending SVG point as a `(usize, usize)` tuple.
+///
+/// # Example
+///
+/// ```rust
+/// let cur_tile = get_mosaic_tile_at(row, col);
+/// let curr_svg_line_end_point = get_current_svg_line_end_point();
+/// let (line_data, svg_end_point) = get_ext_tile_svg_line_data(&cur_tile, &curr_svg_line_end_point, &mut visited_tiles, row, col);
+/// ```
 pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile, 
                                 curr_svg_line_end_point: &Point2D<i32>, 
                                 visited_tiles: &mut ArrayBase<OwnedRepr<TileVisited>, Dim<[usize; 2]>>,
@@ -441,7 +466,7 @@ pub fn get_ext_tile_svg_line_data(cur_tile: &MosaicTile,
 
 } // get_ext_tile_svg_line_data
 
-/// /// Combines the commands from two SVG line `Data` objects into a single `Data` object.
+/// Combines the commands from two SVG line `Data` objects into a single `Data` object.
 ///
 /// This function takes references to two `Data` objects as input and returns a new `Data` object
 /// containing the commands from both input objects, in the order they appear.
