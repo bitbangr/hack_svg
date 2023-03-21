@@ -1,6 +1,6 @@
 use crate::adjacent_tiles::build_adjacent_map;
 use crate::mosaic_tile::{Tile, RGB, MosaicTile};
-use crate::{dfs_tiles, modtile};
+use crate::{dfs_tiles, modtile, pane_to_2d_vec};
 use crate::constants::{FLAGGED, TOP, BOTTOM, LEFT, RIGHT};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
@@ -20,7 +20,6 @@ use usvg::{PathData, PathSegment, Rect};
 use regex::Regex;
 
 use crate::get_edge_bools;
-use crate::pane_to_2d_vec;
 use crate::pane_vec_to_ndarray;
 
 use crate::mosaic_tile_svg_utils::{combine_data, get_ext_tile_svg_line_data};
@@ -129,14 +128,6 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
 
     // println! ("*********\nmosaic_pane_edge_nd_arr\n\n{:?}", &pane_edge_nd_arr);
 
-    // Working CODE - We shall leave as is for now
-    // testing the travel contiguous tiles function
-    // let _ = travel_contig_svg_refact(pane_edge_nd_arr, 
-    //                     contiguous_tiles, 
-    //                     op_svg_file_name ,
-    //                     svg_width as usize,
-    //                     svg_height as usize);
-
     // Testing out new code for tile traversal
     // taking into account Exterior (Clockwise) and Interior(Counter Clockwise)
     // as well as tile visited booleans 
@@ -194,19 +185,31 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     println!("\n {} <- Number of contiguous tile groups", contiguous_tiles.len()); 
     println!("\nVector of contiguous tiles -> {:?}", contiguous_tiles);
 
-    let viewBoxWidth = 4000;
-    let viewBoxHeight = 4000;
-    let desiredWidthInInches = 20.0;
-    let desiredHeightInInches = 20.0;
-    let scaleX = desiredWidthInInches / viewBoxWidth as f32;
-    let scaleY = desiredHeightInInches / viewBoxHeight as f32;
-    
+    // let viewBoxWidth = 4000;
+    // let viewBoxHeight = 4000;
+    // the desired width and height need to be calcuated based on tile size 1/2" or 12.7mm 
+    // and the number of tiles per pane width and pane height.
+    let desired_width_in_inches = 20.0;
+    let desired_height_in_inches = 20.0;
+    let scale_x = desired_width_in_inches / svg_width as f32;
+    let scale_y = desired_height_in_inches / svg_height as f32;
+
+    let width_str = svg_width.to_string()+"in";
+    let height_str = svg_height.to_string()+"in";
+
     let mut document: svg::node::element::SVG = Document::new()
-        .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
-        .set("width", "20in")
-        .set("height", "20in")
-        .set("transform", format!("scale({}, {})", scaleX, scaleY));
+        .set("viewBox", (0, 0, svg_width, svg_height))
+        .set("width", width_str)
+        .set("height", height_str)
+        .set("transform", format!("scale({}, {})", scale_x, scale_y));
     
+    // let mut document: svg::node::element::SVG = Document::new()
+    //     .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
+    //     .set("width", "20in")
+    //     .set("height", "20in")
+    //     .set("transform", format!("scale({}, {})", scaleX, scaleY));
+
+
     // let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
     // let mut document: svg::node::element::SVG = Document::new().set("viewBox", "(0, 0, 20in, 20in)")
                                                             //    .set("transform", format!("scale({}, {})", scaleX, scaleY));
