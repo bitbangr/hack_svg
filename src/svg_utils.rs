@@ -135,7 +135,10 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
                         contiguous_tiles, 
                         op_svg_file_name ,
                         svg_width as usize,
-                        svg_height as usize);
+                        svg_height as usize,
+                        tiles_per_pane_height as usize,
+                        tiles_per_pane_width as usize 
+                    );
     
 }
 
@@ -177,7 +180,10 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                             contiguous_tiles: Vec<Vec<(isize, isize)>>, 
                             op_svg_file_name: &str, 
                             svg_width: usize, 
-                            svg_height: usize) -> Result<(), std::io::Error> 
+                            svg_height: usize,
+                            tiles_per_pane_height: usize,
+                            tiles_per_pane_width: usize                             
+                        ) -> Result<(), std::io::Error> 
 {
     let create_laser_files = false;
 
@@ -189,20 +195,39 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     // let viewBoxHeight = 4000;
     // the desired width and height need to be calcuated based on tile size 1/2" or 12.7mm 
     // and the number of tiles per pane width and pane height.
-    let desired_width_in_inches = 20.0;
-    let desired_height_in_inches = 20.0;
-    let scale_x = desired_width_in_inches / svg_width as f32;
-    let scale_y = desired_height_in_inches / svg_height as f32;
+    let desired_svg_tile_width :f32 = 0.5; // hard coded as 1/2 inch tiles TODO Fix this
+    let desired_svg_tile_height :f32  = 0.5; // hard coded as 1/2 inch tiles TODO Fix this
 
-    let width_str = svg_width.to_string()+"in";
-    let height_str = svg_height.to_string()+"in";
+    // our tiles are 100x100 units  and we want each tile to be 1/2 in x 1/2.
+    // Standard display is 96px per inch for so 1/2" us 48px,  
+    // which makes are scale factor 0.48 * 100 = 48 
+    // TODO Make this a config param 
+    let scale_x :f32 = 0.48;
+    let scale_y :f32 = 0.48;
+
+    let desired_svg_width_in_inches = tiles_per_pane_width as f32 * desired_svg_tile_width; 
+    let desired_svg_height_in_inches = tiles_per_pane_height as f32 * desired_svg_tile_height;  
+    // let scale_x = desired_svg_width_in_inches / svg_width as f32  ;
+    // let scale_y = desired_svg_height_in_inches / svg_height as f32  ;
+
+    let width_str = desired_svg_width_in_inches.to_string()+"in";
+    let height_str = desired_svg_height_in_inches.to_string()+"in";
+
+    let desired_svg_width_in_inches_str = desired_svg_width_in_inches.to_string() +"in";
+    let desired_svg_height_in_inches_str = desired_svg_height_in_inches.to_string() +"in";
 
     let mut document: svg::node::element::SVG = Document::new()
-        .set("viewBox", (0, 0, svg_width, svg_height))
+        .set("viewBox", (0, 0, desired_svg_width_in_inches_str, desired_svg_height_in_inches_str))
         .set("width", width_str)
-        .set("height", height_str)
-        .set("transform", format!("scale({}, {})", scale_x, scale_y));
-    
+        .set("height", height_str);
+        // .set("transform", format!("scale({}, {})", scale_x, scale_y));
+
+        // mgj TO DO try creating a path group
+        // create a path group with name of that rgb value
+        let mut path_group = svg::node::element::Group::new()
+                .set("id", "mosaic")
+                .set("transform", format!("scale({}, {})", scale_x, scale_y));;
+
     // let mut document: svg::node::element::SVG = Document::new()
     //     .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
     //     .set("width", "20in")
@@ -498,9 +523,13 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                                    .set("stroke-width", stroke_width)
                                    .set("d", line_data);
                                 
-        // add the tile path to the document
-        document = document.add(tile_path);
+        // add the tile path to the document  MGJ TODO Trying out adding to path group
+        // document = document.add(tile_path);
         
+        // instead of adding to document lets add to path group
+        // add the tile path to the path group
+        path_group = path_group.add(tile_path);
+
         // also add the line data to the the path data hash map with the corresponding rgb_str as the key
         path_data_hashmap.entry(rgb_str.to_owned())
                 .and_modify(|v| v.push(line_data_clone)) // clone the line data for path data hash map
@@ -508,8 +537,14 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     
     } // for contig_group in &contiguous_tiles{
 
-    // println!("path_data_hashmap -> {:?}", path_data_hashmap);
-    
+
+    // MGJ TO DO try adding the path group to the doc
+    // add the path group to the document
+    document = document.add(path_group);
+
+
+
+    // println!("path_data_hashmap -> {:?}", path_data_hashmap);    
     // doo_eet();
 
     // Save each tile colour to a new svg doc just for that colour
@@ -555,9 +590,17 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
     let viewBoxHeight = 4000;
     let desiredWidthInInches = 20.0;
     let desiredHeightInInches = 20.0;
-    let scaleX = desiredWidthInInches / viewBoxWidth as f32;
-    let scaleY = desiredHeightInInches / viewBoxHeight as f32;
+    // let scaleX = desiredWidthInInches / viewBoxWidth as f32;
+    // let scaleY = desiredHeightInInches / viewBoxHeight as f32;
     
+
+    // our tiles are 100x100 units  and we want each tile to be 1/2 in x 1/2.
+    // Standard display is 96px per inch for so 1/2" us 48px,  
+    // which makes are scale factor 0.48 * 100 = 48 
+    // TODO Make this a config param 
+    let scale_x :f32 = 0.48;
+    let scale_y :f32 = 0.48;
+
     // let mut document: svg::node::element::SVG = Document::new()
     //     .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
     //     .set("width", "20in")
@@ -578,7 +621,7 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
                 .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
                 .set("width", "20in")
                 .set("height", "20in")
-                .set("transform", format!("scale({}, {})", scaleX, scaleY));
+                .set("transform", format!("scale({}, {})", scale_x, scale_y));
         
 
 
