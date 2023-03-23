@@ -612,7 +612,16 @@ fn create_laser_polygon_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, 
                 // .set("height", "20in");
                 // .set("transform", format!("scale({}, {})", scale_x, scale_y));
         
-        for line_data_elements  in line_data_vec {
+
+        // convert all paths to MM units
+        let converted_paths: Vec<Data> = convert_points_to_mm(line_data_vec);
+
+        println!("Converted paths {:?}", converted_paths);
+
+        // for line_data_element in line_data_vec {
+            // try writing the converted to mm paths
+            for line_data_elements in converted_paths {
+        // for line_data_elements  in line_data_vec {
 
             // Extract points from the path
             let mut points = String::new();
@@ -982,8 +991,6 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
 
 }
 
-
-
 fn get_svg_legend(op_svg_file_name: &str, clone: String) -> svg::node::element::Group {
     
     let mut legend_group = svg::node::element::Group::new().set("id", "legend");
@@ -992,8 +999,8 @@ fn get_svg_legend(op_svg_file_name: &str, clone: String) -> svg::node::element::
     let legend_box = Rectangle::new()
         .set("x", 0)
         .set("y", 0)
-        .set("width", "2in") // Assuming 1 inch = 90 units
-        .set("height", "0.5in")
+        .set("width", "96") // Assuming 1 inch = 90 units
+        .set("height", "48")
         .set("fill", "none")
         .set("stroke", "black");
 
