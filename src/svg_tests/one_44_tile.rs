@@ -114,8 +114,8 @@ pub fn svg_frank() {
 } // svg_frank
 
 
-pub fn svg_frank_two() {
-    let op_svg_file_name = "./svg_output/twelveXtwelve/frank_two.svg";
+pub fn svg_frank_mar22() {
+    let op_svg_file_name = "./svg_output/_frank_mosaic/frank_mar22.svg";
     let rows: usize = 40;
     let cols: usize = 40;
     let tiles_per_pane_height: usize = 40;
@@ -150,7 +150,7 @@ pub fn svg_frank_two() {
         tiles_per_pane_width,
         data_results,
     );
-} // svg_frank_two
+} // svg_frank_mar22
 
 
 pub fn svg_frank_tr12() {
