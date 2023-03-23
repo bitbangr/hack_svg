@@ -10,9 +10,11 @@ use ndarray::{Array2, ArrayBase, OwnedRepr, Dim};
 use rosvgtree::{AttributeId, Attribute};
 use rosvgtree::svgtypes::Paint;
 
-use svg::node::element::path::Data;
-use svg::node::element::Path;
-use svg::Document;
+use svg::node::element::path::{Data, Command, Position};
+use svg::node::element::{Path, Polygon};
+use svg::{Document, Parser};
+use svg::node::element::{Circle,Rectangle, SVG, Text};
+
 
 use usvg::{roxmltree, Tree, NodeKind};
 use usvg::{PathData, PathSegment, Rect};
@@ -27,6 +29,7 @@ use crate::mosaic_tile_svg_utils::{combine_data, get_ext_tile_svg_line_data};
 use num_traits::Zero;
 use std::collections::HashMap;
 
+use std::mem;
 
 ///
 /// draw an svg polyline outline around a Vec of contiguous tiles of the same colour
@@ -131,7 +134,7 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
     // Testing out new code for tile traversal
     // taking into account Exterior (Clockwise) and Interior(Counter Clockwise)
     // as well as tile visited booleans 
-    let _ = travel_contig_ext_int_svg(pane_edge_nd_arr, 
+    let _ = travel_contig_svg(pane_edge_nd_arr, 
                         contiguous_tiles, 
                         op_svg_file_name ,
                         svg_width as usize,
@@ -174,9 +177,9 @@ pub(crate) fn create_svg(op_svg_file_name: &str,
 /// let svg_width = 4000;
 /// let svg_height = 4000;
 ///
-/// let result = travel_contig_ext_int_svg(pane_edge_nd_arr, contiguous_tiles, op_svg_file_name, svg_width, svg_height);
+/// let result =   travel_contig_svg(pane_edge_nd_arr, contiguous_tiles, op_svg_file_name, svg_width, svg_height);
 /// ```
-fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>, 
+fn travel_contig_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, Dim<[usize; 2]>>, 
                             contiguous_tiles: Vec<Vec<(isize, isize)>>, 
                             op_svg_file_name: &str, 
                             svg_width: usize, 
@@ -185,9 +188,9 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
                             tiles_per_pane_width: usize                             
                         ) -> Result<(), std::io::Error> 
 {
-    let create_laser_files = false;
+    let create_laser_files = true;
 
-    println!("\n***********\nfn travel_contig_ext_int_svg\n***********");
+    println!("\n***********\nfn   travel_contig_svg\n***********");
     println!("\n {} <- Number of contiguous tile groups", contiguous_tiles.len()); 
     println!("\nVector of contiguous tiles -> {:?}", contiguous_tiles);
 
@@ -537,12 +540,11 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     
     } // for contig_group in &contiguous_tiles{
 
-
     // MGJ TO DO try adding the path group to the doc
     // add the path group to the document
     document = document.add(path_group);
 
-
+    let _ = create_laser_polygon_svg_doc(&path_data_hashmap, svg_width, svg_height, &op_svg_file_name);
 
     // println!("path_data_hashmap -> {:?}", path_data_hashmap);    
     // doo_eet();
@@ -557,8 +559,312 @@ fn travel_contig_ext_int_svg(pane_edge_nd_arr: ArrayBase<OwnedRepr<MosaicTile>, 
     println!("Writing to ouptput file {}", &op_svg_file_name);
     svg::save(op_svg_file_name, &document)   
 
-    // end travel_contig_ext_int_svg
+    // end   travel_contig_svg
 }
+
+/// Creates an SVG document with the given path data and dimensions.
+///
+/// each line_data_element is converted into a svg pPolyline
+/// 
+/// The function takes a HashMap of path data, the width and height of the SVG, and an output file name.
+/// The path data HashMap maps RGB color strings to vectors of path data strings. An output svg document
+/// is created for each RGB colour. Each colour layer can then be separately cut on a laser cutter.
+///
+/// # Arguments
+///
+/// * `path_data_hashmap` - A reference to a HashMap containing the path data, where the key is an RGB color string and the value is a vector of path data strings.
+/// * `svg_width` - The width of the SVG document.
+/// * `svg_height` - The height of the SVG document.
+/// * `op_svg_file_name` - A reference to a string containing the output SVG file name.
+///
+/// # Example
+///
+/// ```rust
+/// let path_data: HashMap<String, Vec<String>> = ...
+/// create_laser_svg_doc(&path_data, 4000, 4000, "output_file.svg");
+/// ```
+fn create_laser_polygon_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_width: usize, svg_height: usize, op_svg_file_name: &str)
+{
+    
+    let op_file_name : String = op_svg_file_name.trim_end_matches(".svg").to_string();
+
+    // let viewBoxWidth = 4000;
+    // let viewBoxHeight = 4000;
+    let desiredWidthInInches = 20.0;
+    let desiredHeightInInches = 20.0;
+        
+    // our tiles are 100x100 units  and we want each tile to be 1/2 in x 1/2.
+    // Standard display is 96px per inch for so 1/2" us 48px,  
+    // which makes are scale factor 0.48 * 100 = 48 
+    // TODO Make this a config param 
+    // let scale_x :f32 = 0.48;
+    // let scale_y :f32 = 0.48;
+
+
+    let mut count: i32= 1 ; 
+
+    for (rgb_value_key, line_data_vec) in path_data_hashmap {
+
+        // let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
+        let mut document: svg::node::element::SVG = Document::new()
+                .set("viewBox", (0, 0, svg_width, svg_height));
+                // .set("width", "20in")
+                // .set("height", "20in");
+                // .set("transform", format!("scale({}, {})", scale_x, scale_y));
+        
+        for line_data_elements  in line_data_vec {
+
+            // Extract points from the path
+            let mut points = String::new();
+
+            println!("{:?} line data", &line_data_elements);
+
+            // let content = &&line_data_elements;
+            // svg::node::element::path::Data::parse(line_data_elements.to_owned());
+
+            // line_data_elements.to_vec().into_iter().for_each(|el| {
+            //     println!("{:?}", &el);
+            //     let something = &el[1];
+            // });
+
+
+            let mut points = String::new();
+
+            line_data_elements.to_vec().into_iter().for_each(|el| {
+                println!("{:?}", &el);
+            
+                match el {
+                    Command::Move(position, parameters) => {
+                        println!("MoveTo: {:?} {:?} ", position, parameters);
+
+                        if position == Position::Absolute 
+                        {
+                            //  parameters.to_vec().into_iter().for_each(|p|{
+                            //     println!("individual line -> {}", &p)
+                            // } );
+
+                            let pvec = parameters.to_vec();
+                            println!("individual line -> x{} y{}", &pvec[0], &pvec[1]);
+                            points.push_str(&format!("{},{} ", &pvec[0], &pvec[1]));
+                        }
+
+                    }
+                    Command::Line(position, parameters) => {
+                        println!("LineTo: BRRR {:?} {:?} ", position, parameters);
+                        if position == Position::Absolute 
+                        {
+                            // parameters.to_vec().into_iter().for_each(|p|{
+                            //     println!("individual line -> {}", &p)
+                            // } );
+                            let pvec = parameters.to_vec();
+                            println!("individual line -> x{} y{}", &pvec[0], &pvec[1]);
+                            points.push_str(&format!("{},{} ", &pvec[0], &pvec[1]));
+                        }
+
+
+                    }
+                    Command::HorizontalLine(_, _) =>{
+                        println!("...{:?}", &el);
+                    },
+                    Command::VerticalLine(_, _)=>{
+                        println!("...{:?}", &el);
+                    },
+                    Command::QuadraticCurve(_, _)=>{
+                        println!("...{:?}", &el);
+                    },
+                    Command::SmoothQuadraticCurve(_, _) =>{
+                        println!("...{:?}", &el);
+                    },
+                    Command::CubicCurve(_, _) =>{
+                        println!("...{:?}", &el);
+                    },
+                    Command::SmoothCubicCurve(_, _) =>{
+                        println!("...{:?}", &el);
+                    },
+                    Command::EllipticalArc(_, _) =>{
+                        println!("...{:?}", &el);
+                    },
+                    Command::Close =>{
+                        println!("Close" )
+                    },
+                }
+                // Handle other command types if needed
+            });            
+
+            // let towd: Data = line_data_elements.to_owned();
+
+            // let tile_path = Path::new().set("d", line_data_elements.to_owned());
+
+            // let path_data: Data = Data::parse(&tile_path.to_string()).unwrap();
+
+    
+            // if let Some(d) = line_data_element.get("d") {
+            //     for command in d {
+            //         if let Data::MoveTo { abs, x, y } = command {
+            //             if abs {
+            //                 points.push_str(&format!("{},{} ", x, y));
+            //             }
+            //         } else if let Data::LineTo { abs, x, y } = command {
+            //             if abs {
+            //                 points.push_str(&format!("{},{} ", x, y));
+            //             }
+            //         }
+            //     }
+            // }
+
+            // Create a SVG Polygon with the extracted points and rgb_value_key as the fill color
+            let mut path_polygon: Polygon = Polygon::new()
+                .set("points", points.trim())
+                .set("fill", rgb_value_key.to_owned());
+
+            document = document.add(path_polygon);
+        }
+    
+        let op_svg_file_name = op_file_name.clone() + "_laser_poly" + &count.to_string() + ".svg"; 
+
+        // add the path group to the document
+        // document = document.add(path_group);
+        // document = document.add(path_polygon);
+            
+        println!("Writing to ouptput file {}", &op_svg_file_name);
+        svg::save(&op_svg_file_name, &document).expect("Error saving SVG file");
+
+        count += 1;
+    }
+
+}
+
+/// trying to take pixel units and convert everything directly to mm so we don't
+/// have to muck around downstream with import export issues between various programs
+/// such as Lightburn Inkscape DeepNest etc. Keep everything in absolute positions
+/// with no transforms etc
+/// 
+/// At this point my code uses 100px by 100px grid and and each tile is to be 1/2" square
+/// or 12.7mm square.  So to translate here "safely" we multilply each point by 0.48 to get
+/// the correctly scaled point.
+fn convert_points_to_mm(line_data_vec: &[Data]) -> Vec<Data> {
+    
+    let mut converted_ld_vec = vec![];
+
+    let scale_x :f32 = 0.48;
+    let scale_y :f32 = 0.48;
+
+    for line_data_elements  in line_data_vec {
+
+        let mut line_d = Data::new();
+
+        // Extract points from the path
+        let mut points = String::new();
+        println!("{:?} line data", &line_data_elements);
+
+        let mut points = String::new();
+
+        line_data_elements.to_vec().into_iter().for_each(|el| {
+            println!("{:?}", &el);
+        
+            // let mut current_line_d = mem::replace(&mut line_d, Data::new());
+
+            match el {
+                Command::Move(position, parameters) => {
+                    println!("MoveTo: {:?} {:?} ", position, parameters);
+                    if position == Position::Absolute 
+                    {
+                        let pvec = parameters.to_vec();
+                        println!("individual line -> x{} y{}", &pvec[0], &pvec[1]);
+                        points.push_str(&format!("{},{} ", &pvec[0], &pvec[1]));
+
+                        let mut x : f32 = pvec[0].try_into().unwrap();
+                        let mut y : f32 = pvec[1].try_into().unwrap();
+
+                        x = x * scale_x;
+                        y = y * scale_y;
+
+                        let xy: (f32, f32) = (x,y); 
+                        line_d = line_d.clone().move_to((x, y));
+
+                    }
+
+                }
+                Command::Line(position, parameters) => {
+                    println!("LineTo: BRRR {:?} {:?} ", position, parameters);
+                    if position == Position::Absolute 
+                    {
+                        // parameters.to_vec().into_iter().for_each(|p|{
+                        //     println!("individual line -> {}", &p)
+                        // } );
+                        let pvec = parameters.to_vec();
+                        println!("individual line -> x{} y{}", &pvec[0], &pvec[1]);
+                        points.push_str(&format!("{},{} ", &pvec[0], &pvec[1]));
+
+                        let mut x : f32 = pvec[0].try_into().unwrap();
+                        let mut y : f32 = pvec[1].try_into().unwrap();
+
+                        x = x * scale_x;
+                        y = y * scale_y;
+
+                        line_d = line_d.clone().line_to((x, y));
+                        
+                    }
+
+                }
+                Command::HorizontalLine(_, _) =>{
+                    println!("...{:?}", &el);
+                },
+                Command::VerticalLine(_, _)=>{
+                    println!("...{:?}", &el);
+                },
+                Command::QuadraticCurve(_, _)=>{
+                    println!("...{:?}", &el);
+                },
+                Command::SmoothQuadraticCurve(_, _) =>{
+                    println!("...{:?}", &el);
+                },
+                Command::CubicCurve(_, _) =>{
+                    println!("...{:?}", &el);
+                },
+                Command::SmoothCubicCurve(_, _) =>{
+                    println!("...{:?}", &el);
+                },
+                Command::EllipticalArc(_, _) =>{
+                    println!("...{:?}", &el);
+                },
+                Command::Close =>{
+                    println!("Close" );
+                    line_d = line_d.clone().close();
+                },
+            }
+
+            // Handle other command types if needed
+        });            
+
+        converted_ld_vec.push(line_d);    
+        }
+
+        converted_ld_vec
+}
+
+
+
+// Helper function to extract points from path data string
+fn extract_points_from_path_data(path_data: &str) -> String {
+    let mut points = String::new();
+    // let path_data: Vec<Data> = Data::parse(path_data).unwrap();
+
+    // for command in path_data {
+    //     if let Data::MoveTo { abs, x, y } = command {
+    //         if abs {
+    //             points.push_str(&format!("{},{} ", x, y));
+    //         }
+    //     } else if let Data::LineTo { abs, x, y } = command {
+    //         if abs {
+    //             points.push_str(&format!("{},{} ", x, y));
+    //         }
+    //     }
+    // }
+
+    points.trim().to_string()
+}
+
 
 /// Creates an SVG document with the given path data and dimensions.
 ///
@@ -586,10 +892,10 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
     //  "./svg_output/twelveXtwelve/fy_laser_org".to_string();
 
     // file_name.trim_end_matches(".svg").to_string()
-    let viewBoxWidth = 4000;
-    let viewBoxHeight = 4000;
-    let desiredWidthInInches = 20.0;
-    let desiredHeightInInches = 20.0;
+    let viewBoxWidth = 1000;
+    let viewBoxHeight = 1000;
+    // let desiredWidthInInches = 20.0;
+    // let desiredHeightInInches = 20.0;
     // let scaleX = desiredWidthInInches / viewBoxWidth as f32;
     // let scaleY = desiredHeightInInches / viewBoxHeight as f32;
     
@@ -598,8 +904,8 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
     // Standard display is 96px per inch for so 1/2" us 48px,  
     // which makes are scale factor 0.48 * 100 = 48 
     // TODO Make this a config param 
-    let scale_x :f32 = 0.48;
-    let scale_y :f32 = 0.48;
+    // let scale_x :f32 = 0.48;
+    // let scale_y :f32 = 0.48;
 
     // let mut document: svg::node::element::SVG = Document::new()
     //     .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
@@ -611,7 +917,6 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
     // let mut document: svg::node::element::SVG = Document::new().set("viewBox", "(0, 0, 20in, 20in)")
     //                                                            .set("transform", format!("scale({}, {})", scaleX, scaleY));
 
-
     let mut count: i32= 1 ; 
 
     for (rgb_value_key, line_data_vec) in path_data_hashmap {
@@ -619,12 +924,10 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
         // let mut document: svg::node::element::SVG = Document::new().set("viewBox", (0, 0, svg_width, svg_height));
         let mut document: svg::node::element::SVG = Document::new()
                 .set("viewBox", (0, 0, viewBoxWidth, viewBoxHeight))
-                .set("width", "20in")
-                .set("height", "20in")
-                .set("transform", format!("scale({}, {})", scale_x, scale_y));
+                .set("width", viewBoxWidth)
+                .set("height", viewBoxHeight);
+                // .set("transform", format!("scale({}, {})", scale_x, scale_y));
         
-
-
         // create a path group with name of that rgb value
         let mut path_group = svg::node::element::Group::new()
                 .set("id", rgb_value_key.clone())
@@ -632,9 +935,21 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
                 .set("stroke", rgb_value_key.to_owned())
                 .set("stroke-width", 0.0);
 
-        for line_data_element in line_data_vec {
+        // convert all paths to MM units
+        let converted_paths: Vec<Data> = convert_points_to_mm(line_data_vec);
+
+        println!("Converted paths {:?}", converted_paths);
+
+        // for line_data_element in line_data_vec {
+            // try writing the converted to mm paths
+            for line_data_element in converted_paths {
+
+            // TODO go through and physically change each path data point to mm. do not use scale 
+            
             // create a path and add it to the svg document
             let tile_path = Path::new().set("d", line_data_element.to_owned());
+
+            //
 
             // create a path and add it to the svg document
             // let tile_path = Path::new()
@@ -647,17 +962,52 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
             path_group = path_group.add(tile_path);
         }
 
+        // let mut op_svg_file_name= "./svg_output/twelveXtwelve/fy_laser_org.svg";
+        let op_svg_file_name = op_file_name.clone() + "_lry" + &count.to_string() + ".svg"; 
+
         // add the path group to the document
         document = document.add(path_group);
         
-        // let mut op_svg_file_name= "./svg_output/twelveXtwelve/fy_laser_org.svg";
-        let op_svg_file_name = op_file_name.clone() + "_lry" + &count.to_string() + ".svg"; 
+        // create a group to hold the legend
+        let mut legend_group: svg::node::element::Group = get_svg_legend (&op_svg_file_name, rgb_value_key.clone());
+
+        // add the legend group to the document
+        document = document.add(legend_group);
+
         println!("Writing to ouptput file {}", &op_svg_file_name);
         svg::save(&op_svg_file_name, &document).expect("Error saving SVG file");
 
         count += 1;
     }
 
+}
+
+
+
+fn get_svg_legend(op_svg_file_name: &str, clone: String) -> svg::node::element::Group {
+    
+    let mut legend_group = svg::node::element::Group::new().set("id", "legend");
+    
+    // Create the legend box (rectangle)
+    let legend_box = Rectangle::new()
+        .set("x", 0)
+        .set("y", 0)
+        .set("width", "2in") // Assuming 1 inch = 90 units
+        .set("height", "0.5in")
+        .set("fill", "none")
+        .set("stroke", "black");
+
+    // Add the text inside the legend box
+    let legend_text = Text::new()
+        .set("x", 5) // Add some padding
+        .set("y", 20) // Adjust the y position to center the text
+        .set("font-size", 12)
+        .set("font-family", "Arial")
+        .add(svg::node::Text::new(op_svg_file_name));
+
+    legend_group = legend_group.add(legend_box).add(legend_text);
+
+    legend_group
 }
 
 
