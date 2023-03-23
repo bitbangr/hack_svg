@@ -68,3 +68,4 @@ pub const RGB_PERL_WHITE: RGB = RGB(220, 214, 210);
 // SVG scale factors for creating tile sizes of 1/2" or 12.7mm based on 96 DPI Points to Inches conversion
 pub const SVG_SCALE_X :f32 = 0.48; 
 pub const SVG_SCALE_Y :f32 = 0.48; 
+pub const SVG_STROKE_WIDTH :f32 = 0.0;
