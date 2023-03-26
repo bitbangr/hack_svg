@@ -1,7 +1,7 @@
 use crate::adjacent_tiles::build_adjacent_map;
 use crate::mosaic_tile::{Tile, RGB, MosaicTile};
 use crate::{dfs_tiles, pane_to_2d_vec};
-use crate::constants::{FLAGGED, TOP, BOTTOM, LEFT, RIGHT, SVG_SCALE_X, SVG_SCALE_Y, SVG_STROKE_WIDTH};
+use crate::constants::{FLAGGED, TOP, BOTTOM, LEFT, RIGHT, SVG_SCALE_X, SVG_SCALE_Y, SVG_STROKE_WIDTH, SVG_PPI};
 use crate::constants::{TOP_LEFT,TOP_RIGHT,BOT_RIGHT, BOT_LEFT};
 
 use euclid::default::{Box2D, Point2D};
@@ -665,6 +665,34 @@ fn create_laser_polygon_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, 
             document = document.add(path_polygon);
         }
     
+        let legend_x:f32 = 0.0;
+        let legend_y:f32 = svg_height as f32 * SVG_SCALE_Y + 5.0 ;
+
+        // create a group to hold the legend
+        let legend_group: svg::node::element::Group = get_svg_legend (&op_svg_file_name, rgb_value_key.clone(), legend_x , legend_y );
+
+        // add the legend group to the document
+        document = document.add(legend_group);
+
+        let laser_rect_x :f32 = 0.0;
+        let laser_rect_y :f32 = legend_y + 48.0 + 5.0 ; 
+        let laser_rect_width :f32 = 12.0 * SVG_PPI  ; // arbitrary 12"x12" piece for packing
+        let laser_rect_height :f32 = 12.0 * SVG_PPI ; // arbitrary 12"x12" piece for packing
+
+        // create a deep_nest rect to represent laser material to be cut
+         // Create the legend box (rectangle)
+        let laser_material_rect = Rectangle::new()
+        .set("x", laser_rect_x )
+        .set("y", laser_rect_y )  // hard code to test
+        .set("width", laser_rect_width) // Assuming 1 inch = 90 units
+        .set("height", laser_rect_height)
+        .set("fill", "none")
+        .set("stroke", "black")
+        .set("stroke-width", 1.0);
+
+        // add the laser material rectangle to the document
+        document = document.add(laser_material_rect);
+
         let op_svg_file_name = op_file_name.clone() + "_laser_poly" + &count.to_string() + ".svg"; 
             
         println!("Writing to laser polygon output file {}", &op_svg_file_name);
@@ -847,11 +875,33 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
         // add the path group to the document
         document = document.add(path_group);
         
+        let legend_x:f32 = 0.0;
+        let legend_y:f32 = svg_height as f32 * SVG_SCALE_Y + 5.0 ;
+
         // create a group to hold the legend
-        let legend_group: svg::node::element::Group = get_svg_legend (&op_svg_file_name, rgb_value_key.clone());
+        let legend_group: svg::node::element::Group = get_svg_legend (&op_svg_file_name, rgb_value_key.clone(), legend_x , legend_y );
 
         // add the legend group to the document
         document = document.add(legend_group);
+
+        let laser_rect_x :f32 = 0.0;
+        let laser_rect_y :f32 = legend_y + 48.0 + 5.0 ; 
+        let laser_rect_width :f32 = 12.0 * SVG_PPI ; // arbitrary 12"x12" piece for packing
+        let laser_rect_height :f32 = 12.0 * SVG_PPI; // arbitrary 12"x12" piece for packing
+
+        // create a deep_nest rect to represent laser material to be cut
+         // Create the legend box (rectangle)
+        let laser_material_rect = Rectangle::new()
+        .set("x", laser_rect_x )
+        .set("y", laser_rect_y )  // hard code to test
+        .set("width", laser_rect_width) // Assuming 1 inch = 90 units
+        .set("height", laser_rect_height)
+        .set("fill", "none")
+        .set("stroke", "black")
+        .set("stroke-width", 1.0);
+
+        // add the laser material rectangle to the document
+        document = document.add(laser_material_rect);
 
         println!("Writing to laser paths output file {}", &op_svg_file_name);
         svg::save(&op_svg_file_name, &document).expect("Error saving SVG file");
@@ -861,29 +911,38 @@ fn create_laser_svg_doc(path_data_hashmap: &HashMap<String, Vec<Data>>, svg_widt
 
 }
 
-fn get_svg_legend(op_svg_file_name: &str, rgb_value_key: String) -> svg::node::element::Group {
+fn get_svg_legend(op_svg_file_name: &str, rgb_value_key: String, x_loc :f32, y_loc:f32) -> svg::node::element::Group {
     
     let mut legend_group = svg::node::element::Group::new().set("id", "legend");
     
+    let legend_file_name_str = op_svg_file_name.rsplit('/').next().unwrap_or(op_svg_file_name);
+
     // Create the legend box (rectangle)
     let legend_box = Rectangle::new()
-        .set("x", 0)
-        .set("y", 0)
+        .set("x", x_loc)
+        .set("y", y_loc)
         .set("width", "96") // Assuming 1 inch = 90 units
         .set("height", "48")
         .set("fill", "none")
         .set("stroke", "black");
 
     // Add the text inside the legend box
-    let legend_text = Text::new()
-        .set("x", 5) // Add some padding
-        .set("y", 20) // Adjust the y position to center the text
-        .set("font-size", 12)
+    let legend_text_file = Text::new()
+        .set("x", x_loc + 5.0) // Add some padding
+        .set("y", y_loc + 20.0) // Adjust the y position to center the text
+        .set("font-size", 10)
         .set("font-family", "Arial")
-        .add(svg::node::Text::new(op_svg_file_name))
+        .add(svg::node::Text::new(legend_file_name_str));
+    
+    // Add the text inside the legend box
+    let legend_text_rgb = Text::new()
+        .set("x", x_loc + 5.0) // Add some padding
+        .set("y", y_loc + 30.0) // Adjust the y position to center the text
+        .set("font-size", 10)
+        .set("font-family", "Arial")
         .add(svg::node::Text::new(rgb_value_key));
 
-    legend_group = legend_group.add(legend_box).add(legend_text);
+    legend_group = legend_group.add(legend_box).add(legend_text_file).add(legend_text_rgb);
 
     legend_group
 }
