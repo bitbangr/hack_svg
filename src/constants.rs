@@ -65,7 +65,8 @@ pub const RGB_RAW_TITA: RGB = RGB(199, 174, 145);
 pub const RGB_IRID_GOLD: RGB = RGB(209, 147, 70);
 pub const RGB_PERL_WHITE: RGB = RGB(220, 214, 210);
 
-// SVG scale factors for creating tile sizes of 1/2" or 12.7mm based on 96 DPI Points to Inches conversion
+// SVG scale factors for creating tile sizes of 1/2" or 12.7mm based on 96 PPI Points to Inches conversion
+pub const SVG_PPI :f32 = 96.0;       
 pub const SVG_SCALE_X :f32 = 0.48; 
 pub const SVG_SCALE_Y :f32 = 0.48; 
 pub const SVG_STROKE_WIDTH :f32 = 0.0;
