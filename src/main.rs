@@ -45,7 +45,8 @@ fn main() {
     // Below are the basic tests.
     // Run these everytime major changes are made to the code base
 
-    let _ = one_44_tile::svg_frank_mar22(); // 40x40 Mosaic
+    // let _ = one_44_tile::svg_frank_mar22(); // 40x40 Mosaic
+    let _ = one_44_tile::svg_frank_monet_mar25(); // 40x40 Mosaic using monet color palette
 
     // let _ = svg_binpack_util::test_bin_pack();
     // let _ = one_44_tile::svg_frank_two(); // 40x40 Mosaic
@@ -87,7 +88,7 @@ fn main() {
 
     // let _ = nine_tile_square::svg_1(); // create_3x3_rgb_checker_tile_data
     // let _ = nine_tile_square::svg_2(); // create_black_center_cross_tile_data
-    let _ = nine_tile_square::svg_3(); // 
+    // let _ = nine_tile_square::svg_3(); // 
     
     // // Going to be a long test so leave this for later 
     // let _ = nine_tile_square::svg_4(); // Center Black Tile surounded by red tiles
