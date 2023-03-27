@@ -918,31 +918,32 @@ fn get_svg_legend(op_svg_file_name: &str, rgb_value_key: String, x_loc :f32, y_l
     let legend_file_name_str = op_svg_file_name.rsplit('/').next().unwrap_or(op_svg_file_name);
 
     // Create the legend box (rectangle)
-    let legend_box = Rectangle::new()
-        .set("x", x_loc)
-        .set("y", y_loc)
-        .set("width", "96") // Assuming 1 inch = 90 units
-        .set("height", "48")
-        .set("fill", "none")
-        .set("stroke", "black");
+    // let legend_box = Rectangle::new()
+    //     .set("x", x_loc)
+    //     .set("y", y_loc)
+    //     .set("width", "96") // Assuming 1 inch = 90 units
+    //     .set("height", "48")
+    //     .set("fill", "none")
+    //     .set("stroke", "black");
 
     // Add the text inside the legend box
     let legend_text_file = Text::new()
         .set("x", x_loc + 5.0) // Add some padding
         .set("y", y_loc + 20.0) // Adjust the y position to center the text
-        .set("font-size", 10)
+        .set("font-size", 14)
         .set("font-family", "Arial")
         .add(svg::node::Text::new(legend_file_name_str));
     
     // Add the text inside the legend box
     let legend_text_rgb = Text::new()
         .set("x", x_loc + 5.0) // Add some padding
-        .set("y", y_loc + 30.0) // Adjust the y position to center the text
-        .set("font-size", 10)
+        .set("y", y_loc + 40.0) // Adjust the y position to center the text
+        .set("font-size", 14)
         .set("font-family", "Arial")
         .add(svg::node::Text::new(rgb_value_key));
 
-    legend_group = legend_group.add(legend_box).add(legend_text_file).add(legend_text_rgb);
+    // legend_group = legend_group.add(legend_box).add(legend_text_file).add(legend_text_rgb);
+    legend_group = legend_group.add(legend_text_file).add(legend_text_rgb);
 
     legend_group
 }
