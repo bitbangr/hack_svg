@@ -45,8 +45,14 @@ fn main() {
     // Below are the basic tests.
     // Run these everytime major changes are made to the code base
 
+
+    // let _ = mary_blaze::svg_mary_blaze_crayola_ver7(); // 60x60 Mosaic
+    let _ = mary_blaze::svg_mary_blaze_crayola_ver7_small_tiles(); // 60x60 small tiles 
     // let _ = one_44_tile::svg_frank_mar22(); // 40x40 Mosaic
-    let _ = one_44_tile::svg_frank_monet_mar25(); // 40x40 Mosaic using monet color palette
+    // let _ = one_44_tile::svg_frank_monet_mar25(); // 40x40 Mosaic using monet color palette
+
+    // let _ = one_44_tile::svg_frank_monet_ver6(); // 40x40 Mosaic using monet color palette - cleaned up background
+    // let _ = one_44_tile::svg_frank_monet_ver7(); // 40x40 Colour Palette fixed. Missing purple added. duplicate yellow removed
 
     // let _ = svg_binpack_util::test_bin_pack();
     // let _ = one_44_tile::svg_frank_two(); // 40x40 Mosaic
@@ -120,8 +126,72 @@ fn main() {
     // // some functions to test refactored code - now execute same as above really
     // let _ = four_tile_square::svg_98();   // 2x2 1st col (white, green), 2nd col (black, black)
     // let _ = four_tile_square::svg_99();   // 2x2 1st col top right green, rest black
-    
-} // main
+
+    // let hex = rgb_to_hex(102, 51, 153);
+ 
+    let colors = [
+        (153, 154, 150),
+        (43, 45, 49),
+        (83, 71, 67),
+        (181, 194, 209),
+        (93, 85, 75),
+        (198, 212, 230),
+        (225, 230, 235),
+        (113, 103, 96),
+        (91, 92, 90),
+        (68, 84, 103),
+    ];
+
+    let mut rgb_hex_values: Vec<RgbHex> = Vec::new();
+
+    for (r, g, b) in &colors {
+        let hex = rgb_to_hex(*r, *g, *b);
+        let rgb_hex = RgbHex {
+            r: *r,
+            g: *g,
+            b: *b,
+            hex,
+        };
+        rgb_hex_values.push(rgb_hex);
+    }
+
+    for rgb_hex in &rgb_hex_values {
+        println!("RGB: ({}, {}, {}), HEX: {}", rgb_hex.r, rgb_hex.g, rgb_hex.b, rgb_hex.hex);
+    }
+
+    // let hex.0 = rgb_to_hex(153,154,150);
+    // let hex.1 = rgb_to_hex(43,45,49);
+    // let hex.2 = rgb_to_hex(83,71,67);
+    // let hex.3 = rgb_to_hex(181,194,209);
+    // let hex.4 = rgb_to_hex(93,85,75);
+    // let hex.5 = rgb_to_hex(198,212,230);
+    // let hex.6 = rgb_to_hex(225,230,235);
+    // let hex.7 = rgb_to_hex(113,103,96);
+    // let hex.8 = rgb_to_hex(91,92,90);
+    // let hex.9 = rgb_to_hex(68,84,103]}
+//     println!("{}", hex); // #663399
+
+
+} // mainfn 
+
+struct RgbHex {
+    r: u8,
+    g: u8,
+    b: u8,
+    hex: String,
+}
+
+fn rgb_to_hex(r: u8, g: u8, b: u8) -> String {
+    let channels = [r, g, b];
+    let mut hex_string = String::from("#");
+
+    for channel in &channels {
+        let hex = format!("{:02x}", channel);
+        hex_string.push_str(&hex);
+    }
+
+    hex_string
+}
 
 /// Initialize an Array2D size row_dim by col_dim of a vector of [false,false,false,false]
 /// each boolean represents the [Top, Right, Bottom, Left] edges of a tile.  If the tile

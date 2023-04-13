@@ -113,6 +113,84 @@ pub fn svg_frank() {
     );
 } // svg_frank
 
+pub fn svg_frank_monet_ver6() {
+    let op_svg_file_name = "./svg_output/_frank_mosaic/monet_green_bkgnd/frank_monet_ver6.svg";
+    let rows: usize = 40;
+    let cols: usize = 40;
+    let tiles_per_pane_height: usize = 40;
+    let tiles_per_pane_width: usize = 40;
+    let svg_width = 4000;
+    let svg_height = 4000 ;
+
+    let rgb_vec_result = read_config("./rgb_json/FrankFolkFest_GreenBkgnd_Ver6.json");
+    let rgb_vec = match rgb_vec_result {
+        Ok(rgb_vec) => rgb_vec,
+        Err(e) => {
+            println!("Error reading config: {:?}", e);
+            panic!();
+        }
+    };
+    
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    // println!("svg1 data_results = {:?}", data_results);
+
+    let _ = create_svg(
+        op_svg_file_name,
+        svg_width,
+        svg_height,
+        rows,
+        cols,
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        data_results,
+    );
+} // svg_frank_monet_ver6
+
+
+pub fn svg_frank_monet_ver7() {
+    let op_svg_file_name = "./svg_output/_frank_mosaic/monet_ver7/frank_monet_ver7.svg";
+    let rows: usize = 40;
+    let cols: usize = 40;
+    let tiles_per_pane_height: usize = 40;
+    let tiles_per_pane_width: usize = 40;
+    let svg_width = 4000;
+    let svg_height = 4000 ;
+
+    let rgb_vec_result = read_config("./rgb_json/FrankFolkFest_mar30_Ver7.json");
+    let rgb_vec = match rgb_vec_result {
+        Ok(rgb_vec) => rgb_vec,
+        Err(e) => {
+            println!("Error reading config: {:?}", e);
+            panic!();
+        }
+    };
+    
+    let rgb_arr = rgb_vec_to_array(rgb_vec);
+
+    let col_width: i32 = 100;
+    let row_height: i32 = 100;
+    let data_results = create_pane_test_data(rgb_arr, row_height, col_width);
+
+    // println!("svg1 data_results = {:?}", data_results);
+
+    let _ = create_svg(
+        op_svg_file_name,
+        svg_width,
+        svg_height,
+        rows,
+        cols,
+        tiles_per_pane_height,
+        tiles_per_pane_width,
+        data_results,
+    );
+} // svg_frank_monet_ver7
+
+
 pub fn svg_frank_monet_mar25() {
     let op_svg_file_name = "./svg_output/_frank_mosaic/monet/franky_monet_mar25.svg";
     let rows: usize = 40;

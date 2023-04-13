@@ -7,3 +7,4 @@ pub mod six_tile_rect;
 pub mod twenty5_tile_square;
 pub mod two_op_line_tiles;
 pub mod two_tile_horiz; 
+pub mod mary_blaze;
